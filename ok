@@ -1,0 +1,118 @@
+<button onclick="startVoiceAndCopy()">🎤 تحدث وسيتم نسخ النص</button>
+
+<div id="output" style="border:1px solid #ccc; padding:10px; margin-top:10px; min-height:50px; white-space: pre-wrap;"></div>
+
+<script>
+  function wordsToNumbersInText(text) {
+    const numberWords = {
+      "صفر": 0, "واحد": 1, "واحدة": 1, "اثنان": 2, "اثنين": 2, "اثنتان": 2, "اثنتين": 2,
+      "ثلاثة": 3, "أربعة": 4, "اربعة":4, "خمسة": 5, "ستة": 6, "سبعة": 7, "ثمانية": 8, "تسعة": 9,
+      "عشرة": 10, "أحد عشر": 11, "اثنا عشر": 12, "ثلاثة عشر": 13, "أربعة عشر": 14, "خمسة عشر": 15,
+      "ستة عشر": 16, "سبعة عشر": 17, "ثمانية عشر": 18, "تسعة عشر": 19,
+      "عشرون": 20, "ثلاثون": 30, "أربعون": 40, "خمسون": 50, "ستون": 60,
+      "سبعون": 70, "ثمانون": 80, "تسعون": 90,
+      "مائة": 100, "مئة": 100, "مئتان": 200, "ثلاثمائة": 300, "أربعمائة": 400,
+      "خمسمائة": 500, "ستمائة": 600, "سبعمائة": 700, "ثمانمائة": 800, "تسعمائة": 900,
+      "ألف": 1000, "الف": 1000, "ألفان": 2000, "آلاف": 3000
+    };
+
+    const multipliers = {
+      "مائة": 100,
+      "مئة": 100,
+      "ألف": 1000,
+      "الف": 1000
+    };
+
+    text = text.replace(/،/g, " ");
+    text = text.replace(/ و /g, " ");
+
+    const words = text.trim().split(/\s+/);
+
+    let resultWords = [];
+    let numberBuffer = [];
+
+    function processNumberBuffer(buffer) {
+      let total = 0;
+      let current = 0;
+
+      buffer.forEach(word => {
+        word = word.toLowerCase();
+        if (numberWords[word] !== undefined) {
+          current += numberWords[word];
+        } else if (multipliers[word] !== undefined) {
+          if (current === 0) current = 1;
+          current *= multipliers[word];
+          total += current;
+          current = 0;
+        }
+      });
+      total += current;
+      return total;
+    }
+
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i].toLowerCase();
+
+      if (numberWords[word] !== undefined || multipliers[word] !== undefined) {
+        numberBuffer.push(word);
+      } else {
+        if (numberBuffer.length > 0) {
+          const num = processNumberBuffer(numberBuffer);
+          resultWords.push(num.toString());
+          numberBuffer = [];
+        }
+        resultWords.push(words[i]);
+      }
+    }
+    if (numberBuffer.length > 0) {
+      const num = processNumberBuffer(numberBuffer);
+      resultWords.push(num.toString());
+    }
+
+    return resultWords.join(" ");
+  }
+
+  function startVoiceAndCopy() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("المتصفح لا يدعم تحويل الصوت إلى نص");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ar-SA';
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    let finalTranscript = "";
+
+    recognition.onresult = function(event) {
+      let interimTranscript = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript + " ";
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+      document.getElementById("output").innerText = finalTranscript + interimTranscript;
+    };
+
+    recognition.onerror = function(event) {
+      alert("❌ خطأ أثناء التعرف: " + event.error);
+    };
+
+    recognition.onend = function() {
+      if (finalTranscript.trim().length === 0) {
+        alert("لم يتم التعرف على أي كلام.");
+        return;
+      }
+      const processedText = wordsToNumbersInText(finalTranscript.trim());
+      navigator.clipboard.writeText(processedText).then(() => {
+        alert("✅ تم نسخ النص:\n" + processedText + "\nاذهب لأي حقل واضغط Ctrl + V للصق");
+      });
+    };
+
+    recognition.start();
+  }
+</script>
