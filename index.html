@@ -77,21 +77,17 @@
       display: none;
     }
 
-    /* عداد الأعضاء */
+    /* عداد الأعضاء داخل الصندوق */
     #userCount {
-      position: fixed;
-      top: 8px;
-      left: 12px;
       font-size: 13px;
       color: #0f0;
       opacity: 0.8;
+      text-align: left;
+      margin-bottom: 10px;
     }
 
-    /* زر تسجيل الخروج */
+    /* زر تسجيل الخروج داخل الصندوق */
     #logoutBtn {
-      position: fixed;
-      top: 8px;
-      right: 12px;
       font-size: 13px;
       padding: 4px 8px;
       border-radius: 6px;
@@ -100,13 +96,14 @@
       color: white;
       cursor: pointer;
       opacity: 0.8;
+      margin-bottom: 15px;
     }
   </style>
 </head>
 <body>
   <!-- شاشة تسجيل الدخول -->
   <div class="login-container" id="login">
-    <h2>!! تسجيل الدخول</h2>
+    <h2>🔒 تسجيل الدخول</h2>
     <input type="text" id="username" placeholder="اسم المستخدم">
     <input type="password" id="password" placeholder="كلمة المرور">
     <label>
@@ -118,11 +115,12 @@
 
   <!-- هنا يبدأ تطبيقك الأصلي -->
   <div id="app">
-    <div id="userCount">👥 عدد الأعضاء المتصلين: 0</div>
-    <button id="logoutBtn" onclick="logout()">تسجيل خروج</button>
-
     <div class="container">
-      <h1>[ Convert Audio To Text In Iraqi ]</h1>
+      <!-- عداد الأعضاء وزر تسجيل الخروج داخل الصندوق -->
+      <div id="userCount">👥 عدد الأعضاء: 0</div>
+      <button id="logoutBtn" onclick="logout()">تسجيل خروج</button>
+
+      <h1>[ Convert Audio To Text In Iraq ]</h1>
       <button id="startBtn" onclick="startRecognition()">[▶︎] بدء التسجيل</button>
       <button id="stopBtn" onclick="stopRecognition()">[X] إيقاف التسجيل</button>
 
