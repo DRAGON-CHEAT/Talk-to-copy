@@ -4,34 +4,39 @@
   <meta charset="UTF-8">
   <title>تحويل الصوت إلى نص</title>
   <style>
+    /* خلفية الصفحة */
     body {
+      margin: 0;
+      padding: 0;
+      background-color: #000; /* أسود */
+      color: #fff;
       font-family: Tahoma, sans-serif;
-      background: #f4f4f4;
-      padding: 30px;
-      direction: rtl;
-      color: #333;
-      text-align: right;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
+    /* صندوق المحتوى */
     .container {
+      background-color: #111;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      text-align: center;
+      width: 90%;
       max-width: 600px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
 
     h1 {
-      font-size: 24px;
       margin-bottom: 20px;
-      color: #222;
+      font-size: 24px;
     }
 
     button {
       padding: 12px 24px;
       font-size: 18px;
-      margin: 10px 5px 0 0;
+      margin: 10px 5px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
@@ -50,12 +55,12 @@
     }
 
     button:hover {
-      opacity: 0.9;
+      opacity: 0.85;
     }
 
     #recordingIndicator {
       display: none;
-      color: red;
+      color: #ff5252;
       font-weight: bold;
       margin-top: 10px;
     }
@@ -76,14 +81,15 @@
     }
 
     #output {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
+      background: #222;
+      border: 1px solid #444;
       padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
       font-size: 18px;
       min-height: 80px;
       white-space: pre-wrap;
+      color: #ddd;
     }
 
     textarea {
@@ -92,14 +98,16 @@
       padding: 12px;
       font-size: 16px;
       border-radius: 6px;
-      border: 1px solid #ccc;
+      border: 1px solid #555;
+      background-color: #1a1a1a;
+      color: #fff;
       resize: vertical;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎙️ تحويل الصوت إلى نص (Chrome فقط)</h1>
+    <h1>🎙️ تحويل الصوت إلى نص (كروم فقط)</h1>
     <button id="startBtn" onclick="startRecognition()">🎤 بدء التسجيل</button>
     <button id="stopBtn" onclick="stopRecognition()">⏹️ إيقاف التسجيل</button>
 
@@ -108,6 +116,7 @@
     </div>
 
     <div id="output"></div>
+
     <textarea id="textField" rows="4" placeholder="الصق النص هنا إذا أردت (Ctrl + V)"></textarea>
   </div>
 
@@ -115,50 +124,103 @@
     let recognition;
     let finalTranscript = "";
 
-    // رقم إلى نص بالعربي
     function wordsToNumbersInText(text) {
-      const numberWords = {
-        "صفر": 0, "واحد": 1, "واحدة": 1, "اثنان": 2, "اثنين": 2,
-        "ثلاثة": 3, "أربعة": 4, "اربعة": 4, "خمسة": 5,
-        "ستة": 6, "سبعة": 7, "ثمانية": 8, "تسعة": 9,
-        "عشرة": 10, "عشرون": 20, "ثلاثون": 30, "أربعون": 40,
-        "خمسون": 50, "ستون": 60, "سبعون": 70, "ثمانون": 80, "تسعون": 90,
-        "مائة": 100, "مئة": 100, "ألف": 1000
+      const units = {
+        "صفر": 0, "واحد": 1, "واحدة": 1, "احد": 1, "احدى": 1,
+        "اثنان": 2, "اثنين": 2, "اثنتان": 2, "اثنتين": 2, "ثنين": 2,
+        "ثلاثة": 3, "ثلاث": 3,
+        "أربعة": 4, "اربعة": 4, "اربع": 4,
+        "خمسة": 5, "خمس": 5,
+        "ستة": 6, "ست": 6,
+        "سبعة": 7, "سبع": 7,
+        "ثمانية": 8, "ثمان": 8,
+        "تسعة": 9, "تسع": 9
+      };
+
+      const teens = {
+        "عشرة": 10, "عشر": 10,
+        "أحد عشر": 11, "احد عشر": 11, "احدى عشر": 11,
+        "اثنا عشر": 12, "اثني عشر": 12,
+        "ثلاثة عشر": 13, "أربعة عشر": 14, "خمسة عشر": 15,
+        "ستة عشر": 16, "سبعة عشر": 17, "ثمانية عشر": 18, "تسعة عشر": 19
+      };
+
+      const tens = {
+        "عشرون": 20, "عشرين": 20,
+        "ثلاثون": 30, "ثلاثين": 30,
+        "أربعون": 40, "اربعين": 40,
+        "خمسون": 50, "خمسين": 50,
+        "ستون": 60, "ستين": 60,
+        "سبعون": 70, "سبعين": 70,
+        "ثمانون": 80, "ثمانين": 80,
+        "تسعون": 90, "تسعين": 90
+      };
+
+      const hundreds = {
+        "مائة": 100, "مئة": 100, "مية": 100,
+        "مئتين": 200, "ميتين": 200,
+        "ثلاثمائة": 300, "ثلاثمية": 300,
+        "أربعمائة": 400, "اربعماية": 400,
+        "خمسمائة": 500, "خمسماية": 500,
+        "ستمائة": 600, "ستمية": 600,
+        "سبعمائة": 700, "سبعمية": 700,
+        "ثمانمائة": 800, "ثمانمية": 800,
+        "تسعمائة": 900, "تسعمية": 900
       };
 
       const multipliers = {
-        "مائة": 100,
-        "مئة": 100,
-        "ألف": 1000
+        "ألف": 1000, "الف": 1000, "ألفين": 2000, "الفين": 2000,
+        "آلاف": 1000,
+        "مليون": 1000000, "ملايين": 1000000
       };
 
-      const words = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
+      const allWords = Object.assign({}, units, teens, tens, hundreds, multipliers);
+
+      const tokens = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
       let resultWords = [];
       let numberBuffer = [];
 
-      function processNumberBuffer(buffer) {
-        let total = 0, current = 0;
-        buffer.forEach(word => {
-          if (numberWords[word]) {
-            current += numberWords[word];
-          } else if (multipliers[word]) {
+      function processBuffer(buffer) {
+        let total = 0;
+        let current = 0;
+
+        buffer.forEach((word, i) => {
+          if (teens[word] !== undefined) {
+            current += teens[word];
+          } else if (units[word] !== undefined) {
+            current += units[word];
+          } else if (tens[word] !== undefined) {
+            current += tens[word];
+          } else if (hundreds[word] !== undefined) {
+            current += hundreds[word];
+          } else if (multipliers[word] !== undefined) {
             if (current === 0) current = 1;
             current *= multipliers[word];
             total += current;
             current = 0;
           }
         });
+
         total += current;
         return total;
       }
 
-      for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-        if (numberWords[word] || multipliers[word]) {
+      for (let i = 0; i < tokens.length; i++) {
+        const word = tokens[i];
+        const fullTwoWords = tokens[i] + " " + (tokens[i + 1] || "");
+
+        if (teens[fullTwoWords]) {
+          numberBuffer.push(fullTwoWords);
+          i++; // تخطي الكلمة التالية
+          continue;
+        }
+
+        if (allWords[word]) {
           numberBuffer.push(word);
         } else {
           if (numberBuffer.length > 0) {
-            resultWords.push(processNumberBuffer(numberBuffer));
+            const num = processBuffer(numberBuffer);
+            resultWords.push(num.toString());
             numberBuffer = [];
           }
           resultWords.push(word);
@@ -166,7 +228,8 @@
       }
 
       if (numberBuffer.length > 0) {
-        resultWords.push(processNumberBuffer(numberBuffer));
+        const num = processBuffer(numberBuffer);
+        resultWords.push(num.toString());
       }
 
       return resultWords.join(" ");
@@ -180,44 +243,32 @@
       }
 
       recognition = new SpeechRecognition();
-      recognition.lang = 'ar-SA';
-      recognition.interimResults = true;
-      recognition.maxAlternatives = 1;
+      recognition.lang = 'ar-IQ'; // دعم لهجة العراق
+      recognition.interimResults = false;
 
-      finalTranscript = "";
-
-      recognition.onstart = () => {
-        document.getElementById("stopBtn").style.display = "inline-block";
+      recognition.onstart = function () {
         document.getElementById("recordingIndicator").style.display = "block";
+        document.getElementById("startBtn").style.display = "none";
+        document.getElementById("stopBtn").style.display = "inline-block";
       };
 
-      recognition.onresult = event => {
-        let interim = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript + " ";
-          } else {
-            interim += event.results[i][0].transcript;
-          }
-        }
-        document.getElementById("output").innerText = finalTranscript + interim;
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        const converted = wordsToNumbersInText(transcript);
+        document.getElementById("output").innerText = converted;
+
+        // نسخ إلى الحافظة تلقائيًا
+        navigator.clipboard.writeText(converted);
       };
 
-      recognition.onerror = event => {
-        alert("❌ خطأ: " + event.error);
-        stopRecognition();
+      recognition.onerror = function (event) {
+        alert("حدث خطأ: " + event.error);
       };
 
-      recognition.onend = () => {
-        document.getElementById("stopBtn").style.display = "none";
+      recognition.onend = function () {
         document.getElementById("recordingIndicator").style.display = "none";
-
-        if (finalTranscript.trim().length > 0) {
-          const processed = wordsToNumbersInText(finalTranscript.trim());
-          navigator.clipboard.writeText(processed);
-          document.getElementById("output").innerText = processed;
-          alert("✅ تم نسخ النص تلقائيًا! استخدم Ctrl + V للصق.");
-        }
+        document.getElementById("startBtn").style.display = "inline-block";
+        document.getElementById("stopBtn").style.display = "none";
       };
 
       recognition.start();
