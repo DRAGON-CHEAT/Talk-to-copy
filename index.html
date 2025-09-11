@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title> Convert audio </title>
+  <title>Convert audio</title>
   <style>
     /* خلفية الصفحة */
     body {
@@ -27,21 +27,7 @@
       text-align: center;
       width: 90%;
       max-width: 600px;
-      transition: all 0.3s ease; /* لجعل التحجيم سلس */
-    }
-
-    /* توهج أنعم مع تدرج ألوان */
-    @keyframes rgbGlow {
-      0%   { box-shadow: 0 0 40px 15px rgba(255,0,0,0.25); }
-      20%  { box-shadow: 0 0 40px 15px rgba(255,165,0,0.25); }
-      40%  { box-shadow: 0 0 40px 15px rgba(0,255,0,0.25); }
-      60%  { box-shadow: 0 0 40px 15px rgba(0,255,255,0.25); }
-      80%  { box-shadow: 0 0 40px 15px rgba(0,0,255,0.25); }
-      100% { box-shadow: 0 0 40px 15px rgba(255,0,255,0.25); }
-    }
-
-    .container.recording {
-      animation: rgbGlow 10s infinite linear;
+      transition: all 0.3s ease;
     }
 
     h1 {
@@ -57,7 +43,7 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.3s, font-size 0.3s ease, padding 0.3s ease;
     }
 
     #startBtn {
@@ -129,26 +115,37 @@
       font-size: 14px;
       color: #b17215;
       text-align: center;
-      transition: font-size 0.3s ease;
     }
 
-    /* وسائط استعلام للشاشات الأصغر */
+    /* توهج ناعم عند التسجيل */
+    @keyframes rgbGlow {
+      0%   { box-shadow: 0 0 40px 15px rgba(255,0,0,0.25); }
+      20%  { box-shadow: 0 0 40px 15px rgba(255,165,0,0.25); }
+      40%  { box-shadow: 0 0 40px 15px rgba(0,255,0,0.25); }
+      60%  { box-shadow: 0 0 40px 15px rgba(0,255,255,0.25); }
+      80%  { box-shadow: 0 0 40px 15px rgba(0,0,255,0.25); }
+      100% { box-shadow: 0 0 40px 15px rgba(255,0,255,0.25); }
+    }
+
+    .container.recording {
+      animation: rgbGlow 10s infinite linear;
+    }
+
+    /* استجابة للشاشات الصغيرة */
     @media (max-width: 500px) {
       .container { padding: 20px; }
-      h1 { font-size: 20px; }
+      .container h1 { font-size: 20px; }
       button { font-size: 16px; padding: 10px 18px; }
       #output { font-size: 16px; padding: 12px; }
       textarea { font-size: 14px; padding: 10px; }
-      footer { font-size: 12px; }
     }
 
     @media (max-width: 350px) {
       .container { padding: 15px; }
-      h1 { font-size: 18px; }
+      .container h1 { font-size: 18px; }
       button { font-size: 14px; padding: 8px 16px; }
       #output { font-size: 14px; padding: 10px; }
       textarea { font-size: 13px; padding: 8px; }
-      footer { font-size: 11px; }
     }
   </style>
 </head>
@@ -235,7 +232,7 @@
         let total = 0;
         let current = 0;
 
-        buffer.forEach((word, i) => {
+        buffer.forEach(word => {
           if (teens[word] !== undefined) {
             current += teens[word];
           } else if (units[word] !== undefined) {
@@ -245,10 +242,14 @@
           } else if (hundreds[word] !== undefined) {
             current += hundreds[word];
           } else if (multipliers[word] !== undefined) {
-            if (current === 0) current = 1;
-            current *= multipliers[word];
-            total += current;
-            current = 0;
+            if (multipliers[word] === 1000 || multipliers[word] === 1000000) {
+              current = current === 0 ? 1 : current;
+              current *= multipliers[word];
+              total += current;
+              current = 0;
+            } else {
+              current *= multipliers[word];
+            }
           }
         });
 
@@ -262,7 +263,7 @@
 
         if (teens[fullTwoWords]) {
           numberBuffer.push(fullTwoWords);
-          i++; // تخطي الكلمة التالية
+          i++;
           continue;
         }
 
@@ -298,19 +299,16 @@
       recognition.interimResults = false;
 
       recognition.onstart = function () {
+        document.querySelector(".container").classList.add("recording");
         document.getElementById("recordingIndicator").style.display = "block";
         document.getElementById("startBtn").style.display = "none";
         document.getElementById("stopBtn").style.display = "inline-block";
-        // تفعيل التوهج
-        document.querySelector(".container").classList.add("recording");
       };
 
       recognition.onresult = function (event) {
         const transcript = event.results[0][0].transcript;
         const converted = wordsToNumbersInText(transcript);
         document.getElementById("output").innerText = converted;
-
-        // نسخ إلى الحافظة تلقائيًا
         navigator.clipboard.writeText(converted);
       };
 
@@ -319,11 +317,10 @@
       };
 
       recognition.onend = function () {
+        document.querySelector(".container").classList.remove("recording");
         document.getElementById("recordingIndicator").style.display = "none";
         document.getElementById("startBtn").style.display = "inline-block";
         document.getElementById("stopBtn").style.display = "none";
-        // إيقاف التوهج
-        document.querySelector(".container").classList.remove("recording");
       };
 
       recognition.start();
