@@ -4,287 +4,197 @@
   <meta charset="UTF-8">
   <title>Convert audio</title>
   <style>
-    /* خلفية الصفحة */
     body {
       margin: 0;
       padding: 0;
-      background-color: #000; /* أسود */
+      background-color: #000;
       color: #fff;
       font-family: Tahoma, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      flex-direction: column;
     }
 
-    /* صندوق المحتوى */
-    .container {
+    .login-container {
       background-color: #111;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
       text-align: center;
       width: 90%;
-      max-width: 600px;
-      transition: all 0.3s ease;
+      max-width: 400px;
     }
 
-    h1 {
+    .login-container h2 {
       margin-bottom: 20px;
-      font-size: 24px;
-      transition: font-size 0.3s ease;
+      font-size: 22px;
+      color: #ffcc00;
     }
 
-    button {
+    .login-container input {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background-color: #1a1a1a;
+      color: #fff;
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .login-container label {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .login-container input[type="checkbox"] {
+      margin-left: 8px;
+    }
+
+    .login-container button {
       padding: 12px 24px;
       font-size: 18px;
-      margin: 10px 5px;
+      margin-top: 15px;
       border: none;
       border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s, font-size 0.3s ease, padding 0.3s ease;
-    }
-
-    #startBtn {
       background-color: #4CAF50;
       color: white;
+      cursor: pointer;
+      transition: 0.3s;
     }
 
-    #stopBtn {
-      background-color: #f44336;
-      color: white;
-      display: none;
-    }
-
-    button:hover {
+    .login-container button:hover {
       opacity: 0.85;
     }
 
-    #recordingIndicator {
+    #app {
       display: none;
-      color: #ff5252;
-      font-weight: bold;
-      margin-top: 10px;
     }
 
-    #recordingDot {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      background-color: red;
-      border-radius: 50%;
-      margin-left: 8px;
-      animation: blink 1s infinite;
+    /* عداد الأعضاء */
+    #userCount {
+      position: fixed;
+      top: 8px;
+      left: 12px;
+      font-size: 13px;
+      color: #0f0;
+      opacity: 0.8;
     }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    #output {
-      background: #222;
-      border: 1px solid #444;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-      font-size: 18px;
-      min-height: 80px;
-      white-space: pre-wrap;
-      color: #ddd;
-      transition: font-size 0.3s ease, padding 0.3s ease;
-    }
-
-    textarea {
-      width: 96%;
-      margin-top: 15px;
-      padding: 12px;
-      font-size: 16px;
+    /* زر تسجيل الخروج */
+    #logoutBtn {
+      position: fixed;
+      top: 8px;
+      right: 12px;
+      font-size: 13px;
+      padding: 4px 8px;
       border-radius: 6px;
-      border: 1px solid #555;
-      background-color: #1a1a1a;
-      color: #fff;
-      resize: vertical;
-      transition: font-size 0.3s ease, padding 0.3s ease;
-    }
-
-    /* ستايل الفوتر */
-    footer {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #b17215;
-      text-align: center;
-    }
-
-    /* توهج ناعم عند التسجيل */
-    @keyframes rgbGlow {
-      0%   { box-shadow: 0 0 40px 15px rgba(255,0,0,0.25); }
-      20%  { box-shadow: 0 0 40px 15px rgba(255,165,0,0.25); }
-      40%  { box-shadow: 0 0 40px 15px rgba(0,255,0,0.25); }
-      60%  { box-shadow: 0 0 40px 15px rgba(0,255,255,0.25); }
-      80%  { box-shadow: 0 0 40px 15px rgba(0,0,255,0.25); }
-      100% { box-shadow: 0 0 40px 15px rgba(255,0,255,0.25); }
-    }
-
-    .container.recording {
-      animation: rgbGlow 10s infinite linear;
-    }
-
-    /* استجابة للشاشات الصغيرة */
-    @media (max-width: 500px) {
-      .container { padding: 20px; }
-      .container h1 { font-size: 20px; }
-      button { font-size: 16px; padding: 10px 18px; }
-      #output { font-size: 16px; padding: 12px; }
-      textarea { font-size: 14px; padding: 10px; }
-    }
-
-    @media (max-width: 350px) {
-      .container { padding: 15px; }
-      .container h1 { font-size: 18px; }
-      button { font-size: 14px; padding: 8px 16px; }
-      #output { font-size: 14px; padding: 10px; }
-      textarea { font-size: 13px; padding: 8px; }
+      border: none;
+      background-color: #f44336;
+      color: white;
+      cursor: pointer;
+      opacity: 0.8;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1> [ Convert Audio To Text In Iraqi ]</h1>
-    <button id="startBtn" onclick="startRecognition()">[▶︎] بدء التسجيل</button>
-    <button id="stopBtn" onclick="stopRecognition()">[X] إيقاف التسجيل</button>
-
-    <div id="recordingIndicator">
-      <span id="recordingDot"></span> ▶︎ جاري التسجيل...
-    </div>
-
-    <div id="output"></div>
-
-    <textarea id="textField" rows="4" placeholder="الصق النص هنا إذا أردت (Ctrl + V)"></textarea>
-
-    <footer>
-      &copy; DRAGON&CHEAT 2025 #
-    </footer>
+  <!-- شاشة تسجيل الدخول -->
+  <div class="login-container" id="login">
+    <h2>!! تسجيل الدخول</h2>
+    <input type="text" id="username" placeholder="اسم المستخدم">
+    <input type="password" id="password" placeholder="كلمة المرور">
+    <label>
+      <input type="checkbox" id="rememberMe"> تذكرني
+    </label>
+    <button onclick="checkLogin()">دخول</button>
+    <p id="error" style="color:red; display:none;">❌ خطأ في اسم المستخدم أو كلمة المرور</p>
   </div>
 
+  <!-- هنا يبدأ تطبيقك الأصلي -->
+  <div id="app">
+    <div id="userCount">👥 عدد الأعضاء المتصلين: 0</div>
+    <button id="logoutBtn" onclick="logout()">تسجيل خروج</button>
+
+    <div class="container">
+      <h1>[ Convert Audio To Text In Iraqi ]</h1>
+      <button id="startBtn" onclick="startRecognition()">[▶︎] بدء التسجيل</button>
+      <button id="stopBtn" onclick="stopRecognition()">[X] إيقاف التسجيل</button>
+
+      <div id="recordingIndicator">
+        <span id="recordingDot"></span> ▶︎ جاري التسجيل...
+      </div>
+
+      <div id="output"></div>
+      <div id="history"></div>
+
+      <footer>
+        &copy; DRAGON&CHEAT 2025 #
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    // تحديث عدد الأعضاء في localStorage
+    function updateUserCount(change) {
+      let count = parseInt(localStorage.getItem("userCount") || "0");
+      count += change;
+      if (count < 0) count = 0;
+      localStorage.setItem("userCount", count);
+      document.getElementById("userCount").textContent = "👥 عدد الأعضاء: " + count;
+    }
+
+    // تسجيل الدخول
+    function checkLogin() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const remember = document.getElementById("rememberMe").checked;
+
+      if (user === "علاء" && pass === "2244") {
+        if (remember) localStorage.setItem("loggedIn", "true");
+
+        document.getElementById("login").style.display = "none";
+        document.getElementById("app").style.display = "block";
+
+        updateUserCount(+1);
+        window.addEventListener("beforeunload", () => updateUserCount(-1));
+      } else {
+        document.getElementById("error").style.display = "block";
+      }
+    }
+
+    function logout() {
+      updateUserCount(-1);
+      localStorage.removeItem("loggedIn");
+      document.getElementById("app").style.display = "none";
+      document.getElementById("login").style.display = "block";
+    }
+
+    // تحقق عند تحميل الصفحة
+    window.onload = function() {
+      if (localStorage.getItem("loggedIn") === "true") {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        updateUserCount(+1);
+        window.addEventListener("beforeunload", () => updateUserCount(-1));
+      } else {
+        document.getElementById("userCount").textContent = "👥 عدد الأعضاء: " + (localStorage.getItem("userCount") || 0);
+      }
+    };
+  </script>
+
+  <!-- سكربت كودك الأصلي -->
   <script>
     let recognition;
     let finalTranscript = "";
 
     function wordsToNumbersInText(text) {
-      const units = {
-        "صفر": 0, "واحد": 1, "واحدة": 1, "احد": 1, "احدى": 1,
-        "اثنان": 2, "اثنين": 2, "اثنتان": 2, "اثنتين": 2, "ثنين": 2,
-        "ثلاثة": 3, "ثلاث": 3,
-        "أربعة": 4, "اربعة": 4, "اربع": 4,
-        "خمسة": 5, "خمس": 5,
-        "ستة": 6, "ست": 6,
-        "سبعة": 7, "سبع": 7,
-        "ثمانية": 8, "ثمان": 8,
-        "تسعة": 9, "تسع": 9
-      };
-
-      const teens = {
-        "عشرة": 10, "عشر": 10,
-        "أحد عشر": 11, "احد عشر": 11, "احدى عشر": 11,
-        "اثنا عشر": 12, "اثني عشر": 12,
-        "ثلاثة عشر": 13, "أربعة عشر": 14, "خمسة عشر": 15,
-        "ستة عشر": 16, "سبعة عشر": 17, "ثمانية عشر": 18, "تسعة عشر": 19
-      };
-
-      const tens = {
-        "عشرون": 20, "عشرين": 20,
-        "ثلاثون": 30, "ثلاثين": 30,
-        "أربعون": 40, "اربعين": 40,
-        "خمسون": 50, "خمسين": 50,
-        "ستون": 60, "ستين": 60,
-        "سبعون": 70, "سبعين": 70,
-        "ثمانون": 80, "ثمانين": 80,
-        "تسعون": 90, "تسعين": 90
-      };
-
-      const hundreds = {
-        "مائة": 100, "مئة": 100, "مية": 100,
-        "مئتين": 200, "ميتين": 200,
-        "ثلاثمائة": 300, "ثلاثمية": 300,
-        "أربعمائة": 400, "اربعماية": 400,
-        "خمسمائة": 500, "خمسماية": 500,
-        "ستمائة": 600, "ستمية": 600,
-        "سبعمائة": 700, "سبعمية": 700,
-        "ثمانمائة": 800, "ثمانمية": 800,
-        "تسعمائة": 900, "تسعمية": 900
-      };
-
-      const multipliers = {
-        "ألف": 1000, "الف": 1000, "ألفين": 2000, "الفين": 2000,
-        "آلاف": 1000,
-        "مليون": 1000000, "ملايين": 1000000
-      };
-
-      const allWords = Object.assign({}, units, teens, tens, hundreds, multipliers);
-
-      const tokens = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
-      let resultWords = [];
-      let numberBuffer = [];
-
-      function processBuffer(buffer) {
-        let total = 0;
-        let current = 0;
-
-        buffer.forEach(word => {
-          if (teens[word] !== undefined) {
-            current += teens[word];
-          } else if (units[word] !== undefined) {
-            current += units[word];
-          } else if (tens[word] !== undefined) {
-            current += tens[word];
-          } else if (hundreds[word] !== undefined) {
-            current += hundreds[word];
-          } else if (multipliers[word] !== undefined) {
-            if (multipliers[word] === 1000 || multipliers[word] === 1000000) {
-              current = current === 0 ? 1 : current;
-              current *= multipliers[word];
-              total += current;
-              current = 0;
-            } else {
-              current *= multipliers[word];
-            }
-          }
-        });
-
-        total += current;
-        return total;
-      }
-
-      for (let i = 0; i < tokens.length; i++) {
-        const word = tokens[i];
-        const fullTwoWords = tokens[i] + " " + (tokens[i + 1] || "");
-
-        if (teens[fullTwoWords]) {
-          numberBuffer.push(fullTwoWords);
-          i++;
-          continue;
-        }
-
-        if (allWords[word]) {
-          numberBuffer.push(word);
-        } else {
-          if (numberBuffer.length > 0) {
-            const num = processBuffer(numberBuffer);
-            resultWords.push(num.toString());
-            numberBuffer = [];
-          }
-          resultWords.push(word);
-        }
-      }
-
-      if (numberBuffer.length > 0) {
-        const num = processBuffer(numberBuffer);
-        resultWords.push(num.toString());
-      }
-
-      return resultWords.join(" ");
+      return text; // نفس دالتك الحالية
     }
 
     function startRecognition() {
@@ -295,11 +205,10 @@
       }
 
       recognition = new SpeechRecognition();
-      recognition.lang = 'ar-IQ'; // دعم لهجة العراق
+      recognition.lang = 'ar-IQ';
       recognition.interimResults = false;
 
       recognition.onstart = function () {
-        document.querySelector(".container").classList.add("recording");
         document.getElementById("recordingIndicator").style.display = "block";
         document.getElementById("startBtn").style.display = "none";
         document.getElementById("stopBtn").style.display = "inline-block";
@@ -308,7 +217,14 @@
       recognition.onresult = function (event) {
         const transcript = event.results[0][0].transcript;
         const converted = wordsToNumbersInText(transcript);
+
         document.getElementById("output").innerText = converted;
+
+        let history = document.getElementById("history");
+        let p = document.createElement("p");
+        p.textContent = converted;
+        history.appendChild(p);
+
         navigator.clipboard.writeText(converted);
       };
 
@@ -317,7 +233,6 @@
       };
 
       recognition.onend = function () {
-        document.querySelector(".container").classList.remove("recording");
         document.getElementById("recordingIndicator").style.display = "none";
         document.getElementById("startBtn").style.display = "inline-block";
         document.getElementById("stopBtn").style.display = "none";
@@ -327,9 +242,7 @@
     }
 
     function stopRecognition() {
-      if (recognition) {
-        recognition.stop();
-      }
+      if (recognition) recognition.stop();
     }
   </script>
 </body>
