@@ -29,6 +29,19 @@
       max-width: 600px;
     }
 
+    /* إضاءة RGB هادئة عند التسجيل */
+    @keyframes rgbGlow {
+      0%   { box-shadow: 0 0 8px 2px rgba(255,0,0,0.25); }
+      25%  { box-shadow: 0 0 8px 2px rgba(0,255,0,0.25); }
+      50%  { box-shadow: 0 0 8px 2px rgba(0,0,255,0.25); }
+      75%  { box-shadow: 0 0 8px 2px rgba(255,255,0,0.25); }
+      100% { box-shadow: 0 0 8px 2px rgba(255,0,255,0.25); }
+    }
+
+    .container.recording {
+      animation: rgbGlow 6s infinite alternate ease-in-out;
+    }
+
     h1 {
       margin-bottom: 20px;
       font-size: 24px;
@@ -263,6 +276,7 @@
         document.getElementById("recordingIndicator").style.display = "block";
         document.getElementById("startBtn").style.display = "none";
         document.getElementById("stopBtn").style.display = "inline-block";
+        document.querySelector(".container").classList.add("recording");
       };
 
       recognition.onresult = function (event) {
@@ -282,6 +296,7 @@
         document.getElementById("recordingIndicator").style.display = "none";
         document.getElementById("startBtn").style.display = "inline-block";
         document.getElementById("stopBtn").style.display = "none";
+        document.querySelector(".container").classList.remove("recording");
       };
 
       recognition.start();
