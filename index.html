@@ -5,60 +5,21 @@
   <title>تحويل الصوت إلى نص</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f7f7f7;
+      font-family: Tahoma, sans-serif;
+      background: #f4f4f4;
       padding: 30px;
       direction: rtl;
-      text-align: right;
       color: #333;
-    }
-
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 12px 24px;
-      font-size: 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-top: 10px;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    #output {
-      margin-top: 20px;
-      background-color: #ffffff;
-      border: 1px solid #ddd;
-      padding: 20px;
-      border-radius: 8px;
-      font-size: 18px;
-      min-height: 80px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      white-space: pre-wrap;
-      line-height: 1.6;
-    }
-
-    #pasteBtn {
-      display: none; /* مخفي حتى يكتمل النسخ */
-    }
-
-    textarea {
-      width: 100%;
-      margin-top: 20px;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      resize: vertical;
+      text-align: right;
     }
 
     .container {
       max-width: 600px;
       margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
 
     h1 {
@@ -66,60 +27,121 @@
       margin-bottom: 20px;
       color: #222;
     }
+
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      margin: 10px 5px 0 0;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    #startBtn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    #stopBtn {
+      background-color: #f44336;
+      color: white;
+      display: none;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #recordingIndicator {
+      display: none;
+      color: red;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    #recordingDot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background-color: red;
+      border-radius: 50%;
+      margin-left: 8px;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    #output {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 18px;
+      min-height: 80px;
+      white-space: pre-wrap;
+    }
+
+    textarea {
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>🎙️DRAGON:تحويل الصوت إلى نص (مع دعم الأرقام)</h1>
+    <h1>🎙️ تحويل الصوت إلى نص (Chrome فقط)</h1>
+    <button id="startBtn" onclick="startRecognition()">🎤 بدء التسجيل</button>
+    <button id="stopBtn" onclick="stopRecognition()">⏹️ إيقاف التسجيل</button>
 
-    <button onclick="startVoiceAndCopy()"> √تحدث🎤 نسخ تلقائي</button>
+    <div id="recordingIndicator">
+      <span id="recordingDot"></span> 📡 جاري التسجيل...
+    </div>
 
     <div id="output"></div>
-
-    <button id="pasteBtn" onclick="pasteText()">📋 لصق النص المنسوخ في الحقل</button>
-
-    <textarea id="textField" rows="4" placeholder="هنا سيتم لصق النص عند الضغط على الزر"></textarea>
+    <textarea id="textField" rows="4" placeholder="الصق النص هنا إذا أردت (Ctrl + V)"></textarea>
   </div>
 
   <script>
-    let latestCopiedText = "";
+    let recognition;
+    let finalTranscript = "";
 
+    // رقم إلى نص بالعربي
     function wordsToNumbersInText(text) {
       const numberWords = {
-        "صفر": 0, "واحد": 1, "واحدة": 1, "اثنان": 2, "اثنين": 2, "اثنتان": 2, "اثنتين": 2,
-        "ثلاثة": 3, "أربعة": 4, "اربعة": 4, "خمسة": 5, "ستة": 6, "سبعة": 7, "ثمانية": 8, "تسعة": 9,
-        "عشرة": 10, "أحد عشر": 11, "اثنا عشر": 12, "ثلاثة عشر": 13, "أربعة عشر": 14, "خمسة عشر": 15,
-        "ستة عشر": 16, "سبعة عشر": 17, "ثمانية عشر": 18, "تسعة عشر": 19,
-        "عشرون": 20, "ثلاثون": 30, "أربعون": 40, "خمسون": 50, "ستون": 60,
-        "سبعون": 70, "ثمانون": 80, "تسعون": 90,
-        "مائة": 100, "مئة": 100, "مئتان": 200, "ثلاثمائة": 300, "أربعمائة": 400,
-        "خمسمائة": 500, "ستمائة": 600, "سبعمائة": 700, "ثمانمائة": 800, "تسعمائة": 900,
-        "ألف": 1000, "الف": 1000, "ألفان": 2000, "آلاف": 3000
+        "صفر": 0, "واحد": 1, "واحدة": 1, "اثنان": 2, "اثنين": 2,
+        "ثلاثة": 3, "أربعة": 4, "اربعة": 4, "خمسة": 5,
+        "ستة": 6, "سبعة": 7, "ثمانية": 8, "تسعة": 9,
+        "عشرة": 10, "عشرون": 20, "ثلاثون": 30, "أربعون": 40,
+        "خمسون": 50, "ستون": 60, "سبعون": 70, "ثمانون": 80, "تسعون": 90,
+        "مائة": 100, "مئة": 100, "ألف": 1000
       };
 
       const multipliers = {
         "مائة": 100,
         "مئة": 100,
-        "ألف": 1000,
-        "الف": 1000
+        "ألف": 1000
       };
 
-      text = text.replace(/،/g, " ");
-      text = text.replace(/ و /g, " ");
-      const words = text.trim().split(/\s+/);
-
+      const words = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
       let resultWords = [];
       let numberBuffer = [];
 
       function processNumberBuffer(buffer) {
-        let total = 0;
-        let current = 0;
-
+        let total = 0, current = 0;
         buffer.forEach(word => {
-          word = word.toLowerCase();
-          if (numberWords[word] !== undefined) {
+          if (numberWords[word]) {
             current += numberWords[word];
-          } else if (multipliers[word] !== undefined) {
+          } else if (multipliers[word]) {
             if (current === 0) current = 1;
             current *= multipliers[word];
             total += current;
@@ -131,77 +153,80 @@
       }
 
       for (let i = 0; i < words.length; i++) {
-        const word = words[i].toLowerCase();
-
-        if (numberWords[word] !== undefined || multipliers[word] !== undefined) {
+        const word = words[i];
+        if (numberWords[word] || multipliers[word]) {
           numberBuffer.push(word);
         } else {
           if (numberBuffer.length > 0) {
-            const num = processNumberBuffer(numberBuffer);
-            resultWords.push(num.toString());
+            resultWords.push(processNumberBuffer(numberBuffer));
             numberBuffer = [];
           }
-          resultWords.push(words[i]);
+          resultWords.push(word);
         }
       }
 
       if (numberBuffer.length > 0) {
-        const num = processNumberBuffer(numberBuffer);
-        resultWords.push(num.toString());
+        resultWords.push(processNumberBuffer(numberBuffer));
       }
 
       return resultWords.join(" ");
     }
 
-    function startVoiceAndCopy() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    function startRecognition() {
+      const SpeechRecognition = window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        alert("المتصفح لا يدعم تحويل الصوت إلى نص");
+        alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");
         return;
       }
 
-      const recognition = new SpeechRecognition();
+      recognition = new SpeechRecognition();
       recognition.lang = 'ar-SA';
       recognition.interimResults = true;
       recognition.maxAlternatives = 1;
 
-      let finalTranscript = "";
+      finalTranscript = "";
 
-      recognition.onresult = function (event) {
-        let interimTranscript = "";
+      recognition.onstart = () => {
+        document.getElementById("stopBtn").style.display = "inline-block";
+        document.getElementById("recordingIndicator").style.display = "block";
+      };
+
+      recognition.onresult = event => {
+        let interim = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           if (event.results[i].isFinal) {
             finalTranscript += event.results[i][0].transcript + " ";
           } else {
-            interimTranscript += event.results[i][0].transcript;
+            interim += event.results[i][0].transcript;
           }
         }
-        document.getElementById("output").innerText = finalTranscript + interimTranscript;
+        document.getElementById("output").innerText = finalTranscript + interim;
       };
 
-      recognition.onerror = function (event) {
-        alert("❌ خطأ أثناء التعرف: " + event.error);
+      recognition.onerror = event => {
+        alert("❌ خطأ: " + event.error);
+        stopRecognition();
       };
 
-      recognition.onend = function () {
-        if (finalTranscript.trim().length === 0) {
-          alert("❗ لم يتم التقاط أي كلام.");
-          return;
+      recognition.onend = () => {
+        document.getElementById("stopBtn").style.display = "none";
+        document.getElementById("recordingIndicator").style.display = "none";
+
+        if (finalTranscript.trim().length > 0) {
+          const processed = wordsToNumbersInText(finalTranscript.trim());
+          navigator.clipboard.writeText(processed);
+          document.getElementById("output").innerText = processed;
+          alert("✅ تم نسخ النص تلقائيًا! استخدم Ctrl + V للصق.");
         }
-        const processedText = wordsToNumbersInText(finalTranscript.trim());
-        navigator.clipboard.writeText(processedText).then(() => {
-          document.getElementById("output").innerText = processedText;
-          latestCopiedText = processedText;
-          document.getElementById("pasteBtn").style.display = "inline-block";
-          alert("✅ تم نسخ النص تلقائيًا. يمكنك لصقه أو استخدام زر '📋 لصق'.");
-        });
       };
 
       recognition.start();
     }
 
-    function pasteText() {
-      document.getElementById("textField").value = latestCopiedText || "";
+    function stopRecognition() {
+      if (recognition) {
+        recognition.stop();
+      }
     }
   </script>
 </body>
