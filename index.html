@@ -4,238 +4,34 @@
   <meta charset="UTF-8">
   <title>Convert audio</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #000;
-      color: #fff;
-      font-family: Tahoma, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
-    }
-
-    .login-container {
-      background-color: #111;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
-      text-align: center;
-      width: 90%;
-      max-width: 400px;
-      display: none;
-    }
-
-    .login-container h2 {
-      margin-bottom: 20px;
-      font-size: 22px;
-      color: #ffcc00;
-    }
-
-    .login-container input {
-      width: 90%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background-color: #1a1a1a;
-      color: #fff;
-      font-size: 16px;
-      text-align: center;
-    }
-
-    .login-container label {
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1px;
-      margin-top: 10px;
-      cursor: pointer;
-      width: -55℅;
-    }
-
-    .login-container button {
-      padding: 12px 24px;
-      font-size: 18px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 8px;
-      background-color: #4CAF50;
-      color: white;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .login-container button:hover {
-      opacity: 0.85;
-    }
-
-    .container {
-      background-color: #111;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-      text-align: center;
-      width: 90%;
-      max-width: 600px;
-      transition: all 0.3s ease;
-      display: none;
-      position: relative;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-      font-size: 24px;
-      transition: font-size 0.3s ease;
-    }
-
-    button {
-      padding: 12px 24px;
-      font-size: 18px;
-      margin: 10px 5px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s, font-size 0.3s ease, padding 0.3s ease;
-    }
-
-    #startBtn {
-      background-color: #4CAF50;
-      color: white;
-    }
-
-    #stopBtn {
-      background-color: #f44336;
-      color: white;
-      display: none;
-    }
-
-    button:hover {
-      opacity: 0.85;
-    }
-
-    #recordingIndicator {
-      display: none;
-      color: #ff5252;
-      font-weight: bold;
-      margin-top: 10px;
-    }
-
-    #recordingDot {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      background-color: red;
-      border-radius: 50%;
-      margin-left: 8px;
-      animation: blink 1s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-
-    #output {
-      background: #222;
-      border: 1px solid #444;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-      font-size: 18px;
-      min-height: 80px;
-      white-space: pre-wrap;
-      color: #ddd;
-      transition: font-size 0.3s ease, padding 0.3s ease;
-    }
-
-    #history {
-      text-align: left;
-      max-height: 150px;
-      overflow-y: auto;
-      margin-top: 10px;
-      color: #aaa;
-      font-size: 14px;
-    }
-
-    textarea {
-      width: 96%;
-      margin-top: 15px;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #555;
-      background-color: #1a1a1a;
-      color: #fff;
-      resize: vertical;
-      transition: font-size 0.3s ease, padding 0.3s ease;
-    }
-
-    #userCountContainer {
-      position: absolute;
-      top: 10px;
-      left: 15px;
-      right: 15px;
-      display: flex;
-      align-items: center;
-      font-size: 12px;
-      opacity: 0.8;
-      justify-content: space-between;
-    }
-
-    #userCount {
-      color: #0f0;
-    }
-
-    #logoutBtn {
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: none;
-      background-color: #f44336;
-      color: white;
-      cursor: pointer;
-      opacity: 0.9;
-    }
-
-    footer {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #b17215;
-      text-align: center;
-    }
-
-    @keyframes rgbGlow {
-      0%   { box-shadow: 0 0 40px 15px rgba(255,0,0,0.25); }
-      20%  { box-shadow: 0 0 40px 15px rgba(255,165,0,0.25); }
-      40%  { box-shadow: 0 0 40px 15px rgba(0,255,0,0.25); }
-      60%  { box-shadow: 0 0 40px 15px rgba(0,255,255,0.25); }
-      80%  { box-shadow: 0 0 40px 15px rgba(0,0,255,0.25); }
-      100% { box-shadow: 0 0 40px 15px rgba(255,0,255,0.25); }
-    }
-
-    .container.recording {
-      animation: rgbGlow 10s infinite linear;
-    }
-
-    @media (max-width: 500px) {
-      .container { padding: 20px; }
-      .container h1 { font-size: 20px; }
-      button { font-size: 16px; padding: 10px 18px; }
-      #output { font-size: 16px; padding: 12px; }
-      textarea { font-size: 14px; padding: 10px; }
-    }
-
-    @media (max-width: 350px) {
-      .container { padding: 15px; }
-      .container h1 { font-size: 18px; }
-      button { font-size: 14px; padding: 8px 16px; }
-      #output { font-size: 14px; padding: 10px; }
-      textarea { font-size: 13px; padding: 8px; }
-    }
+    /* --- كل التنسيقات الأصلية تبقى كما هي --- */
+    body { margin:0; padding:0; background-color:#000; color:#fff; font-family:Tahoma,sans-serif; display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column;}
+    .login-container{background-color:#111; padding:30px; border-radius:12px; box-shadow:0 0 20px rgba(255,255,255,0.15); text-align:center; width:90%; max-width:400px; display:none;}
+    .login-container h2{margin-bottom:20px; font-size:22px; color:#ffcc00;}
+    .login-container input{width:90%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #444; background-color:#1a1a1a; color:#fff; font-size:16px; text-align:center;}
+    .login-container label{font-size:14px; display:flex; align-items:center; justify-content:center; gap:1px; margin-top:10px; cursor:pointer; width:-55℅;}
+    .login-container button{padding:12px 24px; font-size:18px; margin-top:15px; border:none; border-radius:8px; background-color:#4CAF50; color:white; cursor:pointer; transition:0.3s;}
+    .login-container button:hover{opacity:0.85;}
+    .container{background-color:#111; padding:30px; border-radius:12px; box-shadow:0 0 20px rgba(255,255,255,0.1); text-align:center; width:90%; max-width:600px; transition:all 0.3s ease; display:none; position:relative;}
+    h1{margin-bottom:20px; font-size:24px; transition:font-size 0.3s ease;}
+    button{padding:12px 24px; font-size:18px; margin:10px 5px; border:none; border-radius:8px; cursor:pointer; transition:0.3s, font-size 0.3s ease, padding 0.3s ease;}
+    #startBtn{background-color:#4CAF50; color:white;}
+    #stopBtn{background-color:#f44336; color:white; display:none;}
+    button:hover{opacity:0.85;}
+    #recordingIndicator{display:none; color:#ff5252; font-weight:bold; margin-top:10px;}
+    #recordingDot{display:inline-block; width:12px; height:12px; background-color:red; border-radius:50%; margin-left:8px; animation:blink 1s infinite;}
+    @keyframes blink{0%,100%{opacity:1} 50%{opacity:0}}
+    #output{background:#222; border:1px solid #444; padding:15px; border-radius:8px; margin-top:20px; font-size:18px; min-height:80px; white-space:pre-wrap; color:#ddd; transition:font-size 0.3s ease, padding 0.3s ease;}
+    #history{text-align:left; max-height:150px; overflow-y:auto; margin-top:10px; color:#aaa; font-size:14px;}
+    textarea{width:96%; margin-top:15px; padding:12px; font-size:16px; border-radius:6px; border:1px solid #555; background-color:#1a1a1a; color:#fff; resize:vertical; transition:font-size 0.3s ease, padding 0.3s ease;}
+    #userCountContainer{position:absolute; top:10px; left:15px; right:15px; display:flex; align-items:center; font-size:12px; opacity:0.8; justify-content:space-between;}
+    #userCount{color:#0f0;}
+    #logoutBtn{font-size:12px; padding:4px 8px; border-radius:6px; border:none; background-color:#f44336; color:white; cursor:pointer; opacity:0.9;}
+    footer{margin-top:15px; font-size:14px; color:#b17215; text-align:center;}
+    @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25);}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25);}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25);}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25);}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25);}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25);}}
+    .container.recording{animation:rgbGlow 10s infinite linear;}
+    @media(max-width:500px){.container{padding:20px;} .container h1{font-size:20px;} button{font-size:16px; padding:10px 18px;} #output{font-size:16px; padding:12px;} textarea{font-size:14px; padding:10px;}}
+    @media(max-width:350px){.container{padding:15px;} .container h1{font-size:18px;} button{font-size:14px; padding:8px 16px;} #output{font-size:14px; padding:10px;} textarea{font-size:13px; padding:8px;}}
   </style>
 </head>
 <body>
@@ -273,12 +69,9 @@
   </div>
 
   <script>
-    function updateUserCount(change) {
-      let count = parseInt(localStorage.getItem("userCount") || "0");
-      count += change;
-      if (count < 0) count = 0;
-      localStorage.setItem("userCount", count);
-      document.getElementById("userCount").textContent = "👥 الأعضاء: " + count;
+    function updateUserCount() {
+      const activeTabs = JSON.parse(localStorage.getItem("activeTabs") || "[]");
+      document.getElementById("userCount").textContent = "👥 الأعضاء: " + activeTabs.length;
     }
 
     function base64EncodeUnicode(str) {
@@ -297,21 +90,45 @@
         if (remember) localStorage.setItem("loggedIn", "true");
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
-
-        if (!sessionStorage.getItem("counted")) {
-          updateUserCount(+1);
-          sessionStorage.setItem("counted", "true");
-        }
+        registerTab();
       } else {
         document.getElementById("error").style.display = "block";
       }
     }
 
-    function logout() {
-      if (sessionStorage.getItem("counted")) {
-        updateUserCount(-1);
-        sessionStorage.removeItem("counted");
+    // توليد معرف فريد لكل تبويب
+    function generateTabId() {
+      return 'tab-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function registerTab() {
+      let tabId = sessionStorage.getItem("tabId");
+      if (!tabId) {
+        tabId = generateTabId();
+        sessionStorage.setItem("tabId", tabId);
+        let activeTabs = JSON.parse(localStorage.getItem("activeTabs") || "[]");
+        if (!activeTabs.includes(tabId)) {
+          activeTabs.push(tabId);
+          localStorage.setItem("activeTabs", JSON.stringify(activeTabs));
+        }
       }
+      updateUserCount();
+    }
+
+    function unregisterTab() {
+      const tabId = sessionStorage.getItem("tabId");
+      if (tabId) {
+        let activeTabs = JSON.parse(localStorage.getItem("activeTabs") || "[]");
+        const index = activeTabs.indexOf(tabId);
+        if (index !== -1) {
+          activeTabs.splice(index, 1);
+          localStorage.setItem("activeTabs", JSON.stringify(activeTabs));
+        }
+      }
+    }
+
+    function logout() {
+      unregisterTab();
       localStorage.removeItem("loggedIn");
       document.getElementById("app").style.display = "none";
       document.getElementById("login").style.display = "block";
@@ -321,31 +138,26 @@
       if (localStorage.getItem("loggedIn") === "true") {
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
-        if (!sessionStorage.getItem("counted")) {
-          updateUserCount(+1);
-          sessionStorage.setItem("counted", "true");
-        }
+        registerTab();
       }
     }
 
     window.onload = function() {
       autoLogin();
-      document.getElementById("userCount").textContent = "👥 الأعضاء: " + (localStorage.getItem("userCount") || 0);
     };
 
-    window.addEventListener("storage", function(e) {
-      if (e.key === "userCount") {
-        document.getElementById("userCount").textContent = "👥 الأعضاء: " + (e.newValue || 0);
-      }
+    window.addEventListener("beforeunload", function() {
+      unregisterTab();
     });
 
-    window.addEventListener("beforeunload", function() {
-      if (sessionStorage.getItem("counted")) {
-        updateUserCount(-1);
+    window.addEventListener("storage", function(e) {
+      if (e.key === "activeTabs") {
+        updateUserCount();
       }
     });
   </script>
 
+  <!-- كود تحويل الصوت يبقى كما هو -->
   <script>
     let recognition;
     let finalTranscript = "";
