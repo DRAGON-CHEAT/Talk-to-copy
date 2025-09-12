@@ -317,29 +317,28 @@
       document.getElementById("login").style.display = "block";
     }
 
-    window.onload = function() {
+    function autoLogin() {
       if (localStorage.getItem("loggedIn") === "true") {
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
-
         if (!sessionStorage.getItem("counted")) {
           updateUserCount(+1);
           sessionStorage.setItem("counted", "true");
         }
-      } else {
-        document.getElementById("userCount").textContent = "👥 الأعضاء: " + (localStorage.getItem("userCount") || 0);
-        document.getElementById("login").style.display = "block";
       }
+    }
+
+    window.onload = function() {
+      autoLogin();
+      document.getElementById("userCount").textContent = "👥 الأعضاء: " + (localStorage.getItem("userCount") || 0);
     };
 
-    //     localStorage   
     window.addEventListener("storage", function(e) {
       if (e.key === "userCount") {
         document.getElementById("userCount").textContent = "👥 الأعضاء: " + (e.newValue || 0);
       }
     });
 
-    //    
     window.addEventListener("beforeunload", function() {
       if (sessionStorage.getItem("counted")) {
         updateUserCount(-1);
