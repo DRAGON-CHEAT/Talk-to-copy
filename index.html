@@ -268,7 +268,7 @@
     <input type="password" id="password" placeholder="كلمة المرور">
     <label><input type="checkbox" id="rememberMe">تذكرني</label>
     <button onclick="checkLogin()">دخول</button>
-    <p id="error" style="color:red; display:none;">❌ خطأ في اسم المستخدم أو كلمة المرور</p>
+    <p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
   </div>
 
   <div class="container" id="app">
@@ -298,13 +298,21 @@
       return btoa(unescape(encodeURIComponent(str)));
     }
 
-    function updateUserCount(change) {
-      const countRef = db.ref('userCount');
-      countRef.transaction(current => (current || 0) + change);
+    const userId = Date.now() + "_" + Math.floor(Math.random() * 1000);
+
+    function updateOnlineStatus(online) {
+      const ref = db.ref('onlineUsers/' + userId);
+      if (online) {
+        ref.set(true);
+        ref.onDisconnect().remove();
+      } else {
+        ref.remove();
+      }
     }
 
-    db.ref('userCount').on('value', snapshot => {
-      document.getElementById("userCount").textContent = "# الأعضاء: " + (snapshot.val() || 0);
+    db.ref('onlineUsers').on('value', snapshot => {
+      const count = snapshot.numChildren();
+      document.getElementById("userCount").textContent = "👥 الأعضاء: " + count;
     });
 
     function checkLogin() {
@@ -322,22 +330,18 @@
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
 
-        if (!sessionStorage.getItem("alreadyCounted")) {
-          updateUserCount(+1);
-          sessionStorage.setItem("alreadyCounted", "true");
-        }
+        updateOnlineStatus(true);
 
-        window.addEventListener("beforeunload", () => updateUserCount(-1));
+        window.addEventListener("beforeunload", () => updateOnlineStatus(false));
       } else {
         document.getElementById("error").style.display = "block";
       }
     }
 
     function logout() {
-      updateUserCount(-1);
+      updateOnlineStatus(false);
       localStorage.removeItem("loggedIn");
       sessionStorage.removeItem("loggedInSession");
-      sessionStorage.removeItem("alreadyCounted");
 
       document.getElementById("app").style.display = "none";
       document.getElementById("login").style.display = "block";
@@ -358,19 +362,13 @@
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
 
-        if (!sessionStorage.getItem("alreadyCounted")) {
-          updateUserCount(+1);
-          sessionStorage.setItem("alreadyCounted", "true");
-        }
-
-        window.addEventListener("beforeunload", () => updateUserCount(-1));
+        updateOnlineStatus(true);
+        window.addEventListener("beforeunload", () => updateOnlineStatus(false));
       } else {
         document.getElementById("login").style.display = "block";
       }
     };
-  </script>
 
-  <script>
     let recognition;
 
     function wordsToNumbersInText(text) {
