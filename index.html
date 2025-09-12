@@ -50,15 +50,11 @@
       font-size: 14px;
       display: flex;
       align-items: center;
-      justify-content: center; /* يجعل النص والـ checkbox في الوسط أفقياً */
-      gap: 1px; /* مسافة بين الـ checkbox والنص */
+      justify-content: center;
+      gap: 1px;
       margin-top: 10px;
       cursor: pointer;
-      width: -55℅; /* يتمركز بالكامل في منتصف الحاوية */
-    }
-
-    .login-container input[type="checkbox"] {
-      
+      width: -55℅;
     }
 
     .login-container button {
@@ -178,7 +174,6 @@
       transition: font-size 0.3s ease, padding 0.3s ease;
     }
 
-    /* عداد الأعضاء وزر تسجيل الخروج */
     #userCountContainer {
       position: absolute;
       top: 10px;
@@ -188,7 +183,7 @@
       align-items: center;
       font-size: 12px;
       opacity: 0.8;
-      justify-content: space-between; /* الأعضاء على اليسار والزر على اليمين */
+      justify-content: space-between;
     }
 
     #userCount {
@@ -244,7 +239,6 @@
   </style>
 </head>
 <body>
-  <!-- تسجيل الدخول -->
   <div class="login-container" id="login">
     <h2>⟱ تسجيل الدخول ⟱</h2>
     <input type="text" id="username" placeholder="اسم المستخدم">
@@ -254,7 +248,6 @@
     <p id="error" style="color:red; display:none;">❌ خطأ في اسم المستخدم أو كلمة المرور</p>
   </div>
 
-  <!-- التطبيق الأصلي -->
   <div class="container" id="app">
     <div id="userCountContainer">
       <div id="userCount">👥 الأعضاء: 0</div>
@@ -288,9 +281,7 @@
       document.getElementById("userCount").textContent = "👥 الأعضاء: " + count;
     }
 
-    //
     function base64EncodeUnicode(str) {
-      // 
       return btoa(unescape(encodeURIComponent(str)));
     }
 
@@ -299,16 +290,20 @@
       const pass = document.getElementById("password").value.trim();
       const remember = document.getElementById("rememberMe").checked;
 
-      //   : btoa(unescape(encodeURIComponent(")
-      const encodedUser = "2LnZhNin2KE=";  // ""
-      const encodedPass = "MjI0NA==";      // ""
-      // jvcd
+      const encodedUser = "2LnZhNin2KE=";  
+      const encodedPass = "MjI0NA==";      
+
       if (base64EncodeUnicode(user) === encodedUser && base64EncodeUnicode(pass) === encodedPass) {
-        if(remember) localStorage.setItem("loggedIn", "true");
+        if (remember) localStorage.setItem("loggedIn", "true");
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
-        updateUserCount(+1);
-        window.addEventListener("beforeunload", ()=>updateUserCount(-1));
+
+        if (!sessionStorage.getItem("counted")) {
+          updateUserCount(+1);
+          sessionStorage.setItem("counted", "true");
+        }
+
+        window.addEventListener("beforeunload", () => updateUserCount(-1));
       } else {
         document.getElementById("error").style.display = "block";
       }
@@ -317,16 +312,22 @@
     function logout() {
       updateUserCount(-1);
       localStorage.removeItem("loggedIn");
+      sessionStorage.removeItem("counted");
       document.getElementById("app").style.display = "none";
       document.getElementById("login").style.display = "block";
     }
 
     window.onload = function() {
-      if(localStorage.getItem("loggedIn") === "true") {
+      if (localStorage.getItem("loggedIn") === "true") {
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
-        updateUserCount(+1);
-        window.addEventListener("beforeunload", ()=>updateUserCount(-1));
+
+        if (!sessionStorage.getItem("counted")) {
+          updateUserCount(+1);
+          sessionStorage.setItem("counted", "true");
+        }
+
+        window.addEventListener("beforeunload", () => updateUserCount(-1));
       } else {
         document.getElementById("userCount").textContent = "👥 الأعضاء: " + (localStorage.getItem("userCount") || 0);
         document.getElementById("login").style.display = "block";
