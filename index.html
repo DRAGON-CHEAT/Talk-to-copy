@@ -46,26 +46,19 @@
       text-align: center;
     }
 
-    /* تنسيق خاص لتذكرني */
     .login-container label {
+      font-size: 14px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: center; /* يجعل النص والـ checkbox في الوسط أفقياً */
+      gap: 1px; /* مسافة بين الـ checkbox والنص */
       margin-top: 10px;
-      width: 100%;
       cursor: pointer;
-      gap: 8px;
+      width: -55℅; /* يتمركز بالكامل في منتصف الحاوية */
     }
 
     .login-container input[type="checkbox"] {
-      margin: 0;
-      vertical-align: middle;
-    }
-
-    .login-container .remember-text {
-      font-size: 14px;
-      color: #ffcc00;
-      font-weight: bold;
+      
     }
 
     .login-container button {
@@ -256,10 +249,7 @@
     <h2>⟱ تسجيل الدخول ⟱</h2>
     <input type="text" id="username" placeholder="اسم المستخدم">
     <input type="password" id="password" placeholder="كلمة المرور">
-    <label>
-      <input type="checkbox" id="rememberMe">
-      <span class="remember-text">تذكرني</span>
-    </label>
+    <label><input type="checkbox" id="rememberMe">تذكرني</label>
     <button onclick="checkLogin()">دخول</button>
     <p id="error" style="color:red; display:none;">❌ خطأ في اسم المستخدم أو كلمة المرور</p>
   </div>
@@ -289,37 +279,63 @@
     </footer>
   </div>
 
-  <!-- ====== ====== -->
   <script>
-  (function(){
-    //  
-    function b64DecodeUnicode(str) {
-      try {
-        var bin = atob(str);
-        var chars = Array.prototype.map.call(bin, function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join('');
-        return decodeURIComponent(chars);
-      } catch(e) {
-        return atob(str);
+    function updateUserCount(change) {
+      let count = parseInt(localStorage.getItem("userCount") || "0");
+      count += change;
+      if (count < 0) count = 0;
+      localStorage.setItem("userCount", count);
+      document.getElementById("userCount").textContent = "👥 الأعضاء: " + count;
+    }
+
+    // دوال مساعدة لترميز UTF-8 قبل تحويلها إلىالعربية بشكل صحيح)
+    function base64EncodeUnicode(str) {
+      // تحويل السلسلة إلى UTF-8 ثم إلى Base64 بطريقة آمنة للمتصفحات
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function checkLogin() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const remember = document.getElementById("rememberMe").checked;
+
+      // 
+      // : btoa(unescape(encodeURIComponent("")))
+      const encodedUser = "2LnZhNin2KE=";  // ""
+      const encodedPass = "MjI0NA==";      // ""
+
+      // 
+      if (base64EncodeUnicode(user) === encodedUser && base64EncodeUnicode(pass) === encodedPass) {
+        if(remember) localStorage.setItem("loggedIn", "true");
+        document.getElementById("login").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        updateUserCount(+1);
+        window.addEventListener("beforeunload", ()=>updateUserCount(-1));
+      } else {
+        document.getElementById("error").style.display = "block";
       }
     }
 
-    //  
-    var encoded = "ZnVuY3Rpb24gdXBkYXRlVXNlckNvdW50KGNoYW5nZSkgewogICAgICBsZXQgY291bnQgPSBwYXJzZUludChsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgidXNlckNvdW50IikgfHwgIjAiKTsgICAgICAgY291bnQgKz0gY2hhbmdlOyAgICAgICBpZiAoY291bnQgPCAwKSBjb3VudCA9IDA7ICAgICAgIGxvY2FsU3RvcmFnZS5zZXRJdGVtKCJ1c2VyQ291bnQiLCBjb3VudCk7ICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJ1c2VyQ291bnQiKS50ZXh0Q29udGVudCA9ICLwn5iFIOq4i+WQjDogIiArIGNvdW50OyB9CgogICAgZnVuY3Rpb24gY2hlY2tMb2dpbigpIHsKICAgICAgY29uc3QgdXNlciA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJ1c2VybmFtZSIpLnZhbHVlLnRyaW0oKTsgICAgICAgY29uc3QgcGFzcyA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJwYXNzd29yZCIpLnZhbHVlLnRyaW0oKTsgICAgICAgY29uc3QgcmVtZW1iZXIgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgicmVtZW1iZXJNZSIpLmNoZWNrZWQ7CgogICAgICAgaWYodXNlciA9PT0gIuKAlcWw2YjYtdmE2KfYpSciICYmIHBhc3MgPT09ICIyMjQ0IikgewogICAgICAgICAgaWYocmVtZW1iZXIpIGxvY2FsU3RvcmFnZS5zZXRJdGVtKCJsb2dnZWRJbiIsICJ0cnVlIik7CiAgICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgibG9naW4iKS5zdHlsZS5kaXNwbGF5ID0gIm5vbmUiOwogICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoImFwcCIpLnN0eWxlLmRpc3BsYXkgPSAicGxheSI7CiAgICAgICAgICB1cGRhdGVVc2VyQ291bnQoKzEpOwogICAgICAgICAgd2luZG93LmFkZEV2ZW50TGlzdGVuZXIoImJlZm9yZXVubG9hZCIsICgpPT4gdXBkYXRlVXNlckNvdW50KC0xKSk7CiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJlcnJvciIpLnN0eWxlLmRpc3BsYXkgPSAiYmxvY2siOwogICAgICAgIH0KICAgIH0KCiAgICBmdW5jdGlvbiBsb2dvdXQoKSB7CiAgICAgIHVwZGF0ZVVzZXJDb3VudCgtMSk7CiAgICAgIGxvY2FsU3RvcmFnZS5yZW1vdmVJdGVtKCJsb2dnZWRJbiIpOwogICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgicGFwcCIpLnN0eWxlLmRpc3BsYXkgPSAibm9uZSI7CiAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJsb2dpbiIuc3R5bGUuZGlzcGxheSA9ICJibG9jayI7CiAgICB9CgogICAgd2luZG93Lm9ubG9hZCA9IGZ1bmN0aW9uKCkgewogICAgICBpZihsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgibG9nZ2VkSW4iKSA9PT0gInRydWUiKSB7CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoImxvZ2luIikuc3R5bGUuZGlzcGxheSA9ICJub25lIjsgCiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoImFwcCIpLnN0eWxlLmRpc3BsYXkgPSAicGxheSI7CiAgICAgICAgdXBkYXRlVXNlckNvdW50KCsyKTsKICAgICAgICB3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcigiYmVmb3JldW5sb2FkIiwgKCk9PnVwZGF0ZVVzZXJDb3VudCgtMSkpOwogICAgICB9IGVsc2UgewogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJ1c2VyQ291bnQiKS50ZXh0Q29udGVudCA9IOKAmSA8J2I+4oCmIOKAkyDgp4Ag4oCcIOCkvyDgp4Ag4oCcICc8L2I+ICIrIChsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgidXNlckNvdW50IikgfHwgMCk7CiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoImxvZ2luIikudmFsdWUuc3R5bGUuZGlzcGxheSA9ICJibG9jayI7CiAgICAgIH0KICAgIH07";
-
-    try {
-      var decoded = b64DecodeUnicode(encoded);
-      // 
-      window.eval(decoded);
-    } catch (err) {
-      console.error("فشل   :", err);
+    function logout() {
+      updateUserCount(-1);
+      localStorage.removeItem("loggedIn");
+      document.getElementById("app").style.display = "none";
+      document.getElementById("login").style.display = "block";
     }
 
-  })();
+    window.onload = function() {
+      if(localStorage.getItem("loggedIn") === "true") {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        updateUserCount(+1);
+        window.addEventListener("beforeunload", ()=>updateUserCount(-1));
+      } else {
+        document.getElementById("userCount").textContent = "👥 الأعضاء: " + (localStorage.getItem("userCount") || 0);
+        document.getElementById("login").style.display = "block";
+      }
+    };
   </script>
 
-  <!-- ===== == -->
   <script>
     let recognition;
     let finalTranscript = "";
@@ -384,7 +400,7 @@
         navigator.clipboard.writeText(converted);
       }
 
-      recognition.onerror=function(event){alert("حدث خطأ: "+event.error);}
+      recognition.onerror=function(event){alert("حدث خطأ: "+event.error);} 
       recognition.onend=function(){
         document.querySelector(".container").classList.remove("recording");
         document.getElementById("recordingIndicator").style.display="none";
