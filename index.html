@@ -297,21 +297,25 @@
       return btoa(unescape(encodeURIComponent(str)));
     }
 
-    // معرف فريد لكل جهاز
-    const userId = crypto.randomUUID();
+    const deviceId = crypto.randomUUID(); // معرف لكل جهاز
 
-    // تحديث الحالة أونلاين / أوفلاين
-    function updateOnlineStatus(online) {
-      const ref = db.ref('onlineUsers/' + userId);
+    function updateUserOnlineStatus(username, online) {
+      const ref = db.ref('onlineUsers/' + username + '/' + deviceId);
       if (online) {
         ref.set(true);
         ref.onDisconnect().remove();
       } else {
         ref.remove();
+        // تحقق إذا لم يتبق أي جهاز للمستخدم
+        db.ref('onlineUsers/' + username).once('value', snap => {
+          if (!snap.exists()) {
+            db.ref('onlineUsers/' + username).remove();
+          }
+        });
       }
     }
 
-    // عد الأعضاء المتصلين حاليًا
+    // عد المستخدمين المتصلين
     db.ref('onlineUsers').on('value', snapshot => {
       const count = snapshot.numChildren();
       document.getElementById("userCount").textContent = "👥 الأعضاء: " + count;
@@ -332,15 +336,16 @@
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
 
-        updateOnlineStatus(true);
-        window.addEventListener("beforeunload", () => updateOnlineStatus(false));
+        updateUserOnlineStatus(user, true);
+        window.addEventListener("beforeunload", () => updateUserOnlineStatus(user, false));
       } else {
         document.getElementById("error").style.display = "block";
       }
     }
 
     function logout() {
-      updateOnlineStatus(false);
+      const user = document.getElementById("username").value.trim();
+      updateUserOnlineStatus(user, false);
       localStorage.removeItem("loggedIn");
       sessionStorage.removeItem("loggedInSession");
 
@@ -360,17 +365,19 @@
       }
 
       if (loggedInPermanent || loggedInSession) {
+        const user = document.getElementById("username").value.trim();
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
 
-        updateOnlineStatus(true);
-        window.addEventListener("beforeunload", () => updateOnlineStatus(false));
+        updateUserOnlineStatus(user, true);
+        window.addEventListener("beforeunload", () => updateUserOnlineStatus(user, false));
       } else {
         document.getElementById("login").style.display = "block";
       }
     };
   </script>
 
+  <!-- التعرف الصوتي -->
   <script>
     let recognition;
 
