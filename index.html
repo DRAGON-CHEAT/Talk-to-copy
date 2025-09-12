@@ -150,6 +150,7 @@
       white-space: pre-wrap;
       color: #ddd;
       transition: font-size 0.3s ease, padding 0.3s ease;
+      text-align: right;
     }
 
     textarea#history {
@@ -380,58 +381,11 @@
     let recognition;
 
     function wordsToNumbersInText(text) {
-      const units = {
-        "صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,
-        "اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,
-        "ثلاثة":3,"ثلاث":3,
-        "أربعة":4,"اربعة":4,"اربع":4,
-        "خمسة":5,"خمس":5,
-        "ستة":6,"ست":6,
-        "سبعة":7,"سبع":7,
-        "ثمانية":8,"ثمان":8,
-        "تسعة":9,"تسع":9
-      };
-
-      const teens = {
-        "عشرة":10,"عشر":10,
-        "أحد عشر":11,"احد عشر":11,"احدى عشر":11,
-        "اثنا عشر":12,"اثني عشر":12,
-        "ثلاثة عشر":13,"ثلاث عشر":13,
-        "أربعة عشر":14,"اربعة عشر":14,
-        "خمسة عشر":15,
-        "ستة عشر":16,
-        "سبعة عشر":17,
-        "ثمانية عشر":18,
-        "تسعة عشر":19
-      };
-
-      const tens = {
-        "عشرون":20,"عشرين":20,
-        "ثلاثون":30,"ثلاثين":30,
-        "أربعون":40,"اربعين":40,
-        "خمسون":50,"خمسين":50,
-        "ستون":60,"ستين":60,
-        "سبعون":70,"سبعين":70,
-        "ثمانون":80,"ثمانين":80,
-        "تسعون":90,"تسعين":90
-      };
-
-      const hundreds = {
-        "مائة":100,"مئة":100,"مية":100,
-        "مئتين":200,"ميتين":200,
-        "ثلاثمائة":300,"ثلاثمية":300,
-        "أربعمائة":400,"اربعماية":400,
-        "خمسمائة":500,"خمسماية":500,
-        "ستمائة":600,"ستمية":600,
-        "سبعمائة":700,"سبعمية":700,
-        "ثمانمائة":800,"ثمانمية":800,
-        "تسعمائة":900,"تسعمية":900
-      };
-
-      const multipliers = {
-        "ألف":1000,"الف":1000,"ألفين":2000,"الفين":2000,"آلاف":1000,
-        "مليون":1000000,"ملايين":1000000
-      };
+      const units = {"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
+      const teens = {"عشرة":10,"عشر":10,"أحد عشر":11,"احد عشر":11,"احدى عشر":11,"اثنا عشر":12,"اثني عشر":12,"ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19};
+      const tens = {"عشرون":20,"عشرين":20,"ثلاثون":30,"ثلاثين":30,"أربعون":40,"اربعين":40,"خمسون":50,"خمسين":50,"ستون":60,"ستين":60,"سبعون":70,"سبعين":70,"ثمانون":80,"ثمانين":80,"تسعون":90,"تسعين":90};
+      const hundreds = {"مائة":100,"مئة":100,"مية":100,"مئتين":200,"ميتين":200,"ثلاثمائة":300,"ثلاثمية":300,"أربعمائة":400,"اربعماية":400,"خمسمائة":500,"خمسماية":500,"ستمائة":600,"ستمية":600,"سبعمائة":700,"سبعمية":700,"ثمانمائة":800,"ثمانمية":800,"تسعمائة":900,"تسعمية":900};
+      const multipliers = {"ألف":1000,"الف":1000,"ألفين":2000,"الفين":2000,"آلاف":1000,"مليون":1000000,"ملايين":1000000};
 
       const allWords = Object.assign({}, units, teens, tens, hundreds, multipliers);
       const tokens = text.replace(/،/g," ").replace(/ و /g," ").trim().split(/\s+/);
@@ -457,69 +411,61 @@
           }
         });
         total += current;
-        return total;
+        return `<span style="direction:ltr; display:inline-block;">${total}</span>`;
       }
 
       for (let i = 0; i < tokens.length; i++) {
         const word = tokens[i];
         const twoWords = word + " " + (tokens[i+1] || "");
-        if (teens[twoWords]) {
-          numberBuffer.push(twoWords);
-          i++;
-          continue;
-        }
-
-        if (allWords[word]) {
-          numberBuffer.push(word);
-        } else {
-          if (numberBuffer.length > 0) {
-            const num = processBuffer(numberBuffer);
-            if (num !== null) resultWords.push(num.toString());
-            numberBuffer = [];
-          }
+        if (teens[twoWords]) { numberBuffer.push(twoWords); i++; continue; }
+        if (allWords[word]) numberBuffer.push(word);
+        else {
+          if (numberBuffer.length > 0) { resultWords.push(processBuffer(numberBuffer)); numberBuffer = []; }
           resultWords.push(word);
         }
       }
 
-      if (numberBuffer.length > 0) {
-        const num = processBuffer(numberBuffer);
-        if (num !== null) resultWords.push(num.toString());
-      }
+      if (numberBuffer.length > 0) resultWords.push(processBuffer(numberBuffer));
 
       return resultWords.join(" ");
     }
 
     function startRecognition(){
-      const SpeechRecognition=window.webkitSpeechRecognition;
+      const SpeechRecognition = window.webkitSpeechRecognition;
       if(!SpeechRecognition){alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");return;}
-      recognition=new SpeechRecognition();
+      recognition = new SpeechRecognition();
       recognition.lang='ar-IQ';
       recognition.interimResults=false;
 
-      recognition.onstart=function(){
+      recognition.onstart = function(){
         document.querySelector(".container").classList.add("recording");
         document.getElementById("recordingIndicator").style.display="block";
         document.getElementById("startBtn").style.display="none";
         document.getElementById("stopBtn").style.display="inline-block";
       }
 
-      recognition.onresult=function(event){
-        const transcript=event.results[0][0].transcript;
-        const converted=wordsToNumbersInText(transcript);
-        document.getElementById("output").innerText=converted;
+      recognition.onresult = function(event){
+        const transcript = event.results[0][0].transcript;
+        const converted = wordsToNumbersInText(transcript);
 
-        const history=document.getElementById("history");
-        history.value += converted + "\n";
+        document.getElementById("output").innerHTML = converted;
+
+        const history = document.getElementById("history");
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = converted;
+        const plainTextWithLTRNumbers = tempDiv.innerText;
+        history.value += plainTextWithLTRNumbers + "\n";
+
         let lines = history.value.split("\n");
         if(lines.length > 10){
           lines = lines.slice(lines.length-10);
           history.value = lines.join("\n");
         }
 
-        navigator.clipboard.writeText(converted).catch(()=>{});
+        navigator.clipboard.writeText(plainTextWithLTRNumbers).catch(()=>{});
       }
 
-      recognition.onend=function(){
+      recognition.onend = function(){
         document.querySelector(".container").classList.remove("recording");
         document.getElementById("recordingIndicator").style.display="none";
         document.getElementById("startBtn").style.display="inline-block";
@@ -530,9 +476,7 @@
     }
 
     function stopRecognition(){
-      if(recognition){
-        recognition.stop();
-      }
+      if(recognition) recognition.stop();
     }
   </script>
 </body>
