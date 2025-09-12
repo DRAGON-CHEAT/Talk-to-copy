@@ -288,9 +288,9 @@
       document.getElementById("userCount").textContent = "👥 الأعضاء: " + count;
     }
 
-    // دوال مساعدة لترميز UTF-8 قبل تحويلها إلى Base64 (للتعامل مع العربية بشكل صحيح)
+    //
     function base64EncodeUnicode(str) {
-      // تحويل السلسلة إلى UTF-8 ثم إلى Base64 بطريقة آمنة للمتصفحات
+      // 
       return btoa(unescape(encodeURIComponent(str)));
     }
 
@@ -299,12 +299,10 @@
       const pass = document.getElementById("password").value.trim();
       const remember = document.getElementById("rememberMe").checked;
 
-      //    UT
       //   : btoa(unescape(encodeURIComponent(")
       const encodedUser = "2LnZhNin2KE=";  // ""
       const encodedPass = "MjI0NA==";      // ""
-
-      // 
+      // jvcd
       if (base64EncodeUnicode(user) === encodedUser && base64EncodeUnicode(pass) === encodedPass) {
         if(remember) localStorage.setItem("loggedIn", "true");
         document.getElementById("login").style.display = "none";
