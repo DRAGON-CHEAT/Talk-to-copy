@@ -75,7 +75,6 @@
       opacity: 0.85;
     }
 
-    /* صندوق المحتوى */
     .container {
       background-color: #111;
       padding: 30px;
@@ -182,12 +181,14 @@
       position: absolute;
       top: 10px;
       left: 15px;
+      right: 15px;
       display: flex;
       align-items: center;
       gap: 10px;
       font-size: 12px;
       color: #0f0;
       opacity: 0.8;
+      justify-content: flex-end; /* يحرك زر تسجيل خروج لليمين */
     }
 
     #logoutBtn {
@@ -275,7 +276,6 @@
   </div>
 
   <script>
-    // عداد الأعضاء
     function updateUserCount(change) {
       let count = parseInt(localStorage.getItem("userCount") || "0");
       count += change;
@@ -284,7 +284,6 @@
       document.getElementById("userCount").textContent = "👥 الأعضاء: " + count;
     }
 
-    // تسجيل الدخول
     function checkLogin() {
       const user = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
