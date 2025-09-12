@@ -244,7 +244,6 @@
     }
   </style>
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script>
@@ -268,7 +267,7 @@
     <input type="password" id="password" placeholder="كلمة المرور">
     <label><input type="checkbox" id="rememberMe">تذكرني</label>
     <button onclick="checkLogin()">دخول</button>
-    <p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
+    <p id="error" style="color:red; display:none;">❌ خطأ في اسم المستخدم أو كلمة المرور</p>
   </div>
 
   <div class="container" id="app">
@@ -298,8 +297,10 @@
       return btoa(unescape(encodeURIComponent(str)));
     }
 
-    const userId = Date.now() + "_" + Math.floor(Math.random() * 1000);
+    // معرف فريد لكل جهاز
+    const userId = crypto.randomUUID();
 
+    // تحديث الحالة أونلاين / أوفلاين
     function updateOnlineStatus(online) {
       const ref = db.ref('onlineUsers/' + userId);
       if (online) {
@@ -310,6 +311,7 @@
       }
     }
 
+    // عد الأعضاء المتصلين حاليًا
     db.ref('onlineUsers').on('value', snapshot => {
       const count = snapshot.numChildren();
       document.getElementById("userCount").textContent = "👥 الأعضاء: " + count;
@@ -331,7 +333,6 @@
         document.getElementById("app").style.display = "block";
 
         updateOnlineStatus(true);
-
         window.addEventListener("beforeunload", () => updateOnlineStatus(false));
       } else {
         document.getElementById("error").style.display = "block";
@@ -368,7 +369,9 @@
         document.getElementById("login").style.display = "block";
       }
     };
+  </script>
 
+  <script>
     let recognition;
 
     function wordsToNumbersInText(text) {
