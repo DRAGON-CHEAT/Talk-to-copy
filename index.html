@@ -265,14 +265,14 @@
     <h2>⟱ تسجيل الدخول ⟱</h2>
     <input type="text" id="username" placeholder="اسم المستخدم">
     <input type="password" id="password" placeholder="كلمة المرور">
-    <label><input type="checkbox" id="rememberMe">تذكرني</label>
+    <label><input type="checkbox" id="rememberMe">ذكرني</label>
     <button onclick="checkLogin()">دخول</button>
-    <p id="error" style="color:red; display:none;">❌ خطأ في اسم المستخدم أو كلمة المرور</p>
+    <p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
   </div>
 
   <div class="container" id="app">
     <div id="userCountContainer">
-      <div id="userCount">👥 الأعضاء: 0</div>
+      <div id="userCount"># الأعضاء: 0</div>
       <button id="logoutBtn" onclick="logout()">تسجيل خروج</button>
     </div>
 
@@ -297,7 +297,7 @@
       return btoa(unescape(encodeURIComponent(str)));
     }
 
-    const deviceId = crypto.randomUUID(); // معرف لكل جهاز
+    const deviceId = crypto.randomUUID(); //   
 
     function updateUserOnlineStatus(username, online) {
       const ref = db.ref('onlineUsers/' + username + '/' + deviceId);
@@ -306,7 +306,7 @@
         ref.onDisconnect().remove();
       } else {
         ref.remove();
-        // تحقق إذا لم يتبق أي جهاز للمستخدم
+        // hdh 
         db.ref('onlineUsers/' + username).once('value', snap => {
           if (!snap.exists()) {
             db.ref('onlineUsers/' + username).remove();
@@ -315,10 +315,10 @@
       }
     }
 
-    // عد المستخدمين المتصلين
+    //   
     db.ref('onlineUsers').on('value', snapshot => {
       const count = snapshot.numChildren();
-      document.getElementById("userCount").textContent = "👥 الأعضاء: " + count;
+      document.getElementById("userCount").textContent = "# الأعضاء: " + count;
     });
 
     function checkLogin() {
