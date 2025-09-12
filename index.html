@@ -302,17 +302,17 @@
           updateUserCount(+1);
           sessionStorage.setItem("counted", "true");
         }
-
-        window.addEventListener("beforeunload", () => updateUserCount(-1));
       } else {
         document.getElementById("error").style.display = "block";
       }
     }
 
     function logout() {
-      updateUserCount(-1);
+      if (sessionStorage.getItem("counted")) {
+        updateUserCount(-1);
+        sessionStorage.removeItem("counted");
+      }
       localStorage.removeItem("loggedIn");
-      sessionStorage.removeItem("counted");
       document.getElementById("app").style.display = "none";
       document.getElementById("login").style.display = "block";
     }
@@ -326,13 +326,25 @@
           updateUserCount(+1);
           sessionStorage.setItem("counted", "true");
         }
-
-        window.addEventListener("beforeunload", () => updateUserCount(-1));
       } else {
         document.getElementById("userCount").textContent = "👥 الأعضاء: " + (localStorage.getItem("userCount") || 0);
         document.getElementById("login").style.display = "block";
       }
     };
+
+    //     localStorage   
+    window.addEventListener("storage", function(e) {
+      if (e.key === "userCount") {
+        document.getElementById("userCount").textContent = "👥 الأعضاء: " + (e.newValue || 0);
+      }
+    });
+
+    //    
+    window.addEventListener("beforeunload", function() {
+      if (sessionStorage.getItem("counted")) {
+        updateUserCount(-1);
+      }
+    });
   </script>
 
   <script>
