@@ -288,10 +288,8 @@
     <div id="output"></div>
     <textarea id="history" rows="6" readonly></textarea>
 
-    <textarea id="textField" rows="4" placeholder="سجل الكلام هنا مؤقتًا"></textarea>
-
     <footer>
-      &copy; DRAGON&CHEAT 2025 #
+      &copy; DRAGON&CHEAT 2025 @
     </footer>
   </div>
 
@@ -306,7 +304,7 @@
     }
 
     db.ref('userCount').on('value', snapshot => {
-      document.getElementById("userCount").textContent = "👥 الأعضاء: " + (snapshot.val() || 0);
+      document.getElementById("userCount").textContent = "# الأعضاء: " + (snapshot.val() || 0);
     });
 
     function checkLogin() {
@@ -350,7 +348,7 @@
       const loggedInSession = sessionStorage.getItem("loggedInSession") === "true";
 
       if (loggedInPermanent && !loggedInSession) {
-        alert("✅ سيتم تسجيل الدخول تلقائيًا الآن...");
+        alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");
         sessionStorage.setItem("loggedInSession", "true");
         location.reload();
         return;
