@@ -5,61 +5,16 @@
 <title>Convert audio</title>
 <style>
 /* === التنسيقات كما في كودك === */
-body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
-.login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}
-.login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}
-.login-container input{width:90%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #444;background-color:#1a1a1a;color:#fff;font-size:16px;text-align:center;direction:ltr;unicode-bidi:embed}
-.login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}
-.login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}
-.login-container button:hover{opacity:0.85}
-.container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:90%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
-h1{margin-bottom:20px;font-size:24px;transition:font-size 0.3s ease}
-button{padding:12px 24px;font-size:18px;margin:10px 5px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}
-#startBtn{background-color:#4CAF50;color:white}
-#stopBtn{background-color:#f44336;color:white;display:none}
-button:hover{opacity:0.85}
-#recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}
-#recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-#output{
-  background:#222;
-  border:1px solid #444;
-  padding:15px;
-  border-radius:8px;
-  margin-top:20px;
-  font-size:18px;
-  min-height:80px;
-  white-space:pre-wrap;
-  color:#ddd;
-  transition:font-size 0.3s ease,padding 0.3s ease;
-  direction:rtl;              
-  unicode-bidi:plaintext;
-  text-align:right;
+body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}.login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}.login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}.login-container input{width:90%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #444;background-color:#1a1a1a;color:#fff;font-size:16px;text-align:center;direction:ltr;unicode-bidi:embed}.login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}.login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}.login-container button:hover{opacity:0.85}.container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:90%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}h1{margin-bottom:20px;font-size:24px;transition:font-size 0.3s ease}button{padding:12px 24px;font-size:18px;margin:10px 5px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}#startBtn{background-color:#4CAF50;color:white}#stopBtn{background-color:#f44336;color:white;display:none}button:hover{opacity:0.85}#recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}#recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}#output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:ltr;unicode-bidi:embed;text-align:center}textarea#history{text-align:right;max-height:150px;overflow-y:auto;margin-top:10px;color:#aaa;font-size:14px;width:96%;padding:12px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;direction:rtl;unicode-bidi:plaintext}textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}#userCountContainer{position:relative;top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:12px;opacity:0.8;justify-content:space-between}#userCount{color:#0f0}#logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}@keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}.container.recording{animation:rgbGlow 10s infinite linear}  
+
+/* ==== كلاس الأرقام للـ output ==== */
+.num {
+  direction: ltr;
+  unicode-bidi: bidi-override;
+  display: inline-block;
 }
-textarea#history{
-  text-align:right;           
-  direction:rtl;
-  unicode-bidi:plaintext;
-  max-height:150px;
-  overflow-y:auto;
-  margin-top:10px;
-  color:#aaa;
-  font-size:14px;
-  width:96%;
-  padding:12px;
-  border-radius:6px;
-  border:1px solid #555;
-  background-color:#1a1a1a;
-}
-textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}
-#userCountContainer{position:relative;top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:12px;opacity:0.8;justify-content:space-between}
-#userCount{color:#0f0}
-#logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}
-footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
-@keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
-.container.recording{animation:rgbGlow 10s infinite linear}
-@media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
-@media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
+
+@media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}@media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -121,7 +76,7 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 </script>
 
 <script>
-// === التعرف الصوتي + تحويل الكلمات إلى أرقام مع عكس كل رقم + نسخ تلقائي RTL ===
+// === التعرف الصوتي + تحويل الكلمات إلى أرقام مع عكس كل رقم ===
 let recognition;
 
 function wordsToNumbersInText(text){
@@ -211,6 +166,15 @@ function extractDateFromText(text){
   return null;
 }
 
+// ==== دوال لفرض LTR على الأرقام ====
+function forceLTRNumbers(text){
+  return text.replace(/\d+/g,num=>`<span class="num">${num}</span>`);
+}
+
+function forceLTRNumbersForTextarea(text){
+  return text.replace(/\d+/g,num=>`\u202A${num}\u202C`);
+}
+
 function startRecognition(){
   const SpeechRecognition=window.webkitSpeechRecognition;
   if(!SpeechRecognition){alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");return;}
@@ -228,24 +192,19 @@ function startRecognition(){
     const converted=wordsToNumbersInText(transcript);
     const dateFormat=extractDateFromText(converted);
 
-    const finalText=dateFormat?dateFormat:converted;
+    const finalText = dateFormat ? dateFormat : converted;
 
-    // عرض النص
-    document.getElementById("output").innerText=finalText;
+    // output مع span للأرقام
+    document.getElementById("output").innerHTML = forceLTRNumbers(finalText);
 
-    // history
+    // textarea مع Unicode LTR embed للأرقام
     const history=document.getElementById("history");
-    history.value+=finalText+"\n";
-    let lines=history.value.split("\n");
-    if(lines.length>10){
-      lines=lines.slice(lines.length-10);
-      history.value=lines.join("\n");
-    }
+    history.value += forceLTRNumbersForTextarea(finalText) + "\n";
 
-    // نسخ تلقائي RTL
-    const rtlBlob=new Blob([`\u202B${finalText}\u202C`],{type:"text/plain"});
-    const data=new ClipboardItem({"text/plain":rtlBlob});
-    navigator.clipboard.write([data]).catch(()=>{});
+    let lines=history.value.split("\n");
+    if(lines.length>10){lines=lines.slice(lines.length-10);history.value=lines.join("\n");}
+
+    navigator.clipboard.writeText(finalText).catch(()=>{});
   }
   recognition.onend=function(){
     document.querySelector(".container").classList.remove("recording");
