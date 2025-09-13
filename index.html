@@ -52,13 +52,16 @@
 
     .login-container label {
       font-size: 14px;
-      display: flex;
+      display: inline-block;
       align-items: center;
       justify-content: center;
       gap: 1px;
       margin-top: 10px;
       cursor: pointer;
       width: -55℅;
+      text-align: center;
+      position: relative;
+      top: 11px;
     }
 
     .login-container button {
@@ -154,11 +157,10 @@
       white-space: pre-wrap;
       color: #ddd;
       transition: font-size 0.3s ease, padding 0.3s ease;
-
-      /* تعديل اتجاه الأرقام */
+      
       direction: ltr;
       unicode-bidi: embed;
-      text-align: left;
+      text-align: center;
     }
 
     textarea#history {
