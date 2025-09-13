@@ -75,6 +75,7 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 <script>
 // === التعرف الصوتي + تحويل الكلمات إلى أرقام مع عكس كل رقم ===
 let recognition;
+let isHorizontal = false; // حالة التحويل لأفقي
 
 function wordsToNumbersInText(text){
   const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
@@ -83,11 +84,9 @@ function wordsToNumbersInText(text){
   const hundreds={"مائة":100,"مئة":100,"مية":100,"مئتين":200,"ميتين":200,"ثلاثمائة":300,"ثلاثمية":300,"أربعمائة":400,"اربعماية":400,"خمسمائة":500,"خمسماية":500,"ستمائة":600,"ستمية":600,"سبعمائة":700,"سبعمية":700,"ثمانمائة":800,"ثمانمية":800,"تسعمائة":900,"تسعمية":900};
   const multipliers={"ألف":1000,"الف":1000,"ألفين":2000,"الفين":2000,"آلاف":1000,"مليون":1000000,"ملايين":1000000};
   const allWords=Object.assign({},units,teens,tens,hundreds,multipliers);
-
   const tokens=text.replace(/،/g," ").replace(/ و /g," ").trim().split(/\s+/);
   let resultWords=[];
   let numberBuffer=[];
-
   function processBuffer(buffer){
     let total=0;
     let current=0;
@@ -101,25 +100,20 @@ function wordsToNumbersInText(text){
           current=(current===0?1:current)*multipliers[word];
           total+=current;
           current=0;
-        } else {
-          current*=multipliers[word];
-        }
+        } else {current*=multipliers[word];}
       }
     });
     total+=current;
     return total.toString().split("").reverse().join("");
   }
-
   for(let i=0;i<tokens.length;i++){
     const word=tokens[i];
     const twoWords=word+" "+(tokens[i+1]||"");
-
     if(teens[twoWords]){
       numberBuffer.push(twoWords);
       i++;
       continue;
     }
-
     if(allWords[word]){
       numberBuffer.push(word);
     } else {
@@ -131,12 +125,10 @@ function wordsToNumbersInText(text){
       resultWords.push(word);
     }
   }
-
   if(numberBuffer.length>0){
     const num=processBuffer(numberBuffer);
     resultWords.push(num);
   }
-
   return resultWords.join(" ");
 }
 
@@ -149,7 +141,6 @@ function extractDateFromText(text){
       return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
     }
   }
-
   if(/سنة|شهر|يوم/.test(text)){
     const parts=text.split(/\s+/).map(p=>parseInt(p)).filter(n=>!isNaN(n));
     if(parts.length>=3){
@@ -159,22 +150,20 @@ function extractDateFromText(text){
       }
     }
   }
-
   return null;
 }
 
-// === دوال history المعدلة ===
+// === إنشاء سطر history مع نسخة بالضغط وإشعار على اليسار ===
 function createHistoryLine(text){
   const line = document.createElement("div");
   line.textContent = text;
   line.style.position = "relative";
-
   line.onclick = ()=>{
     navigator.clipboard.writeText(text).then(()=>{
       const notice = document.createElement("span");
       notice.textContent = "تم النسخ";
       notice.style.position = "absolute";
-      notice.style.right = "5px";
+      notice.style.left = "5px"; // جهة اليسار
       notice.style.color = "#0f0";
       notice.style.fontSize = "12px";
       notice.style.fontWeight = "bold";
@@ -185,32 +174,26 @@ function createHistoryLine(text){
   return line;
 }
 
+// === إضافة سطر history مع التحكم بعدد السطور ===
 function addHistoryLine(text){
   const history = document.getElementById("history");
-  const line = createHistoryLine(text);
-  history.appendChild(line);
-  history.scrollTop = history.scrollHeight;
-
-  const lines = Array.from(history.children);
-  if(lines.length>10){
-    history.removeChild(lines[0]);
+  if(isHorizontal){
+    history.innerHTML = text; // الأفقي يظهر كل شيء في سطر واحد
+    history.style.height = "200px";
+  } else {
+    history.appendChild(createHistoryLine(text));
+    let lines = Array.from(history.children);
+    if(lines.length>10){
+      history.removeChild(lines[0]);
+    }
+    history.style.height = "150px";
   }
 }
 
-// تحويل العمودي لأفقي
-document.getElementById("toggleOrientation").onclick = function(){
+// === زر النسخ الكل ===
+document.getElementById("copyAllBtn").onclick = ()=>{
   const history = document.getElementById("history");
-  const lines = Array.from(history.children).map(l=>l.textContent.replace("تم النسخ","").trim());
-  const horizontalText = lines.join(" | ");
-  history.innerHTML = "";
-  history.appendChild(createHistoryLine(horizontalText));
-};
-
-// نسخ الكل
-document.getElementById("copyAllBtn").onclick = function(){
-  const history = document.getElementById("history");
-  const lines = Array.from(history.children).map(l=>l.textContent.replace("تم النسخ","").trim());
-  const fullText = lines.join("\n");
+  let fullText = isHorizontal ? history.innerText : Array.from(history.children).map(l=>l.textContent).join("\n");
   navigator.clipboard.writeText(fullText).then(()=>{
     const notice = document.createElement("span");
     notice.textContent = "تم نسخ الكل";
@@ -223,6 +206,24 @@ document.getElementById("copyAllBtn").onclick = function(){
     document.getElementById("historyContainer").appendChild(notice);
     setTimeout(()=>document.getElementById("historyContainer").removeChild(notice),1500);
   });
+};
+
+// === زر تحويل العمودي ↔ الأفقي ===
+document.getElementById("toggleOrientation").onclick = function(){
+  const history = document.getElementById("history");
+  const lines = Array.from(history.children).map(l=>l.textContent.replace("تم النسخ","").trim());
+  if(!isHorizontal){
+    const horizontalText = lines.join(" | ");
+    history.innerHTML = "";
+    history.appendChild(createHistoryLine(horizontalText));
+    history.style.height = "200px";
+    isHorizontal = true;
+  } else {
+    history.innerHTML = "";
+    lines.forEach(lineText => history.appendChild(createHistoryLine(lineText)));
+    history.style.height = "150px";
+    isHorizontal = false;
+  }
 };
 
 // === التعرف الصوتي ===
@@ -242,7 +243,6 @@ function startRecognition(){
     const transcript=event.results[0][0].transcript;
     const converted=wordsToNumbersInText(transcript);
     const dateFormat=extractDateFromText(converted);
-
     document.getElementById("output").innerText=dateFormat?dateFormat:converted;
     addHistoryLine(dateFormat?dateFormat:converted);
   }
