@@ -222,7 +222,20 @@ toggleBtn.addEventListener("click", ()=>{
 
 copyAllBtn.addEventListener("click", ()=>{
   const allText = Array.from(historyEl.children).map(d=>d.innerText).join("\n");
-  navigator.clipboard.writeText(allText).then(()=>{alert("تم نسخ كل النصوص ✅");});
+  navigator.clipboard.writeText(allText).then(()=>{
+    // إزالة أي أيقونة موجودة مسبقًا
+    const existingIcon = copyAllBtn.querySelector("span");
+    if(existingIcon) existingIcon.remove();
+
+    // إضافة أيقونة ✅ بجانب الزر نفسه
+    const icon = document.createElement("span");
+    icon.innerText = " ✅";
+    icon.style.marginLeft = "6px";
+    copyAllBtn.appendChild(icon);
+
+    // إزالة الأيقونة بعد ثانية واحدة
+    setTimeout(()=>{icon.remove();},1000);
+  });
 });
 
 function addToHistory(text){
