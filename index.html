@@ -69,27 +69,25 @@ const db = firebase.database();
 <footer>
   &copy; DRAGON&CHEAT 2025 @
 </footer>
-</div>
 
-<!-- زر استعلام دائري مع تأثير لمعة -->
-<button id="helpBtn" title="تعليمات"
-    style="
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        border: none;
-        background-color: rgba(255, 204, 0, 0.4);
-        color: #000;
-        font-weight: bold;
-        font-size: 18px;
-        cursor: pointer;
-        box-shadow: 0 0 10px rgba(255,255,0,0.3);
-        z-index: 9999;
-        transition: all 0.3s ease;
-    ">?</button>
+<!-- زر استعلام دائري أصغر أسفل الفوتر -->
+<div style="position: relative; width: 100%; display: flex; justify-content: flex-start; margin-top: 10px;">
+    <button id="helpBtn" title="تعليمات"
+        style="
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background-color: rgba(255, 204, 0, 0.4);
+            color: #000;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255,255,0,0.3);
+            transition: all 0.3s ease;
+            margin-left: 20px;
+        ">?</button>
+</div>
 
 <!-- نافذة التعليمات -->
 <div id="helpModal" style="
@@ -123,7 +121,7 @@ const db = firebase.database();
 </div>
 
 <script>
-// === دوال تسجيل الدخول وFirebase كما هي ===
+// === جميع دوالك الأصلية + Firebase كما هي ===
 function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
 const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
@@ -280,7 +278,7 @@ copyAllBtn.addEventListener("click", ()=>{
     const existingIcon = copyAllBtn.querySelector("span");
     if(existingIcon) existingIcon.remove();
     const icon = document.createElement("span");
-    icon.innerText = "[√]";
+    icon.innerText = " ✅";
     icon.style.marginLeft = "6px";
     copyAllBtn.appendChild(icon);
     setTimeout(()=>{icon.remove();},1000);
@@ -301,7 +299,7 @@ function addToHistory(text){
   lineDiv.addEventListener("click", ()=>{
     navigator.clipboard.writeText(text).then(()=>{
       const copyIcon = document.createElement("span");
-      copyIcon.innerText = "[√]";
+      copyIcon.innerText = " ✅";
       copyIcon.style.marginLeft = "6px";
       lineDiv.appendChild(copyIcon);
       setTimeout(()=>{copyIcon.remove();},1000);
@@ -312,7 +310,10 @@ function addToHistory(text){
   historyEl.scrollTop = historyEl.scrollHeight;
 }
 
-// === زر الاستعلام الدائري + نافذة التعليمات ===
+// === زر الاستعلام الدائري أسفل الفوتر ===
+const helpBtn = document.getElementById('helpBtn');
+const helpModal = document.getElementById('helpModal');
+
 helpBtn.addEventListener('mouseenter', ()=>{
     helpBtn.style.backgroundColor = 'rgba(255, 204, 0, 1)';
     helpBtn.style.boxShadow = '0 0 20px rgba(255,255,0,0.8)';
@@ -323,12 +324,10 @@ helpBtn.addEventListener('mouseleave', ()=>{
     helpBtn.style.boxShadow = '0 0 10px rgba(255,255,0,0.3)';
 });
 
-// فتح نافذة التعليمات عند الضغط على الزر
 helpBtn.addEventListener('click', ()=>{
     helpModal.style.display = 'block';
 });
 
-// إغلاق نافذة التعليمات عند الضغط خارجها
 window.addEventListener('click', (e)=>{
     if(e.target === helpModal){
         helpModal.style.display = 'none';
