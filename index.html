@@ -43,8 +43,6 @@
       background-color: #1a1a1a;
       color: #fff;
       font-size: 16px;
-
-      /* تعديل اتجاه الأرقام */
       text-align: center;
       direction: ltr;
       unicode-bidi: embed;
@@ -157,7 +155,6 @@
       white-space: pre-wrap;
       color: #ddd;
       transition: font-size 0.3s ease, padding 0.3s ease;
-      
       direction: ltr;
       unicode-bidi: embed;
       text-align: center;
@@ -175,8 +172,6 @@
       border-radius: 6px;
       border: 1px solid #555;
       background-color: #1a1a1a;
-
-      /* تعديل اتجاه الأرقام */
       direction: ltr;
       unicode-bidi: embed;
     }
@@ -389,7 +384,7 @@
     };
   </script>
 
-  <!-- التعرف الصوتي -->
+  <!-- التعرف الصوتي مع دعم التاريخ -->
   <script>
     let recognition;
 
@@ -456,6 +451,27 @@
       return resultWords.join(" ");
     }
 
+    function extractDateFromText(text) {
+      const regex = /(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
+      const match = text.match(regex);
+      if (match) {
+        let [_, year, month, day] = match;
+        return `${year}/${month.padStart(2,"0")}/${day.padStart(2,"0")}`;
+      }
+
+      const parts = text.split(/\s+/).map(p=>p.trim()).filter(Boolean);
+      const numbers = parts.map(p=>parseInt(p)).filter(n=>!isNaN(n));
+
+      if (numbers.length >= 3) {
+        const year = numbers[0];
+        const month = numbers[1];
+        const day = numbers[2];
+        return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
+      }
+
+      return null;
+    }
+
     function startRecognition(){
       const SpeechRecognition=window.webkitSpeechRecognition;
       if(!SpeechRecognition){alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");return;}
@@ -473,17 +489,19 @@
       recognition.onresult=function(event){
         const transcript=event.results[0][0].transcript;
         const converted=wordsToNumbersInText(transcript);
-        document.getElementById("output").innerText=converted;
+        const dateFormat = extractDateFromText(converted);
+
+        document.getElementById("output").innerText = dateFormat ? dateFormat : converted;
 
         const history=document.getElementById("history");
-        history.value += converted + "\n";
+        history.value += (dateFormat ? dateFormat : converted) + "\n";
         let lines = history.value.split("\n");
         if(lines.length > 10){
           lines = lines.slice(lines.length-10);
           history.value = lines.join("\n");
         }
 
-        navigator.clipboard.writeText(converted).catch(()=>{});
+        navigator.clipboard.writeText(dateFormat ? dateFormat : converted).catch(()=>{});
       }
 
       recognition.onend=function(){
