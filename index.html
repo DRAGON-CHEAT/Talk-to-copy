@@ -4,29 +4,8 @@
 <meta charset="UTF-8">
 <title>Convert audio</title>
 <style>
-body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
-.login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}
-.login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}
-.login-container input{width:90%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #444;background-color:#1a1a1a;color:#fff;font-size:16px;text-align:center;direction:ltr;unicode-bidi:embed}
-.login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}
-.login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}
-.login-container button:hover{opacity:0.85}
-.container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:90%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
-h1{margin-bottom:20px;font-size:24px;transition:font-size 0.3s ease}
-button{padding:12px 24px;font-size:18px;margin:10px 5px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}
-#startBtn{background-color:#4CAF50;color:white}
-#stopBtn{background-color:#f44336;color:white;display:none}
-button:hover{opacity:0.85}
-#recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}
-#recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-#output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:ltr;unicode-bidi:embed;text-align:center}
-#history{position:relative; max-height:150px; overflow-y:auto; margin-top:10px; color:#aaa; font-size:14px; width:96%; padding:12px; border-radius:6px; border:1px solid #555; background-color:#1a1a1a; text-align:left; direction:ltr;}
-#toggleUnderline{position:absolute; top:5px; left:5px; font-size:12px; padding:2px 6px; cursor:pointer;}
-#userCountContainer{position:relative;top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:12px;opacity:0.8;justify-content:space-between}
-#userCount{color:#0f0}
-#logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}
-footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
+/* === التنسيقات الأصلية كما في كودك === */
+body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}.login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}.login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}.login-container input{width:90%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #444;background-color:#1a1a1a;color:#fff;font-size:16px;text-align:center;direction:ltr;unicode-bidi:embed}.login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}.login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}.login-container button:hover{opacity:0.85}.container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:90%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}h1{margin-bottom:20px;font-size:24px;transition:font-size 0.3s ease}button{padding:12px 24px;font-size:18px;margin:10px 5px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}#startBtn{background-color:#4CAF50;color:white}#stopBtn{background-color:#f44336;color:white;display:none}button:hover{opacity:0.85}#recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}#recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}#output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:ltr;unicode-bidi:embed;text-align:center}textarea#history{text-align:left;max-height:150px;overflow-y:auto;margin-top:10px;color:#aaa;font-size:14px;width:96%;padding:12px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;direction:ltr;unicode-bidi:embed}textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}#userCountContainer{position:relative;top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:12px;opacity:0.8;justify-content:space-between}#userCount{color:#0f0}#logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}@keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}.container.recording{animation:rgbGlow 10s infinite linear}@media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}@media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
 </style>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -70,9 +49,11 @@ const db = firebase.database();
 
 <div id="output"></div>
 
-<!-- صندوق التاريخ مع زر التسطير -->
-<div id="history">
-  <button id="toggleUnderline">تسطير</button>
+<!-- بولدر history النهائي -->
+<div id="historyContainer" style="position:relative;width:100%;margin-top:10px;">
+  <div id="history" style="background:#1a1a1a;color:#aaa;padding:12px;border-radius:6px;border:1px solid #555;max-height:150px;overflow-y:auto;font-size:14px;font-family:monospace;white-space:pre-wrap;cursor:pointer;"></div>
+  <button id="toggleOrientation" title="تحويل إلى أفقي" style="position:absolute;top:5px;left:5px;font-size:12px;padding:4px 6px;border:none;border-radius:4px;background:#333;color:#fff;cursor:pointer;opacity:0.7;">↔</button>
+  <button id="copyAllBtn" title="نسخ الكل" style="position:absolute;top:5px;right:5px;font-size:12px;padding:4px 6px;border:none;border-radius:4px;background:#333;color:#fff;cursor:pointer;opacity:0.7;">نسخ الكل</button>
 </div>
 
 <footer>
@@ -81,7 +62,7 @@ const db = firebase.database();
 </div>
 
 <script>
-// دوال تسجيل الدخول وFirebase كما هي
+// === دوال تسجيل الدخول وFirebase كما هي ===
 function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
 const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
@@ -92,18 +73,8 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 </script>
 
 <script>
-// التعرف الصوتي + تحويل الكلمات إلى أرقام مع عكس كل رقم
+// === التعرف الصوتي + تحويل الكلمات إلى أرقام مع عكس كل رقم ===
 let recognition;
-
-let underlineEnabled = true;
-
-document.getElementById("toggleUnderline").onclick = () => {
-    underlineEnabled = !underlineEnabled;
-    const history = document.getElementById("history");
-    Array.from(history.querySelectorAll(".lineText")).forEach(span => {
-        span.style.textDecoration = underlineEnabled ? "underline" : "none";
-    });
-};
 
 function wordsToNumbersInText(text){
   const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
@@ -112,9 +83,11 @@ function wordsToNumbersInText(text){
   const hundreds={"مائة":100,"مئة":100,"مية":100,"مئتين":200,"ميتين":200,"ثلاثمائة":300,"ثلاثمية":300,"أربعمائة":400,"اربعماية":400,"خمسمائة":500,"خمسماية":500,"ستمائة":600,"ستمية":600,"سبعمائة":700,"سبعمية":700,"ثمانمائة":800,"ثمانمية":800,"تسعمائة":900,"تسعمية":900};
   const multipliers={"ألف":1000,"الف":1000,"ألفين":2000,"الفين":2000,"آلاف":1000,"مليون":1000000,"ملايين":1000000};
   const allWords=Object.assign({},units,teens,tens,hundreds,multipliers);
+
   const tokens=text.replace(/،/g," ").replace(/ و /g," ").trim().split(/\s+/);
   let resultWords=[];
   let numberBuffer=[];
+
   function processBuffer(buffer){
     let total=0;
     let current=0;
@@ -128,18 +101,28 @@ function wordsToNumbersInText(text){
           current=(current===0?1:current)*multipliers[word];
           total+=current;
           current=0;
-        } else {current*=multipliers[word];}
+        } else {
+          current*=multipliers[word];
+        }
       }
     });
     total+=current;
     return total.toString().split("").reverse().join("");
   }
+
   for(let i=0;i<tokens.length;i++){
     const word=tokens[i];
     const twoWords=word+" "+(tokens[i+1]||"");
-    if(teens[twoWords]){numberBuffer.push(twoWords);i++;continue;}
-    if(allWords[word]){numberBuffer.push(word);}
-    else{
+
+    if(teens[twoWords]){
+      numberBuffer.push(twoWords);
+      i++;
+      continue;
+    }
+
+    if(allWords[word]){
+      numberBuffer.push(word);
+    } else {
       if(numberBuffer.length>0){
         const num=processBuffer(numberBuffer);
         resultWords.push(num);
@@ -148,21 +131,101 @@ function wordsToNumbersInText(text){
       resultWords.push(word);
     }
   }
-  if(numberBuffer.length>0){const num=processBuffer(numberBuffer);resultWords.push(num);}
+
+  if(numberBuffer.length>0){
+    const num=processBuffer(numberBuffer);
+    resultWords.push(num);
+  }
+
   return resultWords.join(" ");
 }
 
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
   const match=text.match(regex);
-  if(match){let [_,year,month,day]=match.map(Number);if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;}}
+  if(match){
+    let [_,year,month,day]=match.map(Number);
+    if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){
+      return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
+    }
+  }
+
   if(/سنة|شهر|يوم/.test(text)){
     const parts=text.split(/\s+/).map(p=>parseInt(p)).filter(n=>!isNaN(n));
-    if(parts.length>=3){const [year,month,day]=parts;if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;}}
+    if(parts.length>=3){
+      const [year,month,day]=parts;
+      if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){
+        return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
+      }
+    }
   }
+
   return null;
 }
 
+// === دوال history المعدلة ===
+function createHistoryLine(text){
+  const line = document.createElement("div");
+  line.textContent = text;
+  line.style.position = "relative";
+
+  line.onclick = ()=>{
+    navigator.clipboard.writeText(text).then(()=>{
+      const notice = document.createElement("span");
+      notice.textContent = "تم النسخ";
+      notice.style.position = "absolute";
+      notice.style.right = "5px";
+      notice.style.color = "#0f0";
+      notice.style.fontSize = "12px";
+      notice.style.fontWeight = "bold";
+      line.appendChild(notice);
+      setTimeout(()=>line.removeChild(notice),1500);
+    });
+  }
+  return line;
+}
+
+function addHistoryLine(text){
+  const history = document.getElementById("history");
+  const line = createHistoryLine(text);
+  history.appendChild(line);
+  history.scrollTop = history.scrollHeight;
+
+  const lines = Array.from(history.children);
+  if(lines.length>10){
+    history.removeChild(lines[0]);
+  }
+}
+
+// تحويل العمودي لأفقي
+document.getElementById("toggleOrientation").onclick = function(){
+  const history = document.getElementById("history");
+  const lines = Array.from(history.children).map(l=>l.textContent.replace("تم النسخ","").trim());
+  const horizontalText = lines.join(" | ");
+  history.innerHTML = "";
+  history.appendChild(createHistoryLine(horizontalText));
+};
+
+// نسخ الكل
+document.getElementById("copyAllBtn").onclick = function(){
+  const history = document.getElementById("history");
+  const lines = Array.from(history.children).map(l=>l.textContent.replace("تم النسخ","").trim());
+  const fullText = lines.join("\n");
+  navigator.clipboard.writeText(fullText).then(()=>{
+    const notice = document.createElement("span");
+    notice.textContent = "تم نسخ الكل";
+    notice.style.position = "absolute";
+    notice.style.top = "-20px";
+    notice.style.right = "5px";
+    notice.style.color = "#0f0";
+    notice.style.fontSize = "12px";
+    notice.style.fontWeight = "bold";
+    document.getElementById("historyContainer").appendChild(notice);
+    setTimeout(()=>document.getElementById("historyContainer").removeChild(notice),1500);
+  });
+};
+
+// === التعرف الصوتي ===
 function startRecognition(){
   const SpeechRecognition=window.webkitSpeechRecognition;
   if(!SpeechRecognition){alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");return;}
@@ -179,37 +242,9 @@ function startRecognition(){
     const transcript=event.results[0][0].transcript;
     const converted=wordsToNumbersInText(transcript);
     const dateFormat=extractDateFromText(converted);
-    const lineText=dateFormat?dateFormat:converted;
 
-    document.getElementById("output").innerText=lineText;
-
-    const history=document.getElementById("history");
-
-    // إنشاء عنصر السطر الجديد مع زر نسخ
-    const lineDiv=document.createElement("div");
-    lineDiv.style.display="flex";
-    lineDiv.style.justifyContent="space-between";
-    lineDiv.style.marginBottom="4px";
-
-    const textSpan=document.createElement("span");
-    textSpan.className="lineText";
-    textSpan.innerText=lineText;
-    textSpan.style.textDecoration=underlineEnabled?"underline":"none";
-
-    const copyBtn=document.createElement("span");
-    copyBtn.innerText="نسخ";
-    copyBtn.style.color="#00f";
-    copyBtn.style.cursor="pointer";
-    copyBtn.onclick=()=>navigator.clipboard.writeText(lineText);
-
-    lineDiv.appendChild(textSpan);
-    lineDiv.appendChild(copyBtn);
-    history.appendChild(lineDiv);
-
-    // إبقاء آخر 10 أسطر فقط (مع تجاهل زر التسطير)
-    while(history.children.length>11){history.removeChild(history.children[1]);}
-
-    navigator.clipboard.writeText(lineText).catch(()=>{});
+    document.getElementById("output").innerText=dateFormat?dateFormat:converted;
+    addHistoryLine(dateFormat?dateFormat:converted);
   }
   recognition.onend=function(){
     document.querySelector(".container").classList.remove("recording");
@@ -219,7 +254,6 @@ function startRecognition(){
   }
   recognition.start();
 }
-
 function stopRecognition(){if(recognition){recognition.stop();}}
 </script>
 </body>
