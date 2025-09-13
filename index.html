@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="rtl">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <title>Convert audio</title>
@@ -16,7 +16,6 @@
       height: 100vh;
       flex-direction: column;
     }
-
     .login-container {
       background-color: #111;
       padding: 30px;
@@ -27,13 +26,11 @@
       max-width: 400px;
       display: none;
     }
-
     .login-container h2 {
       margin-bottom: 20px;
       font-size: 22px;
       color: #ffcc00;
     }
-
     .login-container input {
       width: 90%;
       padding: 12px;
@@ -45,7 +42,6 @@
       font-size: 16px;
       text-align: center;
     }
-
     .login-container label {
       font-size: 14px;
       display: flex;
@@ -56,7 +52,6 @@
       cursor: pointer;
       width: -55℅;
     }
-
     .login-container button {
       padding: 12px 24px;
       font-size: 18px;
@@ -68,11 +63,9 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
     .login-container button:hover {
       opacity: 0.85;
     }
-
     .container {
       background-color: #111;
       padding: 30px;
@@ -85,13 +78,11 @@
       display: none;
       position: relative;
     }
-
     h1 {
       margin-bottom: 20px;
       font-size: 24px;
       transition: font-size 0.3s ease;
     }
-
     button {
       padding: 12px 24px;
       font-size: 18px;
@@ -101,29 +92,24 @@
       cursor: pointer;
       transition: 0.3s, font-size 0.3s ease, padding 0.3s ease;
     }
-
     #startBtn {
       background-color: #4CAF50;
       color: white;
     }
-
     #stopBtn {
       background-color: #f44336;
       color: white;
       display: none;
     }
-
     button:hover {
       opacity: 0.85;
     }
-
     #recordingIndicator {
       display: none;
       color: #ff5252;
       font-weight: bold;
       margin-top: 10px;
     }
-
     #recordingDot {
       display: inline-block;
       width: 12px;
@@ -133,12 +119,10 @@
       margin-left: 8px;
       animation: blink 1s infinite;
     }
-
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
     }
-
     #output {
       background: #222;
       border: 1px solid #444;
@@ -151,7 +135,6 @@
       color: #ddd;
       transition: font-size 0.3s ease, padding 0.3s ease;
     }
-
     textarea#history {
       text-align: left;
       max-height: 150px;
@@ -166,7 +149,6 @@
       background-color: #1a1a1a;
       resize: vertical;
     }
-
     textarea {
       width: 96%;
       margin-top: 15px;
@@ -179,7 +161,6 @@
       resize: vertical;
       transition: font-size 0.3s ease, padding 0.3s ease;
     }
-
     #userCountContainer {
       position: absolute;
       top: 10px;
@@ -191,11 +172,9 @@
       opacity: 0.8;
       justify-content: space-between;
     }
-
     #userCount {
       color: #0f0;
     }
-
     #logoutBtn {
       font-size: 12px;
       padding: 4px 8px;
@@ -206,14 +185,12 @@
       cursor: pointer;
       opacity: 0.9;
     }
-
     footer {
       margin-top: 15px;
       font-size: 14px;
       color: #b17215;
       text-align: center;
     }
-
     @keyframes rgbGlow {
       0%   { box-shadow: 0 0 40px 15px rgba(255,0,0,0.25); }
       20%  { box-shadow: 0 0 40px 15px rgba(255,165,0,0.25); }
@@ -222,11 +199,9 @@
       80%  { box-shadow: 0 0 40px 15px rgba(0,0,255,0.25); }
       100% { box-shadow: 0 0 40px 15px rgba(255,0,255,0.25); }
     }
-
     .container.recording {
       animation: rgbGlow 10s infinite linear;
     }
-
     @media (max-width: 500px) {
       .container { padding: 20px; }
       .container h1 { font-size: 20px; }
@@ -234,7 +209,6 @@
       #output { font-size: 16px; padding: 12px; }
       textarea { font-size: 14px; padding: 10px; }
     }
-
     @media (max-width: 350px) {
       .container { padding: 15px; }
       .container h1 { font-size: 18px; }
@@ -293,23 +267,16 @@
   </div>
 
   <script>
-    function base64EncodeUnicode(str) {
-      return btoa(unescape(encodeURIComponent(str)));
-    }
-
-    const deviceId = crypto.randomUUID(); //   
+    function base64EncodeUnicode(str) { return btoa(unescape(encodeURIComponent(str))); }
+    const deviceId = crypto.randomUUID();
 
     function updateUserOnlineStatus(username, online) {
       const ref = db.ref('onlineUsers/' + username + '/' + deviceId);
-      if (online) {
-        ref.set(true);
-        ref.onDisconnect().remove();
-      } else {
+      if (online) { ref.set(true); ref.onDisconnect().remove(); }
+      else {
         ref.remove();
         db.ref('onlineUsers/' + username).once('value', snap => {
-          if (!snap.exists()) {
-            db.ref('onlineUsers/' + username).remove();
-          }
+          if (!snap.exists()) { db.ref('onlineUsers/' + username).remove(); }
         });
       }
     }
@@ -323,22 +290,17 @@
       const user = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
       const remember = document.getElementById("rememberMe").checked;
-
       const encodedUser = "2LnZhNin2KE=";
       const encodedPass = "MjI0NA==";
 
       if (base64EncodeUnicode(user) === encodedUser && base64EncodeUnicode(pass) === encodedPass) {
         if (remember) localStorage.setItem("loggedIn", "true");
         else sessionStorage.setItem("loggedInSession", "true");
-
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
-
         updateUserOnlineStatus(user, true);
         window.addEventListener("beforeunload", () => updateUserOnlineStatus(user, false));
-      } else {
-        document.getElementById("error").style.display = "block";
-      }
+      } else { document.getElementById("error").style.display = "block"; }
     }
 
     function logout() {
@@ -346,7 +308,6 @@
       updateUserOnlineStatus(user, false);
       localStorage.removeItem("loggedIn");
       sessionStorage.removeItem("loggedInSession");
-
       document.getElementById("app").style.display = "none";
       document.getElementById("login").style.display = "block";
     }
@@ -366,65 +327,74 @@
         const user = document.getElementById("username").value.trim();
         document.getElementById("login").style.display = "none";
         document.getElementById("app").style.display = "block";
-
         updateUserOnlineStatus(user, true);
         window.addEventListener("beforeunload", () => updateUserOnlineStatus(user, false));
-      } else {
-        document.getElementById("login").style.display = "block";
-      }
+      } else { document.getElementById("login").style.display = "block"; }
     };
   </script>
 
-  <!-- التعرف الصوتي -->
+  <!-- التعرف الصوتي مع قلب الأرقام في history فقط -->
   <script>
     let recognition;
 
     function wordsToNumbersInText(text){
-      const unitsAR={"صفر":0,"واحد":1,"واحدة":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
-      const teensAR={"عشرة":10,"عشر":10,"أحد عشر":11,"احد عشر":11,"احدى عشر":11,"اثنا عشر":12,"اثني عشر":12,"ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19};
-      const tensAR={"عشرون":20,"عشرين":20,"ثلاثون":30,"ثلاثين":30,"أربعون":40,"اربعين":40,"خمسون":50,"خمسين":50,"ستون":60,"ستين":60,"سبعون":70,"سبعين":70,"ثمانون":80,"ثمانين":80,"تسعون":90,"تسعين":90};
-      const hundredsAR={"مائة":100,"مئة":100,"مية":100,"مئتين":200,"ميتين":200,"ثلاثمائة":300,"ثلاثمية":300,"أربعمائة":400,"اربعماية":400,"خمسمائة":500,"خمسماية":500,"ستمائة":600,"ستمية":600,"سبعمائة":700,"سبعمية":700,"ثمانمائة":800,"ثمانمية":800,"تسعمائة":900,"تسعمية":900};
-      const multipliersAR={"ألف":1000,"الف":1000,"ألفين":2000,"الفين":2000,"مليون":1000000,"ملايين":1000000};
-
-      const allWords=Object.assign({},unitsAR,teensAR,tensAR,hundredsAR,multipliersAR);
-      const tokens=text.replace(/،/g," ").replace(/ و /g," ").trim().split(/\s+/);
-      let resultWords=[];
-      let numberBuffer=[];
-
+      const units = {
+        "صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,
+        "اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,
+        "ثلاثة":3,"ثلاث":3,
+        "أربعة":4,"اربعة":4,"اربع":4,
+        "خمسة":5,"خمس":5,
+        "ستة":6,"ست":6,
+        "سبعة":7,"سبع":7,
+        "ثمانية":8,"ثمان":8,
+        "تسعة":9,"تسع":9
+      };
+      const teens = {
+        "عشرة":10,"عشر":10,
+        "أحد عشر":11,"احد عشر":11,"احدى عشر":11,
+        "اثنا عشر":12,"اثني عشر":12,
+        "ثلاثة عشر":13,"ثلاث عشر":13,
+        "أربعة عشر":14,"اربعة عشر":14,
+        "خمسة عشر":15,"ستة عشر":16,
+        "سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19
+      };
+      const tens = {
+        "عشرون":20,"عشرين":20,"ثلاثون":30,"ثلاثين":30,"أربعون":40,"اربعين":40,
+        "خمسون":50,"خمسين":50,"ستون":60,"ستين":60,"سبعون":70,"سبعين":70,
+        "ثمانون":80,"ثمانين":80,"تسعون":90,"تسعين":90
+      };
+      const hundreds = {
+        "مائة":100,"مئة":100,"مية":100,"مئتين":200,"ميتين":200,
+        "ثلاثمائة":300,"ثلاثمية":300,"أربعمائة":400,"اربعماية":400,
+        "خمسمائة":500,"خمسماية":500,"ستمائة":600,"ستمية":600,
+        "سبعمائة":700,"سبعمية":700,"ثمانمائة":800,"ثمانمية":800,"تسعمائة":900,"تسعمية":900
+      };
+      const multipliers = {"ألف":1000,"الف":1000,"ألفين":2000,"الفين":2000,"آلاف":1000,"مليون":1000000,"ملايين":1000000};
+      const allWords = Object.assign({}, units, teens, tens, hundreds, multipliers);
+      const tokens = text.replace(/،/g," ").replace(/ و /g," ").trim().split(/\s+/);
+      let resultWords = [], numberBuffer = [];
       function processBuffer(buffer){
-        let total=0,current=0;
-        buffer.forEach(word=>{
-          if(teensAR[word]!==undefined) current+=teensAR[word];
-          else if(unitsAR[word]!==undefined) current+=unitsAR[word];
-          else if(tensAR[word]!==undefined) current+=tensAR[word];
-          else if(hundredsAR[word]!==undefined) current+=hundredsAR[word];
-          else if(multipliersAR[word]!==undefined){
-            if(multipliersAR[word]>=1000){current=(current===0?1:current)*multipliersAR[word];total+=current;current=0;}
-            else{current*=multipliersAR[word];}
+        let total = 0, current = 0;
+        buffer.forEach(word => {
+          if (teens[word]!==undefined) current+=teens[word];
+          else if (units[word]!==undefined) current+=units[word];
+          else if (tens[word]!==undefined) current+=tens[word];
+          else if (hundreds[word]!==undefined) current+=hundreds[word];
+          else if (multipliers[word]!==undefined){
+            if (multipliers[word]>=1000){ current=(current===0?1:current)*multipliers[word]; total+=current; current=0; }
+            else current*=multipliers[word];
           }
         });
         total+=current;
         return total;
       }
-
-      for(let i=0;i<tokens.length;i++){
-        const word=tokens[i];
-        const twoWords=word+" "+(tokens[i+1]||"");
-        if(teensAR[twoWords]!==undefined){numberBuffer.push(twoWords); i++; continue;}
-        if(allWords[word]!==undefined){numberBuffer.push(word);}
-        else{
-          if(numberBuffer.length>0){
-            const num=processBuffer(numberBuffer);
-            resultWords.push(num.toString());
-            numberBuffer=[];
-          }
-          resultWords.push(word);
-        }
+      for (let i=0;i<tokens.length;i++){
+        const word=tokens[i], twoWords=word+" "+(tokens[i+1]||"");
+        if(teens[twoWords]){ numberBuffer.push(twoWords); i++; continue; }
+        if(allWords[word]) numberBuffer.push(word);
+        else { if(numberBuffer.length>0){ const num=processBuffer(numberBuffer); if(num!==null) resultWords.push(num.toString()); numberBuffer=[]; } resultWords.push(word); }
       }
-      if(numberBuffer.length>0){
-        const num=processBuffer(numberBuffer);
-        resultWords.push(num.toString());
-      }
+      if(numberBuffer.length>0){ const num=processBuffer(numberBuffer); if(num!==null) resultWords.push(num.toString()); }
       return resultWords.join(" ");
     }
 
@@ -445,15 +415,18 @@
       recognition.onresult=function(event){
         const transcript=event.results[0][0].transcript;
         const converted=wordsToNumbersInText(transcript);
+
+        // تظهر في output كما هي
         document.getElementById("output").innerText=converted;
 
+        // تظهر في history مع عكس الأرقام فقط
         const history=document.getElementById("history");
-        history.value += converted + "\n";
+        const historyLine = converted.replace(/\d+/g, num=>num.split("").reverse().join(""));
+        history.value += historyLine + "\n";
+
+        // حفظ آخر 10 أسطر فقط
         let lines = history.value.split("\n");
-        if(lines.length > 10){
-          lines = lines.slice(lines.length-10);
-          history.value = lines.join("\n");
-        }
+        if(lines.length>10){ lines = lines.slice(lines.length-10); history.value = lines.join("\n"); }
 
         navigator.clipboard.writeText(converted).catch(()=>{});
       }
@@ -468,11 +441,7 @@
       recognition.start();
     }
 
-    function stopRecognition(){
-      if(recognition){
-        recognition.stop();
-      }
-    }
+    function stopRecognition(){ if(recognition){ recognition.stop(); } }
   </script>
 </body>
 </html>
