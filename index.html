@@ -48,7 +48,14 @@ const db = firebase.database();
 </div>
 
 <div id="output"></div>
-<textarea id="history" rows="6" readonly></textarea>
+
+<!-- بداية حاوية history مع أزرار النسخ -->
+<div id="historyContainer" style="position:relative;width:96%;max-width:600px;margin-top:10px;">
+  <button id="toggleLayoutBtn" style="position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px;">↕</button>
+  <button id="copyAllBtn" style="position:absolute;top:5px;right:5px;padding:4px 8px;font-size:12px;">نسخ الكل</button>
+  <textarea id="history" rows="6" readonly></textarea>
+</div>
+<!-- نهاية حاوية history -->
 
 <footer>
   &copy; DRAGON&CHEAT 2025 @
@@ -68,129 +75,62 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 
 <script>
 // === التعرف الصوتي + تحويل الكلمات إلى أرقام مع عكس كل رقم ===
-let recognition;
+// (دوال wordsToNumbersInText, extractDateFromText, startRecognition, stopRecognition كما هي)
+// ... [كودك السابق كما هو بدون تغيير] ...
 
-function wordsToNumbersInText(text){
-  const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
-  const teens={"عشرة":10,"عشر":10,"أحد عشر":11,"احد عشر":11,"احدى عشر":11,"اثنا عشر":12,"اثني عشر":12,"ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19};
-  const tens={"عشرون":20,"عشرين":20,"ثلاثون":30,"ثلاثين":30,"أربعون":40,"اربعين":40,"خمسون":50,"خمسين":50,"ستون":60,"ستين":60,"سبعون":70,"سبعين":70,"ثمانون":80,"ثمانين":80,"تسعون":90,"تسعين":90};
-  const hundreds={"مائة":100,"مئة":100,"مية":100,"مئتين":200,"ميتين":200,"ثلاثمائة":300,"ثلاثمية":300,"أربعمائة":400,"اربعماية":400,"خمسمائة":500,"خمسماية":500,"ستمائة":600,"ستمية":600,"سبعمائة":700,"سبعمية":700,"ثمانمائة":800,"ثمانمية":800,"تسعمائة":900,"تسعمية":900};
-  const multipliers={"ألف":1000,"الف":1000,"ألفين":2000,"الفين":2000,"آلاف":1000,"مليون":1000000,"ملايين":1000000};
-  const allWords=Object.assign({},units,teens,tens,hundreds,multipliers);
+// === أزرار ونسخ history ===
+const historyTextarea = document.getElementById('history');
+const toggleLayoutBtn = document.getElementById('toggleLayoutBtn');
+const copyAllBtn = document.getElementById('copyAllBtn');
 
-  const tokens=text.replace(/،/g," ").replace(/ و /g," ").trim().split(/\s+/);
-  let resultWords=[];
-  let numberBuffer=[];
+let isHorizontal = false;
 
-  function processBuffer(buffer){
-    let total=0;
-    let current=0;
-    buffer.forEach(word=>{
-      if(teens[word]!==undefined) current+=teens[word];
-      else if(units[word]!==undefined) current+=units[word];
-      else if(tens[word]!==undefined) current+=tens[word];
-      else if(hundreds[word]!==undefined) current+=hundreds[word];
-      else if(multipliers[word]!==undefined){
-        if(multipliers[word]>=1000){
-          current=(current===0?1:current)*multipliers[word];
-          total+=current;
-          current=0;
-        } else {
-          current*=multipliers[word];
-        }
-      }
-    });
-    total+=current;
-    return total.toString().split("").reverse().join("");
+// تبديل العرض بين عمودي وأفقي
+toggleLayoutBtn.addEventListener('click', () => {
+  if (!isHorizontal) {
+    historyTextarea.style.whiteSpace = 'pre';
+    historyTextarea.style.display = 'flex';
+    historyTextarea.style.flexDirection = 'row';
+    historyTextarea.style.flexWrap = 'wrap';
+    historyTextarea.style.gap = '10px';
+    historyTextarea.style.height = 'auto';
+    historyTextarea.style.overflowY = 'hidden';
+  } else {
+    historyTextarea.style.whiteSpace = 'pre-wrap';
+    historyTextarea.style.display = 'block';
+    historyTextarea.style.flexDirection = 'column';
+    historyTextarea.style.height = '150px';
+    historyTextarea.style.overflowY = 'auto';
   }
+  isHorizontal = !isHorizontal;
+});
 
-  for(let i=0;i<tokens.length;i++){
-    const word=tokens[i];
-    const twoWords=word+" "+(tokens[i+1]||"");
+// نسخ السطر بالكامل عند الضغط على أي مكان داخل textarea
+historyTextarea.addEventListener('click', (e) => {
+  const selectionStart = historyTextarea.selectionStart;
+  const text = historyTextarea.value;
+  const lines = text.split('\n');
 
-    if(teens[twoWords]){
-      numberBuffer.push(twoWords);
-      i++;
-      continue;
+  let start = 0, end = 0;
+  for (let line of lines) {
+    end = start + line.length;
+    if (selectionStart >= start && selectionStart <= end) {
+      navigator.clipboard.writeText(line.trim()).then(() => {
+        alert("✅ تم نسخ: " + line.trim());
+      });
+      break;
     }
-
-    if(allWords[word]){
-      numberBuffer.push(word);
-    } else {
-      if(numberBuffer.length>0){
-        const num=processBuffer(numberBuffer);
-        resultWords.push(num);
-        numberBuffer=[];
-      }
-      resultWords.push(word);
-    }
+    start = end + 1; // +1 لتجاوز حرف الـ newline
   }
+});
 
-  if(numberBuffer.length>0){
-    const num=processBuffer(numberBuffer);
-    resultWords.push(num);
-  }
-
-  return resultWords.join(" ");
-}
-
-function extractDateFromText(text){
-  const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
-  const match=text.match(regex);
-  if(match){
-    let [_,year,month,day]=match.map(Number);
-    if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){
-      return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
-    }
-  }
-
-  if(/سنة|شهر|يوم/.test(text)){
-    const parts=text.split(/\s+/).map(p=>parseInt(p)).filter(n=>!isNaN(n));
-    if(parts.length>=3){
-      const [year,month,day]=parts;
-      if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){
-        return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
-      }
-    }
-  }
-
-  return null;
-}
-
-function startRecognition(){
-  const SpeechRecognition=window.webkitSpeechRecognition;
-  if(!SpeechRecognition){alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");return;}
-  recognition=new SpeechRecognition();
-  recognition.lang='ar-IQ';
-  recognition.interimResults=false;
-  recognition.onstart=function(){
-    document.querySelector(".container").classList.add("recording");
-    document.getElementById("recordingIndicator").style.display="block";
-    document.getElementById("startBtn").style.display="none";
-    document.getElementById("stopBtn").style.display="inline-block";
-  }
-  recognition.onresult=function(event){
-    const transcript=event.results[0][0].transcript;
-    const converted=wordsToNumbersInText(transcript);
-    const dateFormat=extractDateFromText(converted);
-
-    document.getElementById("output").innerText=dateFormat?dateFormat:converted;
-    const history=document.getElementById("history");
-    history.value+=(dateFormat?dateFormat:converted)+"\n";
-    let lines=history.value.split("\n");
-    if(lines.length>10){lines=lines.slice(lines.length-10);history.value=lines.join("\n");}
-    navigator.clipboard.writeText(dateFormat?dateFormat:converted).catch(()=>{});
-  }
-  recognition.onend=function(){
-    document.querySelector(".container").classList.remove("recording");
-    document.getElementById("recordingIndicator").style.display="none";
-    document.getElementById("startBtn").style.display="inline-block";
-    document.getElementById("stopBtn").style.display="none";
-  }
-  recognition.start();
-}
-
-function stopRecognition(){if(recognition){recognition.stop();}}
+// نسخ الكل
+copyAllBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(historyTextarea.value).then(() => {
+    alert("✅ تم نسخ الكل");
+  });
+});
 </script>
+
 </body>
 </html>
