@@ -126,52 +126,10 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 </script>
 
 <script>
-// === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
+// === تحويل الكلمات لأرقام وتطبيق الكلمات الذكية ===
 let recognition;
 let smartWords = {};
 
-// --- الكلمات الذكية ---
-const newSmartWordInput = document.getElementById("newSmartWord");
-newSmartWordInput.addEventListener("input", (e) => {
-  // استبدال الفاصلة الأولى بالسهم تلقائيًا
-  if(e.target.value.includes(",")){
-    e.target.value = e.target.value.replace(",", " → ");
-    const cursorPos = e.target.value.length;
-    e.target.setSelectionRange(cursorPos, cursorPos);
-  }
-});
-
-function addSmartWord(){
-  const val = newSmartWordInput.value.trim();
-  if(!val.includes("→")) return alert("اكتب الكلمة خاطئة، ثم السهم →، ثم الكلمة الصحيحة");
-  const [wrong,right] = val.split("→").map(s=>s.trim());
-  if(!wrong || !right) return alert("الرجاء التأكد من كتابة الكلمة الخاطئة والكلمة الصحيحة");
-  smartWords[wrong] = right;
-  renderSmartWords();
-  newSmartWordInput.value = "";
-  newSmartWordInput.focus();
-}
-
-function renderSmartWords(){
-  const smartList = document.getElementById("smartWordsList");
-  smartList.innerHTML="";
-  Object.keys(smartWords).forEach(k=>{
-    const div=document.createElement("div");
-    div.className="smartWordItem";
-    const span=document.createElement("span");
-    span.innerText=`${k} → ${smartWords[k]}`;
-    const btn=document.createElement("button");
-    btn.innerText="❌";
-    btn.onclick=()=>{delete smartWords[k];renderSmartWords();}
-    div.appendChild(span);
-    div.appendChild(btn);
-    smartList.appendChild(div);
-  });
-}
-
-function toggleSmartMenu(){document.getElementById("smartWordsMenu").style.display="none";}
-
-// --- تحويل الكلمات إلى أرقام مع عكسها ---
 function wordsToNumbersInText(text){
   const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
   const teens={"عشرة":10,"عشر":10,"أحد عشر":11,"احد عشر":11,"احدى عشر":11,"اثنا عشر":12,"اثني عشر":12,"ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19};
@@ -222,7 +180,8 @@ function wordsToNumbersInText(text){
         resultWords.push(num);
         numberBuffer=[];
       }
-      resultWords.push(smartWords[word] || word); // تطبيق الكلمات الذكية
+      // استبدال بالكلمات الذكية
+      resultWords.push(smartWords[word] || word);
     }
   }
   if(numberBuffer.length>0){
@@ -292,6 +251,54 @@ function addToHistory(text){
   historyEl.appendChild(lineDiv);
   historyEl.scrollTop = historyEl.scrollHeight;
 }
+
+// --- الكلمات الذكية ---
+const smartBtn = document.getElementById("smartWordsBtn");
+const smartMenu = document.getElementById("smartWordsMenu");
+const smartList = document.getElementById("smartWordsList");
+const newSmartWordInput = document.getElementById("newSmartWord");
+
+// استبدال الفاصلة تلقائيًا بالسهم داخل input
+newSmartWordInput.addEventListener("input", (e) => {
+  if(e.target.value.includes(",")){
+    e.target.value = e.target.value.replace(",", " → ");
+    const cursorPos = e.target.value.length;
+    e.target.setSelectionRange(cursorPos, cursorPos);
+  }
+});
+
+// زر يفتح ويغلق القائمة
+smartBtn.addEventListener("click", ()=>{
+    smartMenu.style.display = (smartMenu.style.display === "flex") ? "none" : "flex";
+    smartMenu.style.flexDirection="column";
+});
+
+function addSmartWord(){
+  const val = document.getElementById("newSmartWord").value.trim();
+  if(!val || !val.includes("→")) return alert("ادخل كلمة خاطئة → كلمة صحيحة");
+  const [wrong,right] = val.split("→").map(s=>s.trim());
+  smartWords[wrong]=right;
+  renderSmartWords();
+  document.getElementById("newSmartWord").value="";
+}
+
+function renderSmartWords(){
+  smartList.innerHTML="";
+  Object.keys(smartWords).forEach(k=>{
+    const div=document.createElement("div");
+    div.className="smartWordItem";
+    const span=document.createElement("span");
+    span.innerText=`${k} → ${smartWords[k]}`;
+    const btn=document.createElement("button");
+    btn.innerText="❌";
+    btn.onclick=()=>{delete smartWords[k];renderSmartWords();}
+    div.appendChild(span);
+    div.appendChild(btn);
+    smartList.appendChild(div);
+  });
+}
+
+function toggleSmartMenu(){smartMenu.style.display="none";}
 </script>
 
 </body>
