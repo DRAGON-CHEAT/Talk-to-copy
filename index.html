@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>Convert audio</title>
 <style>
-/* === التنسيقات الأصلية كما هي === */
 body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
 .login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}
 .login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}
@@ -21,26 +20,24 @@ button:hover{opacity:0.85}
 #recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}
 #recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-#output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:ltr;unicode-bidi:embed;text-align:center;position:relative}
-textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}
-#userCountContainer{position:relative;top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:12px;opacity:0.8;justify-content:space-between}
-#userCount{color:#0f0}
-#logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}
-footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
-@keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
-.container.recording{animation:rgbGlow 10s infinite linear}
-#smartWordsBtn{position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px;background-color:#564d4d;color:#fff;border:none;border-radius:4px;cursor:pointer;z-index:20}
-#smartWordsMenu{position:absolute;top:30px;left:5px;background:#222;border:1px solid #555;border-radius:6px;padding:6px;display:none;flex-direction:column;gap:4px;z-index:21}
+#outputContainer{position:relative;width:100%;}
+#output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;direction:ltr;unicode-bidi:embed;text-align:center;transition:font-size 0.3s ease,padding 0.3s ease;}
+#smartWordsBtn{position:absolute;top:5px;left:5px;z-index:10;padding:4px 8px;font-size:12px;background:#564d4d;color:#fff;border:none;border-radius:4px;cursor:pointer;}
+#smartWordsMenu{position:absolute;top:35px;left:5px;background:#222;border:1px solid #555;border-radius:6px;padding:6px;display:none;flex-direction:column;gap:4px;z-index:20}
 .smartWordItem{display:flex;justify-content:space-between;align-items:center;background:#333;padding:2px 6px;border-radius:4px;cursor:pointer}
 .smartWordItem span{flex:1;text-align:center}
 .smartWordItem button{background:red;color:#fff;border:none;border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
 #smartAddInput{display:flex;gap:4px;margin-bottom:4px}
 #smartAddInput input{flex:1;padding:4px;border-radius:4px;border:1px solid #555;background:#111;color:#fff;font-size:14px}
 #smartAddInput button{padding:4px 8px;border-radius:4px;border:none;background:#4CAF50;color:#fff;font-size:12px;cursor:pointer}
+#historyContainer{width:96%; min-height:110px; max-height:200px; border:1px solid #555; border-radius:6px; background:#1a1a1a; top:18px; position:relative; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; flex-wrap:wrap;}
+#toggleHistoryBtn,#copyAllHistoryBtn{position:absolute;top:5px;padding:4px 8px;font-size:12px;background-color: #564d4d; color:#fff; border:none; border-radius:4px; cursor:pointer; z-index:10;}
+#toggleHistoryBtn{left:5px;}#copyAllHistoryBtn{right:5px;}
+#history{width:100%; display:flex; flex-direction:column; gap:4px; flex-wrap:wrap; align-items:center; justify-content:flex-start; text-align:center;}
+footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 @media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
 @media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
 </style>
-
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script>
@@ -82,40 +79,31 @@ const db = firebase.database();
   <span id="recordingDot"></span> ▶︎ جاري التسجيل...
 </div>
 
-<div id="output">
+<!-- output + زر كلمات ذكية ثابت -->
+<div id="outputContainer">
+  <div id="output"></div>
   <button id="smartWordsBtn">كلمات ذكية</button>
   <div id="smartWordsMenu">
     <div id="smartAddInput">
-      <input type="text" id="newSmartWord" placeholder="أدخل كلمة خاطئة,ثم صححها">
+      <input type="text" id="newSmartWord" placeholder="أدخل كلمة خاطئة ثم صححها">
       <button onclick="addSmartWord()">إضافة</button>
     </div>
     <div id="smartWordsList"></div>
-    <button onclick="toggleSmartMenu()" style="margin-top:4px;padding:2px 6px;background:#444;color:#fff;border:none;border-radius:4px;font-size:12px;">إغلاق القائمة</button>
+    <button onclick="toggleSmartMenu()">إغلاق القائمة</button>
   </div>
 </div>
 
-<div id="historyContainer" style="width:96%; min-height:110px; max-height:200px; 
-     border:1px solid #555; border-radius:6px; background:#1a1a1a; top:18px;
-     position:relative; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; flex-wrap:wrap;">
-
-  <button id="toggleHistoryBtn" title="تبديل العرض" 
-          style=" 
-    background-color: #564d4d; position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px; z-index:10;">⇄</button>
-
-  <button id="copyAllHistoryBtn" title="نسخ الكل" 
-          style="background-color: #564d4d; position:absolute;top:5px;right:5px;padding:4px 8px;font-size:12px; z-index:10;">نسخ الكل</button>
-
-  <div id="history" style="width:100%; display:flex; flex-direction:column; 
-       gap:4px; flex-wrap:wrap; align-items:center; justify-content:flex-start; text-align:center;">
-  </div>
+<div id="historyContainer">
+  <button id="toggleHistoryBtn" title="تبديل العرض">⇄</button>
+  <button id="copyAllHistoryBtn" title="نسخ الكل">نسخ الكل</button>
+  <div id="history"></div>
 </div>
+
 <br>
-<footer>
-  &copy; DRAGON&CHEAT 2025 @
-</footer>
+<footer>&copy; DRAGON&CHEAT 2025 @</footer>
 
 <script>
-// === دوال Firebase + تسجيل الدخول ===
+// === Firebase + تسجيل دخول ===
 function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
 const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
@@ -126,7 +114,7 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 </script>
 
 <script>
-// === تحويل الكلمات لأرقام وتطبيق الكلمات الذكية ===
+// === تحويل الكلمات إلى أرقام + الكلمات الذكية ===
 let recognition;
 let smartWords = {};
 
@@ -143,21 +131,15 @@ function wordsToNumbersInText(text){
   let numberBuffer=[];
 
   function processBuffer(buffer){
-    let total=0;
-    let current=0;
+    let total=0,current=0;
     buffer.forEach(word=>{
       if(teens[word]!==undefined) current+=teens[word];
       else if(units[word]!==undefined) current+=units[word];
       else if(tens[word]!==undefined) current+=tens[word];
       else if(hundreds[word]!==undefined) current+=hundreds[word];
       else if(multipliers[word]!==undefined){
-        if(multipliers[word]>=1000){
-          current=(current===0?1:current)*multipliers[word];
-          total+=current;
-          current=0;
-        } else {
-          current*=multipliers[word];
-        }
+        if(multipliers[word]>=1000){current=(current===0?1:current)*multipliers[word];total+=current;current=0;} 
+        else current*=multipliers[word];
       }
     });
     total+=current;
@@ -167,27 +149,14 @@ function wordsToNumbersInText(text){
   for(let i=0;i<tokens.length;i++){
     const word=tokens[i];
     const twoWords=word+" "+(tokens[i+1]||"");
-    if(teens[twoWords]){
-      numberBuffer.push(twoWords);
-      i++;
-      continue;
-    }
-    if(allWords[word]){
-      numberBuffer.push(word);
-    } else {
-      if(numberBuffer.length>0){
-        const num=processBuffer(numberBuffer);
-        resultWords.push(num);
-        numberBuffer=[];
-      }
-      // استبدال بالكلمات الذكية
-      resultWords.push(smartWords[word] || word);
+    if(teens[twoWords]){numberBuffer.push(twoWords);i++;continue;}
+    if(allWords[word]) numberBuffer.push(word);
+    else{
+      if(numberBuffer.length>0){const num=processBuffer(numberBuffer);resultWords.push(num);numberBuffer=[];}
+      resultWords.push(smartWords[word]||word);
     }
   }
-  if(numberBuffer.length>0){
-    const num=processBuffer(numberBuffer);
-    resultWords.push(num);
-  }
+  if(numberBuffer.length>0){const num=processBuffer(numberBuffer);resultWords.push(num);}
   return resultWords.join(" ");
 }
 
@@ -219,64 +188,61 @@ function startRecognition(){
   }
   recognition.start();
 }
-
 function stopRecognition(){if(recognition){recognition.stop();}}
 
 // --- سجل التاريخ ---
-const historyEl = document.getElementById("history");
-document.getElementById("toggleHistoryBtn").addEventListener("click", ()=>{
-  if(historyEl.style.flexDirection==="row"){historyEl.style.flexDirection="column";historyEl.style.flexWrap="nowrap";}
+const historyEl=document.getElementById("history");
+const toggleBtn=document.getElementById("toggleHistoryBtn");
+const copyAllBtn=document.getElementById("copyAllHistoryBtn");
+let isHorizontal=false;
+
+toggleBtn.addEventListener("click",()=>{
+  if(isHorizontal){historyEl.style.flexDirection="column";historyEl.style.flexWrap="nowrap";}
   else{historyEl.style.flexDirection="row";historyEl.style.flexWrap="wrap";}
+  isHorizontal=!isHorizontal;
 });
-document.getElementById("copyAllHistoryBtn").addEventListener("click", ()=>{
-  const allText = Array.from(historyEl.children).map(d=>d.innerText).join("\n");
-  navigator.clipboard.writeText(allText);
+
+copyAllBtn.addEventListener("click",()=>{
+  const allText=Array.from(historyEl.children).map(d=>d.innerText).join("\n");
+  navigator.clipboard.writeText(allText).then(()=>{
+    const existingIcon=copyAllBtn.querySelector("span");if(existingIcon) existingIcon.remove();
+    const icon=document.createElement("span");icon.innerText="[√]";icon.style.marginLeft="6px";copyAllBtn.appendChild(icon);setTimeout(()=>{icon.remove();},1000);
+  });
 });
 
 function addToHistory(text){
-  const lineDiv = document.createElement("div");
-  lineDiv.style.cursor = "pointer";
-  lineDiv.style.padding = "2px 6px";
-  lineDiv.style.background = "#1a1a1a";
-  lineDiv.style.borderRadius = "4px";
-  lineDiv.style.margin = "2px 2px";
-  lineDiv.style.textAlign = "center"; 
-  lineDiv.style.width = "auto";       
-  lineDiv.innerText = text;
-
-  lineDiv.addEventListener("click", ()=>{
-    navigator.clipboard.writeText(text);
+  const lineDiv=document.createElement("div");
+  lineDiv.style.cursor="pointer";lineDiv.style.padding="2px 6px";lineDiv.style.background="#1a1a1a";
+  lineDiv.style.borderRadius="4px";lineDiv.style.margin="2px 2px";lineDiv.style.textAlign="center";lineDiv.style.width="auto";       
+  lineDiv.innerText=text;
+  lineDiv.addEventListener("click",()=>{
+    navigator.clipboard.writeText(text).then(()=>{
+      const copyIcon=document.createElement("span");copyIcon.innerText="[√]";copyIcon.style.marginLeft="6px";lineDiv.appendChild(copyIcon);setTimeout(()=>{copyIcon.remove();},1000);
+    });
   });
-
-  historyEl.appendChild(lineDiv);
-  historyEl.scrollTop = historyEl.scrollHeight;
+  historyEl.appendChild(lineDiv);historyEl.scrollTop=historyEl.scrollHeight;
 }
 
 // --- الكلمات الذكية ---
-const smartBtn = document.getElementById("smartWordsBtn");
-const smartMenu = document.getElementById("smartWordsMenu");
-const smartList = document.getElementById("smartWordsList");
-const newSmartWordInput = document.getElementById("newSmartWord");
+const smartBtn=document.getElementById("smartWordsBtn");
+const smartMenu=document.getElementById("smartWordsMenu");
+const smartList=document.getElementById("smartWordsList");
+smartBtn.addEventListener("click",()=>{smartMenu.style.display=smartMenu.style.display==="flex"?"none":"flex";smartMenu.style.flexDirection="column";});
 
-// استبدال الفاصلة تلقائيًا بالسهم داخل input
-newSmartWordInput.addEventListener("input", (e) => {
-  if(e.target.value.includes(",")){
-    e.target.value = e.target.value.replace(",", " → ");
-    const cursorPos = e.target.value.length;
-    e.target.setSelectionRange(cursorPos, cursorPos);
+const newSmartWordInput=document.getElementById("newSmartWord");
+newSmartWordInput.addEventListener("keydown",(e)=>{
+  if(e.key==="Enter"){e.preventDefault();
+    let val=e.target.value.trim();
+    if(!val.includes(",")){alert("ادخل كلمة خاطئة ثم فاصلة ',' ثم الكلمة الصحيحة");return;}
+    val=val.replace(",", " → ");
+    e.target.value=val; addSmartWord();
   }
 });
 
-// زر يفتح ويغلق القائمة
-smartBtn.addEventListener("click", ()=>{
-    smartMenu.style.display = (smartMenu.style.display === "flex") ? "none" : "flex";
-    smartMenu.style.flexDirection="column";
-});
-
 function addSmartWord(){
-  const val = document.getElementById("newSmartWord").value.trim();
-  if(!val || !val.includes("→")) return alert("ادخل كلمة خاطئة → كلمة صحيحة");
-  const [wrong,right] = val.split("→").map(s=>s.trim());
+  const val=document.getElementById("newSmartWord").value.trim();
+  if(!val.includes("→")) return alert("ادخل كلمة خاطئة → كلمة صحيحة");
+  const [wrong,right]=val.split("→").map(s=>s.trim());
   smartWords[wrong]=right;
   renderSmartWords();
   document.getElementById("newSmartWord").value="";
@@ -285,21 +251,14 @@ function addSmartWord(){
 function renderSmartWords(){
   smartList.innerHTML="";
   Object.keys(smartWords).forEach(k=>{
-    const div=document.createElement("div");
-    div.className="smartWordItem";
-    const span=document.createElement("span");
-    span.innerText=`${k} → ${smartWords[k]}`;
-    const btn=document.createElement("button");
-    btn.innerText="❌";
-    btn.onclick=()=>{delete smartWords[k];renderSmartWords();}
-    div.appendChild(span);
-    div.appendChild(btn);
-    smartList.appendChild(div);
+    const div=document.createElement("div");div.className="smartWordItem";
+    const span=document.createElement("span");span.innerText=`${k} → ${smartWords[k]}`;
+    const btn=document.createElement("button");btn.innerText="❌";btn.onclick=()=>{delete smartWords[k];renderSmartWords();}
+    div.appendChild(span);div.appendChild(btn);smartList.appendChild(div);
   });
 }
 
 function toggleSmartMenu(){smartMenu.style.display="none";}
 </script>
-
 </body>
 </html>
