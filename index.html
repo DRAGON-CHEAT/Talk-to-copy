@@ -4,9 +4,43 @@
 <meta charset="UTF-8">
 <title>Convert audio</title>
 <style>
-/* === التنسيقات كما في كودك الأصلي === */
-body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}.login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}.login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}.login-container input{width:90%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #444;background-color:#1a1a1a;color:#fff;font-size:16px;text-align:center;direction:ltr;unicode-bidi:embed}.login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}.login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}.login-container button:hover{opacity:0.85}.container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:90%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}h1{margin-bottom:20px;font-size:24px;transition:font-size 0.3s ease}button{padding:12px 24px;font-size:18px;margin:10px 5px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}#startBtn{background-color:#4CAF50;color:white}#stopBtn{background-color:#f44336;color:white;display:none}button:hover{opacity:0.85}#recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}#recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}#output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:ltr;unicode-bidi:embed;text-align:center}textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}#userCountContainer{position:relative;top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:12px;opacity:0.8;justify-content:space-between}#userCount{color:#0f0}#logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}@keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}.container.recording{animation:rgbGlow 10s infinite linear}@media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}@media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
+/* === التنسيقات الأصلية كما هي === */
+body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
+.login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}
+.login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}
+.login-container input{width:90%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #444;background-color:#1a1a1a;color:#fff;font-size:16px;text-align:center;direction:ltr;unicode-bidi:embed}
+.login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}
+.login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}
+.login-container button:hover{opacity:0.85}
+.container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:90%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
+h1{margin-bottom:20px;font-size:24px;transition:font-size 0.3s ease}
+button{padding:12px 24px;font-size:18px;margin:10px 5px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}
+#startBtn{background-color:#4CAF50;color:white}
+#stopBtn{background-color:#f44336;color:white;display:none}
+button:hover{opacity:0.85}
+#recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}
+#recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:ltr;unicode-bidi:embed;text-align:center;position:relative}
+textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}
+#userCountContainer{position:relative;top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:12px;opacity:0.8;justify-content:space-between}
+#userCount{color:#0f0}
+#logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}
+footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
+@keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
+.container.recording{animation:rgbGlow 10s infinite linear}
+#smartWordsBtn{position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px;background-color:#564d4d;color:#fff;border:none;border-radius:4px;cursor:pointer;z-index:20}
+#smartWordsMenu{position:absolute;top:30px;left:5px;background:#222;border:1px solid #555;border-radius:6px;padding:6px;display:none;flex-direction:column;gap:4px;z-index:21}
+.smartWordItem{display:flex;justify-content:space-between;align-items:center;background:#333;padding:2px 6px;border-radius:4px;cursor:pointer}
+.smartWordItem span{flex:1;text-align:center}
+.smartWordItem button{background:red;color:#fff;border:none;border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
+#smartAddInput{display:flex;gap:4px;margin-bottom:4px}
+#smartAddInput input{flex:1;padding:4px;border-radius:4px;border:1px solid #555;background:#111;color:#fff;font-size:14px}
+#smartAddInput button{padding:4px 8px;border-radius:4px;border:none;background:#4CAF50;color:#fff;font-size:12px;cursor:pointer}
+@media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
+@media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
 </style>
+
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script>
@@ -24,6 +58,7 @@ const db = firebase.database();
 </script>
 </head>
 <body>
+
 <div class="login-container" id="login">
 <h2>⟱ تسجيل الدخول ⟱</h2>
 <input type="text" id="username" placeholder="اسم المستخدم">
@@ -47,9 +82,18 @@ const db = firebase.database();
   <span id="recordingDot"></span> ▶︎ جاري التسجيل...
 </div>
 
-<div id="output"></div>
+<div id="output">
+  <button id="smartWordsBtn">كلمات ذكية</button>
+  <div id="smartWordsMenu">
+    <div id="smartAddInput">
+      <input type="text" id="newSmartWord" placeholder="أدخل كلمة خاطئة,ثم صححها">
+      <button onclick="addSmartWord()">إضافة</button>
+    </div>
+    <div id="smartWordsList"></div>
+    <button onclick="toggleSmartMenu()" style="margin-top:4px;padding:2px 6px;background:#444;color:#fff;border:none;border-radius:4px;font-size:12px;">إغلاق القائمة</button>
+  </div>
+</div>
 
-<!-- صندوق التاريخ مع أزرار النسخ والتبديل -->
 <div id="historyContainer" style="width:96%; min-height:110px; max-height:200px; 
      border:1px solid #555; border-radius:6px; background:#1a1a1a; top:18px;
      position:relative; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; flex-wrap:wrap;">
@@ -123,7 +167,7 @@ const db = firebase.database();
 </div>
 
 <script>
-// === جميع دوالك الأصلية + Firebase كما هي ===
+// === دوالك الأصلية + Firebase ===
 function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
 const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
@@ -136,6 +180,7 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 <script>
 // === التعرف الصوتي + تحويل الكلمات إلى أرقام مع عكس كل رقم ===
 let recognition;
+let smartWords = {};
 
 function wordsToNumbersInText(text){
   const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
@@ -174,13 +219,11 @@ function wordsToNumbersInText(text){
   for(let i=0;i<tokens.length;i++){
     const word=tokens[i];
     const twoWords=word+" "+(tokens[i+1]||"");
-
     if(teens[twoWords]){
       numberBuffer.push(twoWords);
       i++;
       continue;
     }
-
     if(allWords[word]){
       numberBuffer.push(word);
     } else {
@@ -189,15 +232,14 @@ function wordsToNumbersInText(text){
         resultWords.push(num);
         numberBuffer=[];
       }
-      resultWords.push(word);
+      // استبدال تلقائي بالكلمات الذكية
+      resultWords.push(smartWords[word] || word);
     }
   }
-
   if(numberBuffer.length>0){
     const num=processBuffer(numberBuffer);
     resultWords.push(num);
   }
-
   return resultWords.join(" ");
 }
 
@@ -210,7 +252,6 @@ function extractDateFromText(text){
       return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
     }
   }
-
   if(/سنة|شهر|يوم/.test(text)){
     const parts=text.split(/\s+/).map(p=>parseInt(p)).filter(n=>!isNaN(n));
     if(parts.length>=3){
@@ -220,7 +261,6 @@ function extractDateFromText(text){
       }
     }
   }
-
   return null;
 }
 
@@ -257,7 +297,7 @@ function startRecognition(){
 
 function stopRecognition(){if(recognition){recognition.stop();}}
 
-// === إضافات التاريخ الحديثة ===
+// === سجل التاريخ ===
 const historyEl = document.getElementById("history");
 const toggleBtn = document.getElementById("toggleHistoryBtn");
 const copyAllBtn = document.getElementById("copyAllHistoryBtn");
@@ -294,8 +334,8 @@ function addToHistory(text){
   lineDiv.style.background = "#1a1a1a";
   lineDiv.style.borderRadius = "4px";
   lineDiv.style.margin = "2px 2px";
-  lineDiv.style.textAlign = "center"; // نص العنصر بالوسط
-  lineDiv.style.width = "auto";       // عرض تلقائي حسب النص
+  lineDiv.style.textAlign = "center"; 
+  lineDiv.style.width = "auto";       
   lineDiv.innerText = text;
 
   lineDiv.addEventListener("click", ()=>{
@@ -311,6 +351,39 @@ function addToHistory(text){
   historyEl.appendChild(lineDiv);
   historyEl.scrollTop = historyEl.scrollHeight;
 }
+
+// === الكلمات الذكية ===
+const smartBtn = document.getElementById("smartWordsBtn");
+const smartMenu = document.getElementById("smartWordsMenu");
+const smartList = document.getElementById("smartWordsList");
+smartBtn.addEventListener("click", ()=>{smartMenu.style.display = smartMenu.style.display==="flex"?"none":"flex";smartMenu.style.flexDirection="column";});
+
+function addSmartWord(){
+  const val = document.getElementById("newSmartWord").value.trim();
+  if(!val || !val.includes(",")) return alert("ادخل كلمة خاطئة وكلمة صحيحة مفصولة بفاصلة");
+  const [wrong,right] = val.split(",").map(s=>s.trim());
+  smartWords[wrong]=right;
+  renderSmartWords();
+  document.getElementById("newSmartWord").value="";
+}
+
+function renderSmartWords(){
+  smartList.innerHTML="";
+  Object.keys(smartWords).forEach(k=>{
+    const div=document.createElement("div");
+    div.className="smartWordItem";
+    const span=document.createElement("span");
+    span.innerText=`${k} → ${smartWords[k]}`;
+    const btn=document.createElement("button");
+    btn.innerText="❌";
+    btn.onclick=()=>{delete smartWords[k];renderSmartWords();}
+    div.appendChild(span);
+    div.appendChild(btn);
+    smartList.appendChild(div);
+  });
+}
+
+function toggleSmartMenu(){smartMenu.style.display="none";}
 
 // === زر الاستعلام الدائري أسفل الفوتر ===
 const helpBtn = document.getElementById('helpBtn');
@@ -336,5 +409,6 @@ window.addEventListener('click', (e)=>{
     }
 });
 </script>
+
 </body>
 </html>
