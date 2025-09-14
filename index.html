@@ -21,7 +21,8 @@ button:hover{opacity:0.85}
 #recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}
 #recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-#output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:ltr;unicode-bidi:embed;text-align:center;position:relative;outline:none}
+#output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:ltr;unicode-bidi:embed;text-align:center;position:relative;user-select:none}
+#outputText{pointer-events:none} /* النص غير قابل للتعديل */
 textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}
 #userCountContainer{position:relative;top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:12px;opacity:0.8;justify-content:space-between}
 #userCount{color:#0f0}
@@ -29,8 +30,8 @@ textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px
 footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
 .container.recording{animation:rgbGlow 10s infinite linear}
-#smartWordsBtn{position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px;background-color:#564d4d;color:#fff;border:none;border-radius:4px;cursor:pointer;z-index:20}
-#smartWordsMenu{position:absolute;top:30px;left:5px;background:#222;border:1px solid #555;border-radius:6px;padding:6px;display:none;flex-direction:column;gap:4px;z-index:21}
+#smartWordsBtn{position:absolute;top:5px;right:5px;padding:4px 8px;font-size:12px;background-color:#564d4d;color:#fff;border:none;border-radius:4px;cursor:pointer;z-index:20}
+#smartWordsMenu{position:absolute;top:30px;right:5px;background:#222;border:1px solid #555;border-radius:6px;padding:6px;display:none;flex-direction:column;gap:4px;z-index:21}
 .smartWordItem{display:flex;justify-content:space-between;align-items:center;background:#333;padding:2px 6px;border-radius:4px;cursor:pointer}
 .smartWordItem span{flex:1;text-align:center}
 .smartWordItem button{background:red;color:#fff;border:none;border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
@@ -82,7 +83,8 @@ const db = firebase.database();
   <span id="recordingDot"></span> ▶︎ جاري التسجيل...
 </div>
 
-<div id="output" contenteditable="true">
+<div id="output">
+  <div id="outputText"></div>
   <button id="smartWordsBtn">كلمات ذكية</button>
   <div id="smartWordsMenu">
     <div id="smartAddInput">
@@ -114,7 +116,6 @@ const db = firebase.database();
   &copy; DRAGON&CHEAT 2025 @
 </footer>
 
-<!-- زر استعلام دائري أصغر أسفل الفوتر -->
 <div style="position: relative; width: 100%; display: flex; justify-content: flex-start; ">
     <button id="helpBtn" title="تعليمات"
         style="
@@ -133,7 +134,6 @@ const db = firebase.database();
         "> </button>
 </div>
 
-<!-- نافذة التعليمات -->
 <div id="helpModal" style="
     display: none;
     position: fixed;
@@ -155,7 +155,7 @@ const db = firebase.database();
         0. يجب ان يتوفر لديك مكرفون واضح وأنترنت مستقر <br>
         1. اضغط على زر ▶︎ لبدء التسجيل الصوتي.<br>
         2. اضغط على زر X لإيقاف التسجيل.<br>
-        3.  سيتم تحويل كلام إلى أرقام لاتنعكس تنعكس لو تكلمت بها بصورة مستقلة لأنها ارقام لاتينية ليست عربية  .<br>
+        3. سيتم تحويل كلام إلى أرقام لاتنعكس لو تكلمت بها بصورة مستقلة لأنها ارقام لاتينية ليست عربية.<br>
         4. يمكنك نسخ النتائج من صندوق التاريخ.<br>
         5. لتسجيل الدخول، أدخل اسم المستخدم وكلمة المرور. <br>
       ®جميع حقوق محفوظة™
@@ -232,6 +232,7 @@ function wordsToNumbersInText(text){
         resultWords.push(num);
         numberBuffer=[];
       }
+      // استبدال تلقائي بالكلمات الذكية
       resultWords.push(smartWords[word] || word);
     }
   }
@@ -281,7 +282,7 @@ function startRecognition(){
     const dateFormat=extractDateFromText(converted);
     const outputText = dateFormat?dateFormat:converted;
 
-    document.getElementById("output").innerText = outputText;
+    document.getElementById("outputText").innerText = outputText; // فقط النص
     addToHistory(outputText);
     navigator.clipboard.writeText(outputText).catch(()=>{});
   }
@@ -406,16 +407,6 @@ window.addEventListener('click', (e)=>{
     if(e.target === helpModal){
         helpModal.style.display = 'none';
     }
-});
-
-// === تعديل Enter ليشتغل مثل الفاصلة ===
-const outputEl = document.getElementById("output");
-
-outputEl.addEventListener("keydown",(e)=>{
-  if(e.key==="Enter"){
-    e.preventDefault();
-    document.execCommand("insertText", false, ", ");
-  }
 });
 </script>
 
