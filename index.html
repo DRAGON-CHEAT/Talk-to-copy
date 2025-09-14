@@ -29,8 +29,8 @@ textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px
 footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
 .container.recording{animation:rgbGlow 10s infinite linear}
-#smartWordsBtn{position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px;background-color:#564d4d;color:#fff;border:none;border-radius:4px;cursor:pointer;z-index:50}
-#smartWordsMenu{position:absolute;top:30px;left:5px;background:#222;border:1px solid #555;border-radius:6px;padding:6px;display:none;flex-direction:column;gap:4px;z-index:51}
+#smartWordsBtn{position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px;background-color:#564d4d;color:#fff;border:none;border-radius:4px;cursor:pointer;z-index:20}
+#smartWordsMenu{position:absolute;top:30px;left:5px;background:#222;border:1px solid #555;border-radius:6px;padding:6px;display:none;flex-direction:column;gap:4px;z-index:21}
 .smartWordItem{display:flex;justify-content:space-between;align-items:center;background:#333;padding:2px 6px;border-radius:4px;cursor:pointer}
 .smartWordItem span{flex:1;text-align:center}
 .smartWordItem button{background:red;color:#fff;border:none;border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
@@ -385,17 +385,17 @@ function renderSmartWords(){
 
 function toggleSmartMenu(){smartMenu.style.display="none";}
 
-// === إضافة Enter لإدخال فاصلة تلقائيًا في newSmartWord ===
-document.getElementById("newSmartWord").addEventListener("keydown", function(e) {
-    if(e.key === "Enter") {
-        e.preventDefault(); // منع الانتقال لسطر جديد
-        const input = this;
-        const cursorPos = input.selectionStart;
-        const valueBefore = input.value.slice(0, cursorPos);
-        const valueAfter = input.value.slice(cursorPos);
-        input.value = valueBefore + ", " + valueAfter; // إضافة فاصلة ومسافة
-        input.selectionStart = input.selectionEnd = cursorPos + 2; // وضع المؤشر بعد الفاصلة
+// === دعم Enter في newSmartWord لإضافة فاصلة ومسافة ===
+const newSmartInput = document.getElementById("newSmartWord");
+newSmartInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const val = newSmartInput.value.trim();
+    if(val) {
+      newSmartInput.value = val + ", ";
+      newSmartInput.focus();
     }
+  }
 });
 
 // === زر الاستعلام الدائري أسفل الفوتر ===
