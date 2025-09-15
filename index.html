@@ -124,18 +124,14 @@ const db = firebase.database();
 <button onclick="checkLogin()">دخول</button>
 <p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
 </div>
-
 <div class="container" id="app">
-<!-- زر القائمة العلوية -->
-<button id="menuBtn">☰ قائمة</button>
+<div id="userCountContainer">
+  <div id="userCount"># الأعضاء: 0</div>
+  <button id="menuBtn">☰ قائمة</button>
 <div id="menuDropdown">
     <button onclick="logout()" style="padding:8px 12px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;">تسجيل خروج</button>
     <button onclick="helpModal.style.display='block'" style="padding:8px 12px;border-radius:6px;border:none;background-color:#4CAF50;color:white;cursor:pointer;">التعليمات</button>
-</div>
-
-<div id="userCountContainer">
-  <div id="userCount"># الأعضاء: 0</div>
-  <!-- تم نقل زر تسجيل الخروج للقائمة -->
+</div>  
 </div>
 <br>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
