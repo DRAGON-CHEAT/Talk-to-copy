@@ -124,15 +124,14 @@ const db = firebase.database();
 <button onclick="checkLogin()">دخول</button>
 <p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
 </div>
-
 <div class="container" id="app">
 <div id="userCountContainer">
   <div id="userCount"># الأعضاء: 0</div>
   <button id="menuBtn">☰ قائمة</button>
-  <div id="menuDropdown">
+<div id="menuDropdown">
     <button onclick="logout()" style="padding:8px 12px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;">تسجيل خروج</button>
     <button onclick="helpModal.style.display='block'" style="padding:8px 12px;border-radius:6px;border:none;background-color:#4CAF50;color:white;cursor:pointer;">التعليمات</button>
-  </div>  
+</div>  
 </div>
 <br>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
@@ -153,7 +152,16 @@ const db = firebase.database();
       <button onclick="addSmartWord()">إضافة</button>
     </div>
     <div id="smartWordsList"></div>
-    <button onclick="toggleSmartMenu()" style="margin-top:4px;padding:2px 6px;background:#444;color:#fff;border:none;border-radius:4px;font-size:12px;">إغلاق القائمة</button>
+
+    <!-- أزرار التصدير والاستيراد (صغيرتان ومتناسقتان) -->
+    <div style="display:flex; gap:4px; margin-top:6px; justify-content:center;">
+      <button onclick="exportSmartWords()" 
+              style="padding:2px 6px;background:#4CAF50;color:#fff;border:none;border-radius:4px;font-size:12px;">تصدير</button>
+      
+      <button onclick="document.getElementById('importFile').click()" 
+              style="padding:2px 6px;background:#2196F3;color:#fff;border:none;border-radius:4px;font-size:12px;">استيراد</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importSmartWords(event)">
+    </div>
   </div>
 </div>
 
@@ -222,8 +230,9 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 </script>
 
 <script>
-// === التعرف الصوتي + تحويل الكلمات إلى أرقام ===
+// === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
 let recognition;
+let smartWords = {};
 
 function wordsToNumbersInText(text){
   const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
@@ -394,39 +403,25 @@ function addToHistory(text){
   historyEl.scrollTop = historyEl.scrollHeight;
 }
 
-// === الكلمات الذكية مع الحفظ التلقائي والاستيراد/التصدير ===
+// === الكلمات الذكية ===
 const smartBtn = document.getElementById("smartWordsBtn");
 const smartMenu = document.getElementById("smartWordsMenu");
 const smartList = document.getElementById("smartWordsList");
-
-// تحميل الكلمات من التخزين المحلي عند فتح الصفحة
-let smartWords = JSON.parse(localStorage.getItem("smartWords")) || {};
-
-// عرض القائمة عند الضغط على الزر
 smartBtn.addEventListener("click", ()=>{
     smartMenu.style.display = smartMenu.style.display==="flex"?"none":"flex";
     smartMenu.style.flexDirection="column";
-    renderSmartWords();
 });
 
-// إضافة كلمة جديدة
 function addSmartWord(){
   const wrong = document.getElementById("wrongWord").value.trim();
   const right = document.getElementById("correctWord").value.trim();
   if(!wrong || !right) return alert("يرجى ملء الحقلين");
   smartWords[wrong] = right;
-  saveSmartWords();
   renderSmartWords();
   document.getElementById("wrongWord").value = "";
   document.getElementById("correctWord").value = "";
 }
 
-// حفظ الكلمات في التخزين المحلي
-function saveSmartWords(){
-  localStorage.setItem("smartWords", JSON.stringify(smartWords));
-}
-
-// عرض الكلمات في القائمة
 function renderSmartWords(){
   smartList.innerHTML = "";
   Object.keys(smartWords).forEach(k => {
@@ -436,45 +431,100 @@ function renderSmartWords(){
     span.innerText = `${k} → ${smartWords[k]}`;
     const btn = document.createElement("button");
     btn.innerText = "❌";
-    btn.onclick = () => { 
-      delete smartWords[k]; 
-      saveSmartWords();
-      renderSmartWords(); 
-    }
+    btn.onclick = () => { delete smartWords[k]; renderSmartWords(); }
     div.appendChild(span);
     div.appendChild(btn);
     smartList.appendChild(div);
   });
-
-  // أزرار التصدير والاستيراد ضمن نفس القائمة
-  let container = document.getElementById("exportImportBtns");
-  if(!container){
-    container = document.createElement("div");
-    container.id="exportImportBtns";
-    container.style.display="flex";
-    container.style.gap="4px";
-    container.style.marginTop="4px";
-    const exportBtn = document.createElement("button");
-    exportBtn.innerText="تصدير JSON";
-    exportBtn.onclick = ()=>{ 
-      const dataStr = JSON.stringify(smartWords,null,2);
-      navigator.clipboard.writeText(dataStr);
-      alert("تم نسخ JSON إلى الحافظة!");
-    }
-    const importBtn = document.createElement("button");
-    importBtn.innerText="استيراد JSON";
-    importBtn.onclick = ()=>{
-      const data = prompt("الصق JSON هنا");
-      try{ const obj = JSON.parse(data); smartWords=obj; saveSmartWords(); renderSmartWords(); alert("تم الاستيراد بنجاح!"); }
-      catch(e){alert("خطأ في JSON");}
-    }
-    container.appendChild(exportBtn);
-    container.appendChild(importBtn);
-    smartList.parentNode.appendChild(container);
-  }
 }
 
 function toggleSmartMenu(){smartMenu.style.display="none";}
+
+// === زر القائمة العلوية ===
+const menuBtn = document.getElementById('menuBtn');
+const menuDropdown = document.getElementById('menuDropdown');
+
+menuBtn.addEventListener('click', ()=>{
+    menuDropdown.style.display = menuDropdown.style.display === 'flex' ? 'none' : 'flex';
+    menuDropdown.style.flexDirection = 'column';
+});
+
+// إغلاق القائمة عند الضغط خارجها
+window.addEventListener('click', (e)=>{
+    if(!menuBtn.contains(e.target) && !menuDropdown.contains(e.target)){
+        menuDropdown.style.display = 'none';
+    }
+});
+
+// === زر الاستعلام الدائري أسفل الفوتر ===
+// ملاحظة: في كودك الأصلي لم يكن هناك عنصر مع id="helpBtn" لذا نتحقق من وجوده قبل إضافة مستمعي الأحداث حتى لا يسبب خطأ.
+const helpBtn = document.getElementById('helpBtn');
+const helpModal = document.getElementById('helpModal');
+if(helpBtn){
+  helpBtn.addEventListener('mouseenter', ()=>{
+      helpBtn.style.backgroundColor = 'rgba(255, 204, 0, 1)';
+      helpBtn.style.boxShadow = '0 0 20px rgba(255,255,0,0.8)';
+  });
+
+  helpBtn.addEventListener('mouseleave', ()=>{
+      helpBtn.style.backgroundColor = 'rgba(255, 204, 0, 0.4)';
+      helpBtn.style.boxShadow = '0 0 10px rgba(255,255,0,0.3)';
+  });
+
+  helpBtn.addEventListener('click', ()=>{
+      helpModal.style.display = 'block';
+  });
+}
+
+window.addEventListener('click', (e)=>{
+    if(e.target === helpModal){
+        helpModal.style.display = 'none';
+    }
+});
+
+// === تصدير الكلمات الذكية كملف JSON ===
+function exportSmartWords() {
+  try {
+    const dataStr = JSON.stringify(smartWords, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    // اسم الملف قابل للتغيير لو أردت
+    a.download = "smart_words.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert("فشل التصدير");
+  }
+}
+
+// === استيراد الكلمات الذكية من ملف JSON ===
+function importSmartWords(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (typeof imported === "object" && imported !== null) {
+        // دمج المحتوى المستورد مع smartWords الحالي
+        smartWords = { ...smartWords, ...imported };
+        renderSmartWords();
+        alert("✅ تم استيراد الكلمات بنجاح");
+      } else {
+        alert("❌ تنسيق الملف غير صحيح");
+      }
+    } catch (err) {
+      alert("❌ ملف غير صالح");
+    }
+    // إعادة تعيين قيمة input حتى تسمح بتحميل نفس الملف مرة ثانية إذا رغب المستخدم
+    event.target.value = "";
+  };
+  reader.readAsText(file);
+}
 </script>
 
 </body>
