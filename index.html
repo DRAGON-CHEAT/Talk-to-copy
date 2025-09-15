@@ -270,34 +270,31 @@ function wordsToNumbersInText(text){
   }
 
   for(let i=0;i<tokens.length;i++){
-    const word=tokens[i];
-    const twoWords=word+" "+(tokens[i+1]||"");
-
-    // دعم "فاصلة" أو "فارزة"
-    if(word==="فاصلة" || word==="فارزة"){
-      if(resultWords.length>0){
-        resultWords[resultWords.length-1] += ",";
-      } else {
+    let word = tokens[i];
+    const twoWords = word + " " + (tokens[i+1] || "");
+    
+    // إذا كانت كلمة "فاصلة" أو "فارزة" استبدلها بفاصلة
+    if(word === "فاصلة" || word === "فارزة") {
         resultWords.push(",");
-      }
-      continue;
+        continue; // نكمل مع الكلمة التالية
     }
 
     if(teens[twoWords]){
-      numberBuffer.push(twoWords);
-      i++;
-      continue;
+        numberBuffer.push(twoWords);
+        i++;
+        continue;
     }
 
     if(allWords[word]){
-      numberBuffer.push(word);
+        numberBuffer.push(word);
     } else {
-      if(numberBuffer.length>0){
-        const num=processBuffer(numberBuffer);
-        resultWords.push(num);
-        numberBuffer=[];
-      }
-      resultWords.push(smartWords[word] || word);
+        if(numberBuffer.length > 0){
+            const num = processBuffer(numberBuffer);
+            resultWords.push(num);
+            numberBuffer=[];
+        }
+        // الكلمات الذكية
+        resultWords.push(smartWords[word] || word);
     }
   }
 
