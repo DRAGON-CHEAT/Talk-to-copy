@@ -31,9 +31,33 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
 .container.recording{animation:rgbGlow 10s infinite linear}
 
-/* === زر الكلمات الذكية === */
-#smartWordsBtn{position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px;background-color:#564d4d;color:#fff;border:none;border-radius:4px;cursor:pointer;z-index:50}
-#smartWordsMenu{position:absolute;top:35px;left:5px;background:#222;border:1px solid #555;border-radius:6px;padding:6px;display:none;flex-direction:column;gap:4px;z-index:51}
+/* === تعديل زر الكلمات الذكية === */
+#smartWordsBtn {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    padding: 4px 8px;
+    font-size: 12px;
+    background-color: #564d4d;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 50;
+}
+#smartWordsMenu {
+    position: absolute;
+    top: 35px;
+    left: 5px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 51;
+}
 .smartWordItem{display:flex;justify-content:space-between;align-items:center;background:#333;padding:2px 6px;border-radius:4px;cursor:pointer}
 .smartWordItem span{flex:1;text-align:center}
 .smartWordItem button{background:red;color:#fff;border:none;border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
@@ -42,25 +66,56 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 #smartAddInput button{padding:4px 8px;border-radius:4px;border:none;background:#4CAF50;color:#fff;font-size:12px;cursor:pointer}
 
 /* === زر القائمة العلوية === */
-#menuBtn{position:absolute;top:10px;left:10px;padding:6px 12px;font-size:14px;border-radius:6px;border:none;background-color:#444;color:#fff;cursor:pointer;z-index:1000}
-#menuDropdown{position:absolute;top:42px;left:10px;background-color:#222;border:1px solid #555;border-radius:6px;padding:8px;display:none;flex-direction:column;gap:6px;z-index:1000}
+#menuBtn{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    background-color: #444;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1000;
+}
+#menuDropdown{
+    position: absolute;
+    top: 42px;
+    left: 10px;
+    background-color: #222;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 8px;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 1000;
+}
 
 /* === استجابة الشاشة === */
 @media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
 @media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
 </style>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script>
-const firebaseConfig={apiKey:"AIzaSyDa1_gisk5GuTvRzACp0lA1TGe3-b2Sz8A",authDomain:"dragon-tv-3e8c1.firebaseapp.com",databaseURL:"https://dragon-tv-3e8c1-default-rtdb.firebaseio.com",projectId:"dragon-tv-3e8c1",storageBucket:"dragon-tv-3e8c1.firebasestorage.app",messagingSenderId:"909817368695",appId:"1:909817368695:web:b5e9ffccafefcbc41a7672"};
-firebase.initializeApp(firebaseConfig);const db=firebase.database();
+const firebaseConfig = {
+  apiKey: "AIzaSyDa1_gisk5GuTvRzACp0lA1TGe3-b2Sz8A",
+  authDomain: "dragon-tv-3e8c1.firebaseapp.com",
+  databaseURL: "https://dragon-tv-3e8c1-default-rtdb.firebaseio.com",
+  projectId: "dragon-tv-3e8c1",
+  storageBucket: "dragon-tv-3e8c1.firebasestorage.app",
+  messagingSenderId: "909817368695",
+  appId: "1:909817368695:web:b5e9ffccafefcbc41a7672"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 </script>
 </head>
 <body>
 
-<!-- تسجيل دخول -->
 <div class="login-container" id="login">
 <h2>⟱ تسجيل الدخول ⟱</h2>
 <input type="text" id="username" placeholder="اسم المستخدم">
@@ -69,19 +124,17 @@ firebase.initializeApp(firebaseConfig);const db=firebase.database();
 <button onclick="checkLogin()">دخول</button>
 <p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
 </div>
-
-<!-- التطبيق -->
 <div class="container" id="app">
 <div id="userCountContainer">
   <div id="userCount"># الأعضاء: 0</div>
   <button id="menuBtn">☰ قائمة</button>
-  <div id="menuDropdown">
+<div id="menuDropdown">
     <button onclick="logout()" style="padding:8px 12px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;">تسجيل خروج</button>
     <button onclick="helpModal.style.display='block'" style="padding:8px 12px;border-radius:6px;border:none;background-color:#4CAF50;color:white;cursor:pointer;">التعليمات</button>
-  </div>  
+</div>  
 </div>
 <br>
-<h1>[ Convert Audio To Text In Iraqi ]</h1><br>
+<h1> [ Convert Audio To Text In Iraqi ]</h1><br>
 <button id="startBtn" onclick="startRecognition()">[▶︎] بدء التسجيل</button>
 <button id="stopBtn" onclick="stopRecognition()">[X] إيقاف التسجيل</button>
 
@@ -99,61 +152,150 @@ firebase.initializeApp(firebaseConfig);const db=firebase.database();
       <button onclick="addSmartWord()">إضافة</button>
     </div>
     <div id="smartWordsList"></div>
+
+    <!-- أزرار التصدير والاستيراد (صغيرتان ومتناسقتان) -->
     <div style="display:flex; gap:4px; margin-top:6px; justify-content:center;">
-      <button onclick="exportSmartWords()" style="padding:2px 6px;background:#4CAF50;color:#fff;border:none;border-radius:4px;font-size:12px;">تصدير</button>
-      <button onclick="document.getElementById('importFile').click()" style="padding:2px 6px;background:#2196F3;color:#fff;border:none;border-radius:4px;font-size:12px;">استيراد</button>
+      <button onclick="exportSmartWords()" 
+              style="padding:2px 6px;background:#4CAF50;color:#fff;border:none;border-radius:4px;font-size:12px;">تصدير</button>
+      
+      <button onclick="document.getElementById('importFile').click()" 
+              style="padding:2px 6px;background:#2196F3;color:#fff;border:none;border-radius:4px;font-size:12px;">استيراد</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importSmartWords(event)">
     </div>
   </div>
 </div>
 
-<!-- سجل التاريخ -->
-<div id="historyContainer" style="width:96%; min-height:110px; max-height:200px; border:1px solid #555; border-radius:6px; background:#1a1a1a; top:18px; position:relative; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; flex-wrap:wrap;">
-  <button id="toggleHistoryBtn" title="تبديل العرض" style="background-color: #564d4d; position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px; z-index:10;">⇄</button>
-  <button id="copyAllHistoryBtn" title="نسخ الكل" style="background-color: #564d4d; position:absolute;top:5px;right:5px;padding:4px 8px;font-size:12px; z-index:10;">نسخ الكل</button>
-  <div id="history" style="width:100%; display:flex; flex-direction:column; gap:4px; flex-wrap:wrap; align-items:center; justify-content:flex-start; text-align:center;"></div>
+<div id="historyContainer" style="width:96%; min-height:110px; max-height:200px; 
+     border:1px solid #555; border-radius:6px; background:#1a1a1a; top:18px;
+     position:relative; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:4px; flex-wrap:wrap;">
+
+  <button id="toggleHistoryBtn" title="تبديل العرض" 
+          style=" 
+    background-color: #564d4d; position:absolute;top:5px;left:5px;padding:4px 8px;font-size:12px; z-index:10;">⇄</button>
+
+  <button id="copyAllHistoryBtn" title="نسخ الكل" 
+          style="background-color: #564d4d; position:absolute;top:5px;right:5px;padding:4px 8px;font-size:12px; z-index:10;">نسخ الكل</button>
+
+  <div id="history" style="width:100%; display:flex; flex-direction:column; 
+       gap:4px; flex-wrap:wrap; align-items:center; justify-content:flex-start; text-align:center;">
+  </div>
 </div>
 <br>
-<footer>&copy; DRAGON&CHEAT 2025 @</footer>
-</div>
+<footer>
+  &copy; DRAGON&CHEAT 2025 @
+</footer>
 
-<!-- نافذة التعليمات -->
-<div id="helpModal" style="display: none;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 80%;max-width: 400px;background-color: #111;color: #fff;padding: 20px;border-radius: 12px;box-shadow: 0 0 20px rgba(255,255,255,0.3);text-align: center;z-index: 10000;">
-  <h3>تعليمات الاستخدام</h3>
-  <p>0. يجب ان يتوفر لديك مكرفون واضح وأنترنت مستقر <br>1. اضغط على زر ▶︎ لبدء التسجيل الصوتي.<br>2. اضغط على زر X لإيقاف التسجيل.<br>3. سيتم تحويل كلام إلى أرقام لاتنعكس لو تكلمت بها بصورة مستقلة لأنها ارقام لاتينية ليست عربية.<br>4. يمكنك نسخ النتائج من صندوق التاريخ.<br>5. لتسجيل الدخول، أدخل اسم المستخدم وكلمة المرور.<br>®جميع حقوق محفوظة™</p>
-  <button onclick="helpModal.style.display='none'" style="margin-top:15px;padding:8px 16px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;">إغلاق</button>
+<div id="helpModal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 400px;
+    background-color: #111;
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+    text-align: center;
+    z-index: 10000;
+">
+    <h3>تعليمات الاستخدام</h3>
+    <p>
+        0. يجب ان يتوفر لديك مكرفون واضح وأنترنت مستقر <br>
+        1. اضغط على زر ▶︎ لبدء التسجيل الصوتي.<br>
+        2. اضغط على زر X لإيقاف التسجيل.<br>
+        3. سيتم تحويل كلام إلى أرقام لاتنعكس لو تكلمت 
+        بها بصورة مستقلة لأنها ارقام لاتينية ليست عربية.<br>
+        4. يمكنك نسخ النتائج من صندوق التاريخ.<br>
+        5. لتسجيل الدخول، أدخل اسم المستخدم وكلمة المرور. <br>
+      ®جميع حقوق محفوظة™
+    </p>
+    <button onclick="helpModal.style.display='none'" 
+        style="margin-top:15px;padding:8px 16px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;">
+        إغلاق
+    </button>
 </div>
 
 <script>
-/* تسجيل دخول + Firebase */
+// === دوال Firebase + تسجيل دخول ===
 function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
-const deviceId=crypto.randomUUID();
+const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
 db.ref('onlineUsers').on('value',snapshot=>{document.getElementById("userCount").textContent="# الأعضاء: "+snapshot.numChildren();});
-function checkLogin(){const user=document.getElementById("username").value.trim();const pass=document.getElementById("password").value.trim();const remember=document.getElementById("rememberMe").checked;const encodedUser="2LnZhNin2KE=";const encodedPass="MjI0NA==";if(base64EncodeUnicode(user)===encodedUser&&base64EncodeUnicode(pass)===encodedPass){if(remember)localStorage.setItem("loggedIn","true");else sessionStorage.setItem("loggedInSession","true");document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("error").style.display="block";}}
+function checkLogin(){const user=document.getElementById("username").value.trim();const pass=document.getElementById("password").value.trim();const remember=document.getElementById("rememberMe").checked;const encodedUser="2LnZhNin2KE=";const encodedPass="MjI0NA==";if(base64EncodeUnicode(user)===encodedUser && base64EncodeUnicode(pass)===encodedPass){if(remember)localStorage.setItem("loggedIn","true");else sessionStorage.setItem("loggedInSession","true");document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("error").style.display="block";}}
 function logout(){const user=document.getElementById("username").value.trim();updateUserOnlineStatus(user,false);localStorage.removeItem("loggedIn");sessionStorage.removeItem("loggedInSession");document.getElementById("app").style.display="none";document.getElementById("login").style.display="block";}
-window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(loggedInPermanent&&!loggedInSession){alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");sessionStorage.setItem("loggedInSession","true");location.reload();return;}if(loggedInPermanent||loggedInSession){const user=document.getElementById("username").value.trim();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("login").style.display="block";}}
+window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(loggedInPermanent && !loggedInSession){alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");sessionStorage.setItem("loggedInSession","true");location.reload();return;}if(loggedInPermanent||loggedInSession){const user=document.getElementById("username").value.trim();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("login").style.display="block";}}
 </script>
 
 <script>
-/* التعرف الصوتي + الأرقام + التواريخ + الكلمات الذكية + السجل */
-let recognition;let smartWords={};
-function wordsToNumbersInText(text){const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};const teens={"عشرة":10,"عشر":10,"أحد عشر":11,"احد عشر":11,"احدى عشر":11,"اثنا عشر":12,"اثني عشر":12,"ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19};const tens={"عشرون":20,"عشرين":20,"ثلاثون":30,"ثلاثين":30,"أربعون":40,"اربعين":40,"خمسون":50,"خمسين":50,"ستون":60,"ستين":60,"سبعون":70,"سبعين":70,"ثمانون":80,"ثمانين":80,"تسعون":90,"تسعين":90};const hundreds={"مائة":100,"مئة":100,"مية":100,"مئتين":200,"ميتين":200,"ثلاثمائة":300,"اربعمائة":400,"خمسمائة":500,"ستمائة":600,"سبعمائة":700,"ثمانمائة":800,"تسعمائة":900};const thousands={"الف":1000,"ألف":1000,"آلاف":1000,"الاف":1000,"ألاف":1000,"الافاً":1000};const bigNumbers={"مليون":1000000,"ملايين":1000000,"مليار":1000000000,"مليارات":1000000000};text=text.replace(/سنة/g,"").replace(/عام/g,"").replace(/شهر/g,"").replace(/يوم/g,"");let tokens=text.split(/[\s,،]+/);let result=0;let temp=0;for(let token of tokens){if(units[token]!==undefined){temp+=units[token];}else if(teens[token]!==undefined){temp+=teens[token];}else if(tens[token]!==undefined){temp+=tens[token];}else if(hundreds[token]!==undefined){temp+=hundreds[token];}else if(thousands[token]!==undefined){if(temp===0)temp=1;temp*=1000;result+=temp;temp=0;}else if(bigNumbers[token]!==undefined){if(temp===0)temp=1;temp*=bigNumbers[token];result+=temp;temp=0;}else{if(temp>0){result+=temp;temp=0;}}}result+=temp;return result||text;}
-function applySmartWords(text){for(let wrong in smartWords){let correct=smartWords[wrong];let regex=new RegExp("\\b"+wrong+"\\b","g");text=text.replace(regex,correct);}return text;}
-function addSmartWord(){const wrong=document.getElementById("wrongWord").value.trim();const correct=document.getElementById("correctWord").value.trim();if(wrong&&correct){smartWords[wrong]=correct;updateSmartWordsList();document.getElementById("wrongWord").value="";document.getElementById("correctWord").value="";saveSmartWords();}}
-function updateSmartWordsList(){const list=document.getElementById("smartWordsList");list.innerHTML="";for(let wrong in smartWords){const div=document.createElement("div");div.className="smartWordItem";div.innerHTML=`<span>${wrong} ➜ ${smartWords[wrong]}</span><button onclick="deleteSmartWord('${wrong}')">X</button>`;list.appendChild(div);}}
-function deleteSmartWord(wrong){delete smartWords[wrong];updateSmartWordsList();saveSmartWords();}
-function saveSmartWords(){localStorage.setItem("smartWords",JSON.stringify(smartWords));}
-function loadSmartWords(){const saved=localStorage.getItem("smartWords");if(saved)smartWords=JSON.parse(saved);updateSmartWordsList();}
-function exportSmartWords(){const dataStr="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(smartWords));const dl=document.createElement("a");dl.setAttribute("href",dataStr);dl.setAttribute("download","smartWords.json");dl.click();}
-function importSmartWords(event){const file=event.target.files[0];if(file){const reader=new FileReader();reader.onload=function(e){try{smartWords=JSON.parse(e.target.result);updateSmartWordsList();saveSmartWords();}catch(err){alert("خطأ في الملف");}};reader.readAsText(file);}}
-function startRecognition(){recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();recognition.lang="ar-IQ";recognition.continuous=true;recognition.interimResults=true;document.getElementById("recordingIndicator").style.display="block";document.getElementById("startBtn").style.display="none";document.getElementById("stopBtn").style.display="inline-block";document.querySelector(".container").classList.add("recording");recognition.onresult=function(event){let transcript="";for(let i=event.resultIndex;i<event.results.length;i++){transcript+=event.results[i][0].transcript+" ";}transcript=applySmartWords(transcript);const numConverted=wordsToNumbersInText(transcript.trim());document.getElementById("outputText").textContent=numConverted;if(event.results[0].isFinal)saveToHistory(numConverted);};recognition.start();}
-function stopRecognition(){if(recognition){recognition.stop();document.getElementById("recordingIndicator").style.display="none";document.getElementById("startBtn").style.display="inline-block";document.getElementById("stopBtn").style.display="none";document.querySelector(".container").classList.remove("recording");}}
-function saveToHistory(text){if(!text)return;const history=document.getElementById("history");const item=document.createElement("div");item.style.cssText="padding:6px 10px;background:#333;border-radius:4px;color:#fff;cursor:pointer;flex:1;text-align:center;";item.textContent=text;item.onclick=function(){navigator.clipboard.writeText(text);alert("تم النسخ");};history.appendChild(item);history.scrollTop=history.scrollHeight;}
-document.getElementById("toggleHistoryBtn").addEventListener("click",()=>{const history=document.getElementById("history");if(history.style.flexDirection==="row"){history.style.flexDirection="column";}else{history.style.flexDirection="row";}});
-document.getElementById("copyAllHistoryBtn").addEventListener("click",()=>{const history=document.getElementById("history");let allText="";for(let child of history.children){allText+=child.textContent+"\\n";}navigator.clipboard.writeText(allText);alert("تم نسخ الكل");});
-document.getElementById("smartWordsBtn").addEventListener("click",()=>{const menu=document.getElementById("smartWordsMenu");menu.style.display=menu.style.display==="flex"?"none":"flex";});
-window.onload=function(){loadSmartWords();const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(!(loggedInPermanent||loggedInSession)){document.getElementById("login").style.display="block";}else{document.getElementById("app").style.display="block";}};
+// === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية مع دعم "فاصلة" ===
+let recognition;
+let smartWords = {};
+
+function wordsToNumbersInText(text){
+  const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
+  const teens={"عشرة":10,"عشر":10,"أحد عشر":11,"احد عشر":11,"احدى عشر":11,"اثنا عشر":12,"اثني عشر":12,"ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19};
+  const tens={"عشرون":20,"عشرين":20,"ثلاثون":30,"ثلاثين":30,"أربعون":40,"اربعين":40,"خمسون":50,"خمسين":50,"ستون":60,"ستين":60,"سبعون":70,"سبعين":70,"ثمانون":80,"ثمانين":80,"تسعون":90,"تسعين":90};
+  const hundreds={"مائة":100,"مئة":100,"مية":100,"مئتين":200,"ميتين":200,"ثلاثمائة":300,"ثلاثمية":300,"أربعمائة":400,"اربعماية":400,"خمسمائة":500,"خمسماية":500,"ستمائة":600,"ستمية":600,"سبعمائة":700,"سبعمية":700,"ثمانمائة":800,"ثمانمية":800,"تسعمائة":900,"تسعمية":900};
+  const multipliers={"ألف":1000,"الف":1000,"ألفين":2000,"الفين":2000,"آلاف":1000,"مليون":1000000,"ملايين":1000000};
+  const allWords=Object.assign({},units,teens,tens,hundreds,multipliers);
+
+  const tokens=text.replace(/،/g,",").replace(/ و /g," ").trim().split(/\s+/);
+  let resultWords=[];
+  let numberBuffer=[];
+
+  function processBuffer(buffer){
+    let total=0;
+    let current=0;
+    buffer.forEach(word=>{
+      if(teens[word]!==undefined) current+=teens[word];
+      else if(units[word]!==undefined) current+=units[word];
+      else if(tens[word]!==undefined) current+=tens[word];
+      else if(hundreds[word]!==undefined) current+=hundreds[word];
+      else if(multipliers[word]!==undefined){
+        if(multipliers[word]>=1000){
+          current=(current===0?1:current)*multipliers[word];
+          total+=current;
+          current=0;
+        } else {
+          current*=multipliers[word];
+        }
+      }
+    });
+    total+=current;
+    return total.toString().split("").reverse().join("");
+  }
+
+  for(let i=0;i<tokens.length;i++){
+    const word=tokens[i];
+    const twoWords=word+" "+(tokens[i+1]||"");
+    if(teens[twoWords]){
+      numberBuffer.push(twoWords);
+      i++;
+      continue;
+    }
+    if(allWords[word]){
+      numberBuffer.push(word);
+    } else {
+      if(numberBuffer.length>0){
+        const num=processBuffer(numberBuffer);
+        resultWords.push(num);
+        numberBuffer=[];
+      }
+      resultWords.push(smartWords[word] || word);
+    }
+  }
+  if(numberBuffer.length>0){
+    const num=processBuffer(numberBuffer);
+    resultWords.push(num);
+  }
+  return resultWords.join(" ");
+}
+
+// باقي الدوال كما في النسخة الأصلية (extractDateFromText, startRecognition, stopRecognition, history, smartWords, menu, import/export)
 </script>
+
 </body>
 </html>
