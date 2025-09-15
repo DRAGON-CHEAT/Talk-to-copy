@@ -233,7 +233,7 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 // === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
 let recognition;
 let smartWords = {};
-    
+
 function wordsToNumbersInText(text){
   const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
   const teens={"عشرة":10,"عشر":10,"أحد عشر":11,"احد عشر":11,"احدى عشر":11,"اثنا عشر":12,"اثني عشر":12,"ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19};
@@ -265,44 +265,32 @@ function wordsToNumbersInText(text){
       }
     });
     total+=current;
-    // تحويل الرقم إلى نص مع فواصل الآلاف
-    return total.toLocaleString('en-US');
+    return total.toString().split("").reverse().join("");
   }
 
   for(let i=0;i<tokens.length;i++){
-    let word = tokens[i];
-    const twoWords = word + " " + (tokens[i+1] || "");
-    
-    // إذا كانت كلمة "فاصلة" أو "فارزة" استبدلها بفاصلة
-    if(word === "فاصلة" || word === "فارزة") {
-        resultWords.push(",");
-        continue; // نكمل مع الكلمة التالية
-    }
-
+    const word=tokens[i];
+    const twoWords=word+" "+(tokens[i+1]||"");
     if(teens[twoWords]){
-        numberBuffer.push(twoWords);
-        i++;
-        continue;
+      numberBuffer.push(twoWords);
+      i++;
+      continue;
     }
-
     if(allWords[word]){
-        numberBuffer.push(word);
+      numberBuffer.push(word);
     } else {
-        if(numberBuffer.length > 0){
-            const num = processBuffer(numberBuffer);
-            resultWords.push(num);
-            numberBuffer=[];
-        }
-        // الكلمات الذكية
-        resultWords.push(smartWords[word] || word);
+      if(numberBuffer.length>0){
+        const num=processBuffer(numberBuffer);
+        resultWords.push(num);
+        numberBuffer=[];
+      }
+      resultWords.push(smartWords[word] || word);
     }
   }
-
   if(numberBuffer.length>0){
     const num=processBuffer(numberBuffer);
     resultWords.push(num);
   }
-
   return resultWords.join(" ");
 }
 
