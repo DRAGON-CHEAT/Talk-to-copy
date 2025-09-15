@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Convert audio</title>
 <style>
-/* === التنسيقات الأصلية كما هي === */
+/* === التنسيقات الأصلية مع تعديل زر الكلمات الذكية === */
 body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
 .login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}
 .login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}
@@ -22,7 +22,7 @@ button:hover{opacity:0.85}
 #recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 #output{background:#222;border:1px solid #444;padding:15px;border-radius:8px;margin-top:20px;font-size:18px;min-height:80px;white-space:pre-wrap;color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:ltr;unicode-bidi:embed;text-align:center;position:relative;user-select:none}
-#outputText{pointer-events:none} /* النص غير قابل للتعديل */
+#outputText{pointer-events:none} 
 textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}
 #userCountContainer{position:relative;top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:12px;opacity:0.8;justify-content:space-between}
 #userCount{color:#0f0}
@@ -30,14 +30,41 @@ textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px
 footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
 .container.recording{animation:rgbGlow 10s infinite linear}
-#smartWordsBtn{position:absolute;top:5px;right:5px;padding:4px 8px;font-size:12px;background-color:#564d4d;color:#fff;border:none;border-radius:4px;cursor:pointer;z-index:20}
-#smartWordsMenu{position:absolute;top:30px;right:5px;background:#222;border:1px solid #555;border-radius:6px;padding:6px;display:none;flex-direction:column;gap:4px;z-index:21}
+
+/* === تعديل زر الكلمات الذكية === */
+#smartWordsBtn {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    padding: 4px 8px;
+    font-size: 12px;
+    background-color: #564d4d;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 50;
+}
+#smartWordsMenu {
+    position: absolute;
+    top: 35px;
+    left: 5px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 51;
+}
 .smartWordItem{display:flex;justify-content:space-between;align-items:center;background:#333;padding:2px 6px;border-radius:4px;cursor:pointer}
 .smartWordItem span{flex:1;text-align:center}
 .smartWordItem button{background:red;color:#fff;border:none;border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
 #smartAddInput{display:flex;gap:4px;margin-bottom:4px}
 #smartAddInput input{flex:1;padding:4px;border-radius:4px;border:1px solid #555;background:#111;color:#fff;font-size:14px}
 #smartAddInput button{padding:4px 8px;border-radius:4px;border:none;background:#4CAF50;color:#fff;font-size:12px;cursor:pointer}
+
 @media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
 @media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
 </style>
@@ -88,7 +115,8 @@ const db = firebase.database();
   <button id="smartWordsBtn">كلمات ذكية</button>
   <div id="smartWordsMenu">
     <div id="smartAddInput">
-      <input type="text" id="newSmartWord" placeholder="أدخل كلمة خاطئة,ثم صححها">
+      <input type="text" id="wrongWord" placeholder="أدخل الكلمة الخاطئة">
+      <input type="text" id="correctWord" placeholder="أدخل التصحيح">
       <button onclick="addSmartWord()">إضافة</button>
     </div>
     <div id="smartWordsList"></div>
@@ -167,7 +195,7 @@ const db = firebase.database();
 </div>
 
 <script>
-// === دوالك الأصلية + Firebase ===
+// === دوال Firebase + تسجيل دخول ===
 function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
 const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
@@ -178,7 +206,7 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 </script>
 
 <script>
-// === التعرف الصوتي + تحويل الكلمات إلى أرقام مع عكس كل رقم ===
+// === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
 let recognition;
 let smartWords = {};
 
@@ -232,7 +260,6 @@ function wordsToNumbersInText(text){
         resultWords.push(num);
         numberBuffer=[];
       }
-      // استبدال تلقائي بالكلمات الذكية
       resultWords.push(smartWords[word] || word);
     }
   }
@@ -282,7 +309,7 @@ function startRecognition(){
     const dateFormat=extractDateFromText(converted);
     const outputText = dateFormat?dateFormat:converted;
 
-    document.getElementById("outputText").innerText = outputText; // فقط النص
+    document.getElementById("outputText").innerText = outputText;
     addToHistory(outputText);
     navigator.clipboard.writeText(outputText).catch(()=>{});
   }
@@ -356,27 +383,31 @@ function addToHistory(text){
 const smartBtn = document.getElementById("smartWordsBtn");
 const smartMenu = document.getElementById("smartWordsMenu");
 const smartList = document.getElementById("smartWordsList");
-smartBtn.addEventListener("click", ()=>{smartMenu.style.display = smartMenu.style.display==="flex"?"none":"flex";smartMenu.style.flexDirection="column";});
+smartBtn.addEventListener("click", ()=>{
+    smartMenu.style.display = smartMenu.style.display==="flex"?"none":"flex";
+    smartMenu.style.flexDirection="column";
+});
 
 function addSmartWord(){
-  const val = document.getElementById("newSmartWord").value.trim();
-  if(!val || !val.includes(",")) return alert("ادخل كلمة خاطئة وكلمة صحيحة مفصولة بفاصلة");
-  const [wrong,right] = val.split(",").map(s=>s.trim());
-  smartWords[wrong]=right;
+  const wrong = document.getElementById("wrongWord").value.trim();
+  const right = document.getElementById("correctWord").value.trim();
+  if(!wrong || !right) return alert("يرجى ملء الحقلين");
+  smartWords[wrong] = right;
   renderSmartWords();
-  document.getElementById("newSmartWord").value="";
+  document.getElementById("wrongWord").value = "";
+  document.getElementById("correctWord").value = "";
 }
 
 function renderSmartWords(){
-  smartList.innerHTML="";
-  Object.keys(smartWords).forEach(k=>{
-    const div=document.createElement("div");
-    div.className="smartWordItem";
-    const span=document.createElement("span");
-    span.innerText=`${k} → ${smartWords[k]}`;
-    const btn=document.createElement("button");
-    btn.innerText="❌";
-    btn.onclick=()=>{delete smartWords[k];renderSmartWords();}
+  smartList.innerHTML = "";
+  Object.keys(smartWords).forEach(k => {
+    const div = document.createElement("div");
+    div.className = "smartWordItem";
+    const span = document.createElement("span");
+    span.innerText = `${k} → ${smartWords[k]}`;
+    const btn = document.createElement("button");
+    btn.innerText = "❌";
+    btn.onclick = () => { delete smartWords[k]; renderSmartWords(); }
     div.appendChild(span);
     div.appendChild(btn);
     smartList.appendChild(div);
