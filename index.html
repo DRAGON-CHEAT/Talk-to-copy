@@ -65,6 +65,35 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 #smartAddInput input{flex:1;padding:4px;border-radius:4px;border:1px solid #555;background:#111;color:#fff;font-size:14px}
 #smartAddInput button{padding:4px 8px;border-radius:4px;border:none;background:#4CAF50;color:#fff;font-size:12px;cursor:pointer}
 
+/* === زر القائمة العلوية === */
+#menuBtn{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    background-color: #444;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1000;
+}
+#menuDropdown{
+    position: absolute;
+    top: 45px;
+    left: 10px;
+    background-color: #222;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 8px;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 1000;
+}
+
+/* === استجابة الشاشة === */
 @media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
 @media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
 </style>
@@ -97,9 +126,16 @@ const db = firebase.database();
 </div>
 
 <div class="container" id="app">
+<!-- زر القائمة العلوية -->
+<button id="menuBtn">☰ قائمة</button>
+<div id="menuDropdown">
+    <button onclick="logout()" style="padding:8px 12px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;">تسجيل خروج</button>
+    <button onclick="helpModal.style.display='block'" style="padding:8px 12px;border-radius:6px;border:none;background-color:#4CAF50;color:white;cursor:pointer;">التعليمات</button>
+</div>
+
 <div id="userCountContainer">
   <div id="userCount"># الأعضاء: 0</div>
-  <button id="logoutBtn" onclick="logout()">تسجيل خروج</button>
+  <!-- تم نقل زر تسجيل الخروج للقائمة -->
 </div>
 
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
@@ -206,11 +242,10 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 </script>
 
 <script>
-// === التعرف الصوتي + تحويل الكلمات إلى أرقام + استخراج التاريخ + الكلمات الذكية ===
+// === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
 let recognition;
 let smartWords = {};
 
-// تحويل الكلمات إلى أرقام
 function wordsToNumbersInText(text){
   const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
   const teens={"عشرة":10,"عشر":10,"أحد عشر":11,"احد عشر":11,"احدى عشر":11,"اثنا عشر":12,"اثني عشر":12,"ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19};
@@ -271,7 +306,6 @@ function wordsToNumbersInText(text){
   return resultWords.join(" ");
 }
 
-// استخراج التاريخ
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
   const match=text.match(regex);
@@ -293,7 +327,6 @@ function extractDateFromText(text){
   return null;
 }
 
-// تسجيل الصوت
 function startRecognition(){
   const SpeechRecognition=window.webkitSpeechRecognition;
   if(!SpeechRecognition){alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");return;}
@@ -418,6 +451,22 @@ function renderSmartWords(){
 }
 
 function toggleSmartMenu(){smartMenu.style.display="none";}
+
+// === زر القائمة العلوية ===
+const menuBtn = document.getElementById('menuBtn');
+const menuDropdown = document.getElementById('menuDropdown');
+
+menuBtn.addEventListener('click', ()=>{
+    menuDropdown.style.display = menuDropdown.style.display === 'flex' ? 'none' : 'flex';
+    menuDropdown.style.flexDirection = 'column';
+});
+
+// إغلاق القائمة عند الضغط خارجها
+window.addEventListener('click', (e)=>{
+    if(!menuBtn.contains(e.target) && !menuDropdown.contains(e.target)){
+        menuDropdown.style.display = 'none';
+    }
+});
 
 // === زر الاستعلام الدائري أسفل الفوتر ===
 const helpBtn = document.getElementById('helpBtn');
