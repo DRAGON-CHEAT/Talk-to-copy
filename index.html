@@ -13,7 +13,6 @@ body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans
 .login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}
 .login-container button:hover{opacity:0.85}
 .container{background-color:#111;padding:28px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:90%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
-h1{margin-bottom:20px;font-size:24px;transition:font-size 0.3s ease}
 button{padding:12px 24px;font-size:18px;margin:10px 5px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}
 #startBtn{background-color:#4CAF50;color:white}
 #stopBtn{background-color:#f44336;color:white;display:none}
@@ -30,6 +29,21 @@ textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px
 footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
 .container.recording{animation:rgbGlow 10s infinite linear}
+#h1 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    transition: font-size 0.3s ease;
+    position: relative;
+    display: inline-block;
+    color: #ffcc00;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(90deg, #ff0000, #ffcc00, #00ff00, #00ffff, #0000ff, #ff00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 5px #fff, 0 0 10px #ff0, 0 0 20px #f0f;
+}
 
 /* === تعديل زر الكلمات الذكية === */
 #smartWordsBtn {
