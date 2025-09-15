@@ -428,9 +428,9 @@ function renderSmartWords(){
     const div = document.createElement("div");
     div.className = "smartWordItem";
     const span = document.createElement("span");
-    span.innerText = `${k} → ${smartWords[k]}`;
+    span.innerText = `${k} ⟸ ${smartWords[k]}`;
     const btn = document.createElement("button");
-    btn.innerText = "❌";
+    btn.innerText = "X";
     btn.onclick = () => { delete smartWords[k]; renderSmartWords(); }
     div.appendChild(span);
     div.appendChild(btn);
@@ -492,7 +492,7 @@ function exportSmartWords() {
     const a = document.createElement("a");
     a.href = url;
     // اسم الملف قابل للتغيير لو أردت
-    a.download = "smart_words.json";
+    a.download = "recovery_txt.json";
     a.click();
 
     URL.revokeObjectURL(url);
@@ -513,12 +513,12 @@ function importSmartWords(event) {
         // دمج المحتوى المستورد مع smartWords الحالي
         smartWords = { ...smartWords, ...imported };
         renderSmartWords();
-        alert("✅ تم استيراد الكلمات بنجاح");
+        alert("√ تم استيراد الكلمات بنجاح");
       } else {
-        alert("❌ تنسيق الملف غير صحيح");
+        alert("X تنسيق الملف غير صحيح");
       }
     } catch (err) {
-      alert("❌ ملف غير صالح");
+      alert("X ملف غير صالح");
     }
     // إعادة تعيين قيمة input حتى تسمح بتحميل نفس الملف مرة ثانية إذا رغب المستخدم
     event.target.value = "";
