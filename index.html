@@ -272,14 +272,13 @@ function wordsToNumbersInText(text){
     const word=tokens[i];
     const twoWords=word+" "+(tokens[i+1]||"");
 
-    // دعم كلمة "فاصلة"
     if(word==="فاصلة"){
-      if(numberBuffer.length>0){
-        const num=processBuffer(numberBuffer);
-        resultWords.push(num);
-        numberBuffer=[];
+      // إذا كان هناك نص سابق، نلصق الفاصلة مباشرة
+      if(resultWords.length>0){
+        resultWords[resultWords.length-1] += ",";
+      } else {
+        resultWords.push(",");
       }
-      resultWords.push(",");
       continue;
     }
 
@@ -288,6 +287,7 @@ function wordsToNumbersInText(text){
       i++;
       continue;
     }
+
     if(allWords[word]){
       numberBuffer.push(word);
     } else {
