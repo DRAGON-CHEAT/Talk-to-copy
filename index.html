@@ -137,7 +137,7 @@ const db = firebase.database();
   <div id="userCount"># الأعضاء: 0</div>
   <!-- تم نقل زر تسجيل الخروج للقائمة -->
 </div>
-
+<br>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
 <button id="startBtn" onclick="startRecognition()">[▶︎] بدء التسجيل</button>
 <button id="stopBtn" onclick="stopRecognition()">[X] إيقاف التسجيل</button>
@@ -148,7 +148,7 @@ const db = firebase.database();
 
 <div id="output">
   <div id="outputText"></div>
-  <button id="smartWordsBtn">كلمات ذكية</button>
+  <button id="smartWordsBtn">ادراج تصحيح</button>
   <div id="smartWordsMenu">
     <div id="smartAddInput">
       <input type="text" id="wrongWord" placeholder="أدخل الكلمة الخاطئة">
@@ -180,24 +180,6 @@ const db = firebase.database();
   &copy; DRAGON&CHEAT 2025 @
 </footer>
 
-<div style="position: relative; width: 100%; display: flex; justify-content: flex-start; ">
-    <button id="helpBtn" title="تعليمات"
-        style="
-            width: 0px;
-            height: 0px;
-            border-radius: 50%;
-            border: none;
-            background-color: rgba(205, 163, 69, 0.1);
-            color: #000;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba();
-            transition: all 0.3s ease;
-            margin-left: 20px;
-        "> </button>
-</div>
-
 <div id="helpModal" style="
     display: none;
     position: fixed;
@@ -219,7 +201,8 @@ const db = firebase.database();
         0. يجب ان يتوفر لديك مكرفون واضح وأنترنت مستقر <br>
         1. اضغط على زر ▶︎ لبدء التسجيل الصوتي.<br>
         2. اضغط على زر X لإيقاف التسجيل.<br>
-        3. سيتم تحويل كلام إلى أرقام لاتنعكس لو تكلمت بها بصورة مستقلة لأنها ارقام لاتينية ليست عربية.<br>
+        3. سيتم تحويل كلام إلى أرقام لاتنعكس لو تكلمت 
+        بها بصورة مستقلة لأنها ارقام لاتينية ليست عربية.<br>
         4. يمكنك نسخ النتائج من صندوق التاريخ.<br>
         5. لتسجيل الدخول، أدخل اسم المستخدم وكلمة المرور. <br>
       ®جميع حقوق محفوظة™
