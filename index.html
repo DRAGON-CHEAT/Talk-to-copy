@@ -491,44 +491,12 @@ function addToHistory(text){
       setTimeout(()=>{copyIcon.remove();},1000);
     });
   });
+  
+  // أضف العنصر الجديد في بداية التاريخ
+historyEl.insertBefore(lineDiv, historyEl.firstChild);
 
-  historyEl.appendChild(lineDiv);
-  historyEl.scrollTop = historyEl.scrollHeight;
-}
-
-// === الكلمات الذكية ===
-const smartBtn = document.getElementById("smartWordsBtn");
-const smartMenu = document.getElementById("smartWordsMenu");
-const smartList = document.getElementById("smartWordsList");
-smartBtn.addEventListener("click", ()=>{
-    smartMenu.style.display = smartMenu.style.display==="flex"?"none":"flex";
-    smartMenu.style.flexDirection="column";
-});
-
-function addSmartWord(){
-  const wrong = document.getElementById("wrongWord").value.trim();
-  const right = document.getElementById("correctWord").value.trim();
-  if(!wrong || !right) return alert("يرجى ملء الحقلين");
-  smartWords[wrong] = right;
-  renderSmartWords();
-  document.getElementById("wrongWord").value = "";
-  document.getElementById("correctWord").value = "";
-}
-
-function renderSmartWords(){
-  smartList.innerHTML = "";
-  Object.keys(smartWords).forEach(k => {
-    const div = document.createElement("div");
-    div.className = "smartWordItem";
-    const span = document.createElement("span");
-    span.innerText = `${k} ⟸ ${smartWords[k]}`;
-    const btn = document.createElement("button");
-    btn.innerText = "X";
-    btn.onclick = () => { delete smartWords[k]; renderSmartWords(); }
-    div.appendChild(span);
-    div.appendChild(btn);
-    smartList.appendChild(div);
-  });
+// حتى يظل السكورل ثابت (ما ينط للنهاية)
+historyEl.scrollTop = 0;
 }
 
 function toggleSmartMenu(){smartMenu.style.display="none";}
@@ -547,10 +515,9 @@ window.addEventListener('click', (e)=>{
     if(!menuBtn.contains(e.target) && !menuDropdown.contains(e.target)){
         menuDropdown.style.display = 'none';
     }
-});
 
 // === زر الاستعلام الدائري أسفل الفوتر ===
-// ملاحظة: في كودك الأصلي لم يكن هناك عنصر مع id="helpBtn" لذا نتحقق من وجوده قبل إضافة مستمعي الأحداث حتى لا يسبب خطأ.
+//هناك عنصر مع id="helpBtn" لذا نتحقق من وجوده قبل إضافة مستمعي الأحداث حتى لا يسبب خطأ.
 const helpBtn = document.getElementById('helpBtn');
 const helpModal = document.getElementById('helpModal');
 if(helpBtn){
