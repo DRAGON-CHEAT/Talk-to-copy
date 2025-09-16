@@ -238,6 +238,17 @@ window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn"
 let recognition;
 let smartWords = {};
 
+function applySmartWords(text) {
+  for (const wrong in smartWords) {
+    if (smartWords.hasOwnProperty(wrong)) {
+      const correct = smartWords[wrong];
+      // استبدال كل كلمة خاطئة بالتصحيح
+      text = text.split(wrong).join(correct);
+    }
+  }
+  return text;
+}
+  
   function wordsToNumbersInText(text) {
   const units = {
     "صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,
@@ -601,17 +612,6 @@ function importSmartWords(event) {
     event.target.value = "";
   };
   reader.readAsText(file);
-}
-
- function applySmartWords(text) {
-  for (const wrong in smartWords) {
-    if (smartWords.hasOwnProperty(wrong)) {
-      const correct = smartWords[wrong];
-      // استبدال كل كلمة خاطئة بالتصحيح
-      text = text.split(wrong).join(correct);
-    }
-  }
-  return text;
 }
  
 </script>
