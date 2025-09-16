@@ -385,16 +385,20 @@ function startRecognition(){
   recognition.onresult=function(event){
 const transcript = event.results[0][0].transcript;
 let converted = wordsToNumbersInText(transcript);
-const dateFormat = extractDateFromText(converted);
-let outputText = dateFormat ? dateFormat : converted;
 
-// ✅ مرر النص على التصحيحات الذكية
-Object.keys(smartWords).forEach(wrong=>{
+// تطبيق التصحيحات الذكية
+Object.keys(smartWords).forEach(wrong => {
   const correct = smartWords[wrong];
-  // استبدال الكلمة فقط إذا كانت مستقلة (تستخدم regex مع حدود الكلمة)
   const regex = new RegExp("\\b" + wrong + "\\b", "g");
-  outputText = outputText.replace(regex, correct);
+  converted = converted.replace(regex, correct);
 });
+
+const dateFormat = extractDateFromText(converted);
+const outputText = dateFormat ? dateFormat : converted;
+
+document.getElementById("outputText").innerHTML = outputText;
+addToHistory(outputText);
+navigator.clipboard.writeText(outputText).catch(()=>{});
 
     document.getElementById("outputText").innerHTML = outputText;
     addToHistory(outputText);
