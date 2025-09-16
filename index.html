@@ -2,115 +2,133 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>التعرف على الصوت</title>
-  <style>
-    body { font-family: Arial, sans-serif; direction: rtl; }
-    #history { margin-top: 20px; }
-    .entry { border-bottom: 1px solid #ccc; padding: 5px 0; }
-    button { margin: 5px; }
-  </style>
+  <title>تحويل الصوت إلى أرقام</title>
 </head>
 <body>
-  <button id="startBtn">بدء التسجيل</button>
-  <button id="stopBtn">إيقاف</button>
-  <div id="history"></div>
+  <button id="startBtn">ابدأ التحدث</button>
 
-<script>
-//--------------------------------------------
-// دالة تحويل النص إلى أرقام
-//--------------------------------------------
-function wordsToNumbersInText(text){
-  const units={"صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,"اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعة":4,"اربع":4,"خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,"ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9};
-  const teens={"عشرة":10,"عشر":10,"أحد عشر":11,"احد عشر":11,"احدى عشر":11,"اثنا عشر":12,"اثني عشر":12,"ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19};
-  const tens={"عشرون":20,"عشرين":20,"ثلاثون":30,"ثلاثين":30,"أربعون":40,"اربعين":40,"خمسون":50,"خمسين":50,"ستون":60,"ستين":60,"سبعون":70,"سبعين":70,"ثمانون":80,"ثمانين":80,"تسعون":90,"تسعين":90};
-  const hundreds={"مائة":100,"مئة":100,"مية":100,"مئتين":200,"ميتين":200,"ثلاثمائة":300,"ثلاثمية":300,"أربعمائة":400,"اربعماية":400,"خمسمائة":500,"خمسماية":500,"ستمائة":600,"ستمية":600,"سبعمائة":700,"سبعمية":700,"ثمانمائة":800,"ثمانمية":800,"تسعمائة":900,"تسعمية":900};
-  const multipliers={"ألف":1000,"الف":1000,"ألفين":2000,"الفين":2000,"آلاف":1000,"مليون":1000000,"ملايين":1000000};
-  const allWords=Object.assign({},units,teens,tens,hundreds,multipliers);
+  <script>
+    function wordsToNumbersInText(text) {
+      const units = {
+        "صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,
+        "اثنان":2,"اثنين":2,"اتنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,
+        "ثلاثة":3,"ثلاث":3,"تلاته":3,"تلات":3,
+        "أربعة":4,"اربعة":4,"اربع":4,
+        "خمسة":5,"خمس":5,
+        "ستة":6,"ست":6,
+        "سبعة":7,"سبع":7,
+        "ثمانية":8,"ثمان":8,"تمانية":8,"تمنيه":8,"ثمنيه":8,
+        "تسعة":9,"تسع":9
+      };
 
-  const tokens=text.replace(/،/g," ").replace(/ و /g," ").trim().split(/\s+/);
-  let resultWords=[];
-  let numberBuffer=[];
+      const teens = {
+        "عشرة":10,"عشر":10,
+        "احد عشر":11,"أحد عشر":11,"احدى عشر":11,
+        "اثنا عشر":12,"اثني عشر":12,"اتنعشر":12,
+        "ثلاثة عشر":13,"ثلاث عشر":13,"تلاتعشر":13,
+        "أربعة عشر":14,"اربعة عشر":14,
+        "خمسة عشر":15,"خمستعشر":15,
+        "ستة عشر":16,"ستعشر":16,
+        "سبعة عشر":17,"سبعتعشر":17,
+        "ثمانية عشر":18,"تمنتعشر":18,
+        "تسعة عشر":19,"تسعتعشر":19
+      };
 
-  function processBuffer(buffer){
-    let total=0;
-    let current=0;
-    buffer.forEach(word=>{
-      if(teens[word]!==undefined) current+=teens[word];
-      else if(units[word]!==undefined) current+=units[word];
-      else if(tens[word]!==undefined) current+=tens[word];
-      else if(hundreds[word]!==undefined) current+=hundreds[word];
-      else if(multipliers[word]!==undefined){
-        if(multipliers[word]>=1000){
-          current=(current===0?1:current)*multipliers[word];
-          total+=current;
-          current=0;
+      const tens = {
+        "عشرون":20,"عشرين":20,
+        "ثلاثون":30,"ثلاثين":30,"تلاتين":30,
+        "أربعون":40,"اربعين":40,
+        "خمسون":50,"خمسين":50,
+        "ستون":60,"ستين":60,
+        "سبعون":70,"سبعين":70,
+        "ثمانون":80,"ثمانين":80,"تمانون":80,"تمانين":80,
+        "تسعون":90,"تسعين":90
+      };
+
+      const hundreds = {
+        "مائة":100,"مئة":100,"ميه":100,"مية":100,
+        "مئتين":200,"ميتين":200,
+        "ثلاثمائة":300,"ثلاثمية":300,
+        "أربعمائة":400,"اربعماية":400,"اربعمية":400,
+        "خمسمائة":500,"خمسماية":500,"خمسمية":500,
+        "ستمائة":600,"ستمية":600,
+        "سبعمائة":700,"سبعمية":700,
+        "ثمانمائة":800,"ثمانمية":800,"تمنمية":800,"ثمنمية":800,
+        "تسعمائة":900,"تسعمية":900
+      };
+
+      const multipliers = {
+        "ألف":1000,"الف":1000,"الفين":2000,"ألفين":2000,"آلاف":1000,
+        "مليون":1000000,"ملايين":1000000,
+        "مليار":1000000000,"مليارات":1000000000
+      };
+
+      const allWords = Object.assign({}, units, teens, tens, hundreds, multipliers);
+
+      // تقسيم النص إلى كلمات
+      const tokens = text.replace(/،/g," ").replace(/\s+و\s+/g," ").trim().split(/\s+/);
+
+      let result = [];
+      let buffer = [];
+      
+      function flushBuffer() {
+        if (buffer.length === 0) return null;
+
+        let total = 0, current = 0;
+        buffer.forEach(word => {
+          if(teens[word]!==undefined){
+            current += teens[word];
+          } else if(units[word]!==undefined){
+            current += units[word];
+          } else if(tens[word]!==undefined){
+            current += tens[word];
+          } else if(hundreds[word]!==undefined){
+            current += hundreds[word];
+          } else if(multipliers[word]!==undefined){
+            let mult = multipliers[word];
+            if (current === 0) current = 1;
+            current *= mult;
+            total += current;
+            current = 0;
+          }
+        });
+        total += current;
+
+        buffer = [];
+        return total;
+      }
+
+      tokens.forEach(word=>{
+        if(allWords[word]!==undefined){
+          buffer.push(word);
         } else {
-          current*=multipliers[word];
+          let num = flushBuffer();
+          if(num!==null) result.push(num.toString());
+          result.push(word);
         }
-      }
+      });
+
+      let num = flushBuffer();
+      if(num!==null) result.push(num.toString());
+
+      return result.join(" ");
+    }
+
+    // 🎤 كود الصوت
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = "ar-SA";
+
+    recognition.onresult = function(event) {
+      let transcript = event.results[0][0].transcript;
+      let converted = wordsToNumbersInText(transcript);
+      console.log("النص:", transcript);
+      console.log("بعد التحويل:", converted);
+      alert("النص: " + transcript + "\nبعد التحويل: " + converted);
+    };
+
+    document.getElementById("startBtn").addEventListener("click", ()=>{
+      recognition.start();
     });
-    total+=current;
-    return total.toString(); // ✅ بدون قلب الرقم
-  }
-
-  for(let i=0;i<tokens.length;i++){
-    const word=tokens[i];
-    const twoWords=word+" "+(tokens[i+1]||"");
-    if(teens[twoWords]){
-      numberBuffer.push(twoWords);
-      i++;
-      continue;
-    }
-    if(allWords[word]){
-      numberBuffer.push(word);
-    } else {
-      if(numberBuffer.length>0){
-        const num=processBuffer(numberBuffer);
-        resultWords.push(num);
-        numberBuffer=[];
-      }
-      resultWords.push(word);
-    }
-  }
-  if(numberBuffer.length>0){
-    const num=processBuffer(numberBuffer);
-    resultWords.push(num);
-  }
-  return resultWords.join(" ");
-}
-
-//--------------------------------------------
-// محرك التعرف على الصوت
-//--------------------------------------------
-const recognition = new webkitSpeechRecognition();
-recognition.lang = "ar-SA";
-recognition.continuous = false;
-recognition.interimResults = false;
-
-recognition.onresult = function(event) {
-  let transcript = event.results[0][0].transcript;
-  let converted = wordsToNumbersInText(transcript);
-  console.log("النص:", transcript);
-  console.log("بعد التحويل:", converted);
-
-  const historyDiv = document.getElementById("history");
-  historyDiv.innerHTML += "<div class='entry'><b>النص:</b> "+transcript+"<br><b>بعد التحويل:</b> "+converted+"</div>";
-};
-
-recognition.onerror = function(event) {
-  console.error("خطأ:", event.error);
-};
-
-function startRecognition(){
-  recognition.start();
-}
-
-function stopRecognition(){
-  recognition.stop();
-}
-
-document.getElementById("startBtn").onclick = startRecognition;
-document.getElementById("stopBtn").onclick = stopRecognition;
-</script>
+  </script>
 </body>
 </html>
