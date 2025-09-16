@@ -382,10 +382,20 @@ function startRecognition(){
     document.getElementById("startBtn").style.display="none";
     document.getElementById("stopBtn").style.display="inline-block";
   }
-  recognition.onresult=function(event){
-const transcript = event.results[0][0].transcript;
-let converted = wordsToNumbersInText(transcript);
+  recognition.onresult = function(event){
+  const transcript = event.results[0][0].transcript;
+  let converted = wordsToNumbersInText(transcript);
 
+  // ✅ طبق التصحيحات على النص
+  converted = applySmartWords(converted);
+
+  const dateFormat = extractDateFromText(converted);
+  const outputText = dateFormat ? dateFormat : converted;
+
+  document.getElementById("outputText").innerHTML = outputText;
+  addToHistory(outputText);
+  navigator.clipboard.writeText(outputText).catch(()=>{});
+}
 // تطبيق التصحيحات الذكية
 Object.keys(smartWords).forEach(wrong => {
   const correct = smartWords[wrong];
@@ -592,6 +602,18 @@ function importSmartWords(event) {
   };
   reader.readAsText(file);
 }
+
+ function applySmartWords(text) {
+  for (const wrong in smartWords) {
+    if (smartWords.hasOwnProperty(wrong)) {
+      const correct = smartWords[wrong];
+      // استبدال كل كلمة خاطئة بالتصحيح
+      text = text.split(wrong).join(correct);
+    }
+  }
+  return text;
+}
+ 
 </script>
 
 </body>
