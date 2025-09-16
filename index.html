@@ -296,17 +296,6 @@ function wordsToNumbersInText(text) {
   let resultWords = [];
   let numberBuffer = [];
 
-  function parseSmall(buffer) {
-    let total = 0;
-    buffer.forEach(word=>{
-      if(teens[word]!==undefined) total += teens[word];
-      else if(units[word]!==undefined) total += units[word];
-      else if(tens[word]!==undefined) total += tens[word];
-      else if(hundreds[word]!==undefined) total += hundreds[word];
-    });
-    return total;
-  }
-
 function parseNumber(buffer) {
   let total = 0;   // الرقم النهائي
   let current = 0; // رقم مؤقت (مئات + عشرات + آحاد)
