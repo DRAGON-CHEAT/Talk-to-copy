@@ -30,7 +30,11 @@ textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px
 footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
 .container.recording{animation:rgbGlow 10s infinite linear}
-
+.ltr-num {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+   
 /* === تعديل زر الكلمات الذكية === */
 #smartWordsBtn {
     position: absolute;
@@ -331,7 +335,7 @@ let smartWords = {};
     } else {
       if (numberBuffer.length > 0) {
         const num = processBuffer(numberBuffer);
-        resultWords.push("\u202B" + num + "\u202C");
+        resultWords.push('<span class="ltr-num">' + num + '</span>');
         numberBuffer = [];
       }
       resultWords.push(" " + word);
@@ -339,9 +343,7 @@ let smartWords = {};
   }
   if (numberBuffer.length > 0) {
     const num = processBuffer(numberBuffer);
-    // U+202B = Right-To-Left Embedding
-// U+202C = Pop Directional Formatting
-resultWords.push("\u202B" + num + "\u202C");
+    resultWords.push('<span class="ltr-num">' + num + '</span>');
 
   }
   return resultWords.join(" ").trim();
