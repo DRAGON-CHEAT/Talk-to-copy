@@ -331,7 +331,7 @@ let smartWords = {};
     } else {
       if (numberBuffer.length > 0) {
         const num = processBuffer(numberBuffer);
-        resultWords.push(num);
+        resultWords.push('<span dir="ltr">' + num + '</span>');
         numberBuffer = [];
       }
       resultWords.push(" " + word);
