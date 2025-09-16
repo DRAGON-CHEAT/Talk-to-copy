@@ -383,7 +383,7 @@ function startRecognition(){
     const dateFormat=extractDateFromText(converted);
     const outputText = dateFormat?dateFormat:converted;
 
-    document.getElementById("outputText").innerText = outputText;
+    document.getElementById("outputText").innerHTML = outputText;
     addToHistory(outputText);
     navigator.clipboard.writeText(outputText).catch(()=>{});
   }
