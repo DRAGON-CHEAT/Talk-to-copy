@@ -291,16 +291,19 @@ function wordsToNumbersInText(text) {
 
   const decimalMarkers = ["فاصلة","فارزة","نقطة"];
 
-  const tokens = text.replace(/،/g," ").replace(/ و /g," ").trim().split(/\s+/);
+  const tokens = text.replace(/،/g," ").trim().split(/\s+/);
 
   let resultWords = [];
   let numberBuffer = [];
 
 function parseNumber(buffer) {
-  let total = 0;   // الرقم النهائي
-  let current = 0; // رقم مؤقت (مئات + عشرات + آحاد)
+  let total = 0;
+  let current = 0;
 
   buffer.forEach(word => {
+    if (word === "و") {
+      return; // تجاهل "و"
+    }
     if (hundreds[word] !== undefined) {
       current += hundreds[word];
     } else if (tens[word] !== undefined) {
@@ -311,7 +314,7 @@ function parseNumber(buffer) {
       current += units[word];
     } else if (multipliers[word] !== undefined) {
       let mult = multipliers[word];
-      if (current === 0) current = 1; // مثال: "ألف" بدون رقم قبله
+      if (current === 0) current = 1;
       current *= mult;
       total += current;
       current = 0;
