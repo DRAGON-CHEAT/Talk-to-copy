@@ -331,7 +331,7 @@ let smartWords = {};
     } else {
       if (numberBuffer.length > 0) {
         const num = processBuffer(numberBuffer);
-        resultWords.push('<span dir="ltr">' + num + '</span>');
+        resultWords.push("\u202B" + num + "\u202C");
         numberBuffer = [];
       }
       resultWords.push(" " + word);
@@ -339,7 +339,10 @@ let smartWords = {};
   }
   if (numberBuffer.length > 0) {
     const num = processBuffer(numberBuffer);
-    resultWords.push(num);
+    // U+202B = Right-To-Left Embedding
+// U+202C = Pop Directional Formatting
+resultWords.push("\u202B" + num + "\u202C");
+
   }
   return resultWords.join(" ").trim();
 }  
