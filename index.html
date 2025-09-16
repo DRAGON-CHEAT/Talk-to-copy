@@ -491,12 +491,17 @@ function addToHistory(text){
       setTimeout(()=>{copyIcon.remove();},1000);
     });
   });
-  
-  // أضف العنصر الجديد في بداية التاريخ
-historyEl.insertBefore(lineDiv, historyEl.firstChild);
 
-// حتى يظل السكورل ثابت (ما ينط للنهاية)
-historyEl.scrollTop = 0;
+  // ✅ هنا نضيف الشرط
+  if (historyEl.firstChild) {
+    historyEl.insertBefore(lineDiv, historyEl.firstChild); // الجديد بالأعلى
+  } else {
+    historyEl.appendChild(lineDiv); // أول عنصر
+  }
+
+  // نخلي التمرير للأعلى
+  historyEl.scrollTop = 0;
+}
 
 function toggleSmartMenu(){smartMenu.style.display="none";}
 
