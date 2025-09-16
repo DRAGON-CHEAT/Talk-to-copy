@@ -393,26 +393,29 @@ function startRecognition(){
     document.getElementById("startBtn").style.display="none";
     document.getElementById("stopBtn").style.display="inline-block";
   }
-  recognition.onresult = function(event){
+  recognition.onresult = function(event) {
   const transcript = event.results[0][0].transcript;
-  let converted = wordsToNumbersInText(transcript);
 
-  // ✅ طبق التصحيحات على النص
+  // 1. طبق الكلمات الذكية على النص الخام
+  let preApplied = applySmartWords(transcript);
+
+  // 2. حول النص (كلمات -> أرقام)
+  let converted = wordsToNumbersInText(preApplied);
+
+  // 3. طبق الكلمات الذكية مرة ثانية بعد التحويل
   converted = applySmartWords(converted);
 
+  // 4. فحص إذا كان التاريخ
   const dateFormat = extractDateFromText(converted);
   const outputText = dateFormat ? dateFormat : converted;
 
+  // 5. عرض النتيجة
   document.getElementById("outputText").innerHTML = outputText;
   addToHistory(outputText);
   navigator.clipboard.writeText(outputText).catch(()=>{});
-}
-// تطبيق التصحيحات الذكية
-Object.keys(smartWords).forEach(wrong => {
-  const correct = smartWords[wrong];
-  const regex = new RegExp("\\b" + wrong + "\\b", "g");
-  converted = converted.replace(regex, correct);
-});
+
+};
+
 
 const dateFormat = extractDateFromText(converted);
 const outputText = dateFormat ? dateFormat : converted;
