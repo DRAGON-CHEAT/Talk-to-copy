@@ -396,16 +396,16 @@ function startRecognition(){
   recognition.onresult = function(event) {
   const transcript = event.results[0][0].transcript;
 
-  // 1. طبق الكلمات الذكية على النص الخام
-  let preApplied = applySmartWords(transcript);
+  // 1. طبق الكلمات الذكية أولاً
+  let fixedText = applySmartWords(transcript);
 
-  // 2. حول النص (كلمات -> أرقام)
-  let converted = wordsToNumbersInText(preApplied);
+  // 2. حول الكلمات إلى أرقام
+  let converted = wordsToNumbersInText(fixedText);
 
-  // 3. طبق الكلمات الذكية مرة ثانية بعد التحويل
+  // 3. طبق الكلمات الذكية مرة ثانية (لو التصحيح يحتوي أرقام مثلاً)
   converted = applySmartWords(converted);
 
-  // 4. فحص إذا كان التاريخ
+  // 4. فحص إذا كان تاريخ
   const dateFormat = extractDateFromText(converted);
   const outputText = dateFormat ? dateFormat : converted;
 
@@ -413,9 +413,7 @@ function startRecognition(){
   document.getElementById("outputText").innerHTML = outputText;
   addToHistory(outputText);
   navigator.clipboard.writeText(outputText).catch(()=>{});
-
 };
-
 
 const dateFormat = extractDateFromText(converted);
 const outputText = dateFormat ? dateFormat : converted;
