@@ -307,20 +307,30 @@ function wordsToNumbersInText(text) {
     return total;
   }
 
-  function parseNumber(buffer) {
-    let total = 0, current = 0;
-    buffer.forEach(word=>{
-      if(multipliers[word]!==undefined){
-        let mult = multipliers[word];
-        if(current===0) current=1;
-        total += current*mult;
-        current = 0;
-      } else {
-        current += parseSmall([word]);
-      }
-    });
-    return total + current;
-  }
+function parseNumber(buffer) {
+  let total = 0;   // النتيجة النهائية
+  let current = 0; // يخزن الرقم قبل المضاعف (مثلاً: 123)
+
+  buffer.forEach(word => {
+    if (hundreds[word] !== undefined) {
+      current += hundreds[word];
+    } else if (tens[word] !== undefined) {
+      current += tens[word];
+    } else if (teens[word] !== undefined) {
+      current += teens[word];
+    } else if (units[word] !== undefined) {
+      current += units[word];
+    } else if (multipliers[word] !== undefined) {
+      let mult = multipliers[word];
+      if (current === 0) current = 1;   // مثال: "ألف" بدون عدد قبله
+      current *= mult;
+      total += current;
+      current = 0;
+    }
+  });
+
+  return total + current;
+}
 
   for(let i=0;i<tokens.length;i++){
     let word = tokens[i];
