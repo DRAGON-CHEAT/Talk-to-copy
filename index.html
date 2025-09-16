@@ -382,56 +382,60 @@ function extractDateFromText(text){
 }
 
 function startRecognition(){
-  const SpeechRecognition=window.webkitSpeechRecognition;
-  if(!SpeechRecognition){alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");return;}
-  recognition=new SpeechRecognition();
-  recognition.lang='ar-IQ';
-  recognition.interimResults=false;
-  recognition.onstart=function(){
+  const SpeechRecognition = window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'ar-IQ';
+  recognition.interimResults = false;
+
+  recognition.onstart = function(){
     document.querySelector(".container").classList.add("recording");
-    document.getElementById("recordingIndicator").style.display="block";
-    document.getElementById("startBtn").style.display="none";
-    document.getElementById("stopBtn").style.display="inline-block";
-  }
+    document.getElementById("recordingIndicator").style.display = "block";
+    document.getElementById("startBtn").style.display = "none";
+    document.getElementById("stopBtn").style.display = "inline-block";
+  };
+
   recognition.onresult = function(event) {
-  const transcript = event.results[0][0].transcript;
+    try {
+      const transcript = event.results[0][0].transcript || "";
 
-  // 1. طبق الكلمات الذكية أولاً
-  let fixedText = applySmartWords(transcript);
+      // 1) طبق الكلمات الذكية على النص الخام (حتى لو المستخدم نطق الكلمة الخاطئة)
+      let preApplied = applySmartWords(transcript);
 
-  // 2. حول الكلمات إلى أرقام
-  let converted = wordsToNumbersInText(fixedText);
+      // 2) حول الكلمات إلى أرقام
+      let converted = wordsToNumbersInText(preApplied || "");
 
-  // 3. طبق الكلمات الذكية مرة ثانية (لو التصحيح يحتوي أرقام مثلاً)
-  converted = applySmartWords(converted);
+      // 3) طبق الكلمات الذكية أيضاً بعد التحويل (لو التصحيح ينتج عنه كلمات/أرقام لها تأثير)
+      converted = applySmartWords(converted);
 
-  // 4. فحص إذا كان تاريخ
-  const dateFormat = extractDateFromText(converted);
-  const outputText = dateFormat ? dateFormat : converted;
+      // DEBUG: افتح Console (F12) لو حبيت تشوف القيم
+      console.log("transcript:", transcript);
+      console.log("after apply (raw):", preApplied);
+      console.log("converted:", converted);
 
-  // 5. عرض النتيجة
-  document.getElementById("outputText").innerHTML = outputText;
-  addToHistory(outputText);
-  navigator.clipboard.writeText(outputText).catch(()=>{});
-};
+      // 4) تحقق إذا حصلنا على صيغة تاريخ ثم اعرض
+      const dateFormat = extractDateFromText(converted);
+      const outputText = dateFormat ? dateFormat : converted;
 
-const dateFormat = extractDateFromText(converted);
-const outputText = dateFormat ? dateFormat : converted;
+      document.getElementById("outputText").innerHTML = outputText;
+      addToHistory(outputText);
+      navigator.clipboard.writeText(outputText).catch(()=>{});
+    } catch (err) {
+      console.error("onresult error:", err);
+    }
+  };
 
-document.getElementById("outputText").innerHTML = outputText;
-addToHistory(outputText);
-navigator.clipboard.writeText(outputText).catch(()=>{});
-
-    document.getElementById("outputText").innerHTML = outputText;
-    addToHistory(outputText);
-    navigator.clipboard.writeText(outputText).catch(()=>{});
-  }
-  recognition.onend=function(){
+  recognition.onend = function(){
     document.querySelector(".container").classList.remove("recording");
-    document.getElementById("recordingIndicator").style.display="none";
-    document.getElementById("startBtn").style.display="inline-block";
-    document.getElementById("stopBtn").style.display="none";
-  }
+    document.getElementById("recordingIndicator").style.display = "none";
+    document.getElementById("startBtn").style.display = "inline-block";
+    document.getElementById("stopBtn").style.display = "none";
+  };
+
   recognition.start();
 }
 
