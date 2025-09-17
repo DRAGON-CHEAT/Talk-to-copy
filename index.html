@@ -21,7 +21,7 @@ button:hover{opacity:0.85}
 #recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}
 #recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-#output{background:#222;border:1px solid #444;padding:15px; width:90%; border-radius:8px;margin-top:20px;font-size:18px;min-height:80px; /*white-space:pre-wrap;*/color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:rtl;unicode-bidi:embed;text-align:center;position:relative;user-select:none}
+#output{background:#222;border:1px solid #444;padding:15px; width:92%; border-radius:8px;margin-top:20px;font-size:18px;min-height:80px; /*white-space:pre-wrap;*/color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:rtl;unicode-bidi:embed;text-align:center;position:relative;user-select:none}
 #outputText{pointer-events:none} 
 textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}
 #userCountContainer{top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:13px;opacity:0.8;justify-content:space-between}
@@ -72,7 +72,7 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 /* === زر القائمة العلوية === */
 #menuBtn{
     position: absolute;
-    top: 0px;
+    /*top: 0px;*/
     left: 10px;
     padding: 6px 12px;
     font-size: 14px;
@@ -170,7 +170,7 @@ const db = firebase.database();
 </div>
 
 <div id="historyContainer" style="
-    width:90%; min-height:170px; max-height:200px;
+    width:98%; min-height:170px; max-height:200px;
     border:1px solid #555; border-radius:6px;
     background:#1a1a1a; margin-top:18px;
     display:flex; flex-direction:column; gap:6px;
