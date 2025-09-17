@@ -296,7 +296,7 @@ document.getElementById("username").addEventListener("keydown", function(e){
 // === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
 let recognition;
 let smartWords = {};
-const autoRestartCheckbox = document.getElementById("autoRestartCheckbox");
+manualStop = false; // إعادة التعيين عند بدء التسجيل
 
 function applySmartWords(text) {
   for (const wrong in smartWords) {
@@ -479,22 +479,22 @@ function startRecognition(){
   };
 
   recognition.onend = function(){
-    document.querySelector(".container").classList.remove("recording");
-    document.getElementById("recordingIndicator").style.display = "none";
-    document.getElementById("startBtn").style.display = "inline-block";
-    document.getElementById("stopBtn").style.display = "none";
+  document.querySelector(".container").classList.remove("recording");
+  document.getElementById("recordingIndicator").style.display = "none";
+  document.getElementById("startBtn").style.display = "inline-block";
+  document.getElementById("stopBtn").style.display = "none";
 
-    // إعادة تشغيل التسجيل تلقائيًا إذا تم التفعيل
-    if(autoRestartCheckbox.checked) {
-      startRecognition();
-    }
-  };
-
-  recognition.start();
+  // إعادة التشغيل التلقائي فقط إذا لم يتم الضغط على إيقاف
+  if(autoRestartCheckbox.checked && !manualStop) {
+    startRecognition();
+  }
+};
+recognition.start();
 }
 
 function stopRecognition(){ 
-  if(recognition){ recognition.stop(); }
+manualStop = true; // إشعار بأن المستخدم يريد الإيقاف
+if(recognition){ recognition.stop();
 }
 document.getElementById("startBtn").onclick = startRecognition;
 document.getElementById("stopBtn").onclick = stopRecognition;
