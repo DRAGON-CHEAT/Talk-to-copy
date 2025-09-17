@@ -258,6 +258,15 @@ function checkLogin(){const user=document.getElementById("username").value.trim(
 function logout(){const user=document.getElementById("username").value.trim();updateUserOnlineStatus(user,false);localStorage.removeItem("loggedIn");sessionStorage.removeItem("loggedInSession");document.getElementById("app").style.display="none";document.getElementById("login").style.display="block";}
 window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(loggedInPermanent && !loggedInSession){alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");sessionStorage.setItem("loggedInSession","true");location.reload();return;}if(loggedInPermanent||loggedInSession){const user=document.getElementById("username").value.trim();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("login").style.display="block";}}
 </script>
+<script>
+// انتقال بالإنتر من اسم المستخدم إلى كلمة المرور
+document.getElementById("username").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    e.preventDefault();
+    document.getElementById("password").focus();
+  }
+});
+</script>
 
 <script>
 // === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
