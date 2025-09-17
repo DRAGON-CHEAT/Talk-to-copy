@@ -34,7 +34,11 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
   direction: ltr;
   unicode-bidi: embed;
 }
-   
+  
+#autoRestartCheckbox:hover + #autoRestartTooltip {
+    visibility: visible;
+    opacity: 1;
+}
 /* === تعديل زر الكلمات الذكية === */
 #smartWordsBtn {
     position: absolute;
@@ -140,6 +144,25 @@ const db = firebase.database();
 <br>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
 <button id="startBtn" onclick="startRecognition()">[▶︎] بدء التسجيل</button>
+<label style="margin-right:10px; cursor:pointer; user-select:none; position:relative;">
+  <input type="checkbox" id="autoRestartCheckbox"> تسجيل مستمر
+  <span id="autoRestartTooltip" style="
+        visibility:hidden;
+        background-color:#333;
+        color:#fff;
+        text-align:center;
+        border-radius:6px;
+        padding:5px;
+        position:absolute;
+        z-index:100;
+        font-size:12px;
+        top:-30px;
+        right:0;
+        opacity:0;
+        transition: opacity 0.3s;">
+    عند تفعيل هذا الخيار سيعمل التسجيل تلقائيًا بدون توقف
+  </span>
+</label>
 <button id="stopBtn" onclick="stopRecognition()">[X] إيقاف التسجيل</button>
 
 <div id="recordingIndicator">
@@ -475,7 +498,28 @@ function startRecognition(){
 }
 
 function stopRecognition(){if(recognition){recognition.stop();}}
+// الحصول على CheckBox
+const autoRestartCheckbox = document.getElementById("autoRestartCheckbox");
 
+// تعديل onend في startRecognition لدعم التشغيل المستمر
+const originalStartRecognition = startRecognition; // للحفاظ على الدالة الأصلية
+
+function startRecognitionWithAutoRestart() {
+  originalStartRecognition();
+
+  // عند انتهاء التسجيل
+  recognition.onend = function(){
+    document.querySelector(".container").classList.remove("recording");
+    document.getElementById("recordingIndicator").style.display = "none";
+    document.getElementById("startBtn").style.display = "inline-block";
+    document.getElementById("stopBtn").style.display = "none";
+
+    // إعادة تشغيل التسجيل تلقائيًا إذا تم التفعيل
+    if(autoRestartCheckbox.checked) {
+      startRecognitionWithAutoRestart();
+    }
+  };
+}
 // === سجل التاريخ ===
 const historyEl = document.getElementById("history");
 const toggleBtn = document.getElementById("toggleHistoryBtn");
