@@ -182,14 +182,13 @@ const db = firebase.database();
 
   <div id="history" style="width:100%; display:flex; flex-direction:column; 
        gap:4px; flex-wrap:wrap; align-items:center; justify-content:flex-start; text-align:center;">
-    <button id="clearHistoryBtn" title="حذف الكل" 
-        style="background-color:#b32626; color:white; border:none;
-               border-radius:6px; font-size:12px; padding:4px 10px;
-               position:absolute; bottom:5px; right:5px; cursor:pointer; z-index:10;">
-  🗑 حذف الكل
-</button>
-
   </div>
+     <button id="clearHistoryBtn" title="حذف الكل" 
+        style="background-color:#b32626; color:white; border:none;
+               border-radius:6px; font-size:1px; padding:4px 7px;
+               position:absolute; bottom:5px; right:5px; cursor:pointer; z-index:10;"> 
+  حذف الكل
+</button>
 </div>
 <br>
 <footer>
@@ -513,14 +512,14 @@ function addToHistory(text){
 
   // زر الحذف ❌
   const delBtn = document.createElement("button");
-  delBtn.innerText = "❌";
+  delBtn.innerText = "X";
   delBtn.style.background = "red";
   delBtn.style.color = "white";
   delBtn.style.border = "none";
-  delBtn.style.borderRadius = "4px";
+  delBtn.style.borderRadius = "3px";
   delBtn.style.cursor = "pointer";
   delBtn.style.fontSize = "12px";
-  delBtn.style.padding = "0 6px";
+  delBtn.style.padding = "0 3px";
 
   delBtn.addEventListener("click", (e)=>{
     e.stopPropagation(); // منع تفعيل نسخ النص
