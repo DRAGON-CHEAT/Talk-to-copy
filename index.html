@@ -182,6 +182,13 @@ const db = firebase.database();
 
   <div id="history" style="width:100%; display:flex; flex-direction:column; 
        gap:4px; flex-wrap:wrap; align-items:center; justify-content:flex-start; text-align:center;">
+    <button id="clearHistoryBtn" title="حذف الكل" 
+        style="background-color:#b32626; color:white; border:none;
+               border-radius:6px; font-size:12px; padding:4px 10px;
+               position:absolute; bottom:5px; right:5px; cursor:pointer; z-index:10;">
+  🗑 حذف الكل
+</button>
+
   </div>
 </div>
 <br>
@@ -446,6 +453,10 @@ const historyEl = document.getElementById("history");
 const toggleBtn = document.getElementById("toggleHistoryBtn");
 const copyAllBtn = document.getElementById("copyAllHistoryBtn");
 let isHorizontal = false;
+const clearAllBtn = document.getElementById("clearHistoryBtn");
+clearAllBtn.addEventListener("click", ()=>{
+  historyEl.innerHTML = ""; // يمسح كل السجل مباشرة
+});
 
 toggleBtn.addEventListener("click", ()=>{
   if(isHorizontal){
@@ -473,33 +484,58 @@ copyAllBtn.addEventListener("click", ()=>{
 
 function addToHistory(text){
   const lineDiv = document.createElement("div");
-  lineDiv.style.cursor = "pointer";
+  lineDiv.style.display = "flex";
+  lineDiv.style.alignItems = "center";
+  lineDiv.style.gap = "6px";
   lineDiv.style.padding = "2px 6px";
   lineDiv.style.background = "#1a1a1a";
   lineDiv.style.borderRadius = "4px";
   lineDiv.style.margin = "2px 2px";
-  lineDiv.style.textAlign = "center"; 
-  lineDiv.style.width = "auto";       
-  lineDiv.innerText = text;
+  lineDiv.style.width = "auto";
 
-  lineDiv.addEventListener("click", ()=>{
+  // النص
+  const spanText = document.createElement("span");
+  spanText.innerText = text;
+  spanText.style.cursor = "pointer";
+  spanText.style.flex = "1";
+  spanText.style.textAlign = "center";
+
+  // نسخ عند الضغط
+  spanText.addEventListener("click", ()=>{
     navigator.clipboard.writeText(text).then(()=>{
       const copyIcon = document.createElement("span");
       copyIcon.innerText = "[√]";
       copyIcon.style.marginLeft = "6px";
-      lineDiv.appendChild(copyIcon);
+      spanText.appendChild(copyIcon);
       setTimeout(()=>{copyIcon.remove();},1000);
     });
   });
 
-  // ✅ هنا نضيف الشرط
+  // زر الحذف ❌
+  const delBtn = document.createElement("button");
+  delBtn.innerText = "❌";
+  delBtn.style.background = "red";
+  delBtn.style.color = "white";
+  delBtn.style.border = "none";
+  delBtn.style.borderRadius = "4px";
+  delBtn.style.cursor = "pointer";
+  delBtn.style.fontSize = "12px";
+  delBtn.style.padding = "0 6px";
+
+  delBtn.addEventListener("click", (e)=>{
+    e.stopPropagation(); // منع تفعيل نسخ النص
+    lineDiv.remove();
+  });
+
+  lineDiv.appendChild(spanText);
+  lineDiv.appendChild(delBtn);
+
   if (historyEl.firstChild) {
-    historyEl.insertBefore(lineDiv, historyEl.firstChild); // الجديد بالأعلى
+    historyEl.insertBefore(lineDiv, historyEl.firstChild); 
   } else {
-    historyEl.appendChild(lineDiv); // أول عنصر
+    historyEl.appendChild(lineDiv);
   }
 
-  // نخلي التمرير للأعلى
   historyEl.scrollTop = 0;
 }
 
