@@ -143,9 +143,9 @@ const db = firebase.database();
 </div>
 <br>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
-<button id="startBtn" onclick="startRecognition()">[▶︎] بدء التسجيل</button>
+<button id="startBtn" onclick="startRecognition()">[▶︎] أبدء الكلام</button>
 <label style="margin-right:10px; cursor:pointer; user-select:none; position:relative;">
-  <input type="checkbox" id="autoRestartCheckbox"> تسجيل مستمر
+  <input type="checkbox" id="autoRestartCheckbox">  مستمر
   <span id="autoRestartTooltip" style="
         visibility:hidden;
         background-color:#333;
@@ -163,7 +163,7 @@ const db = firebase.database();
     عند تفعيل هذا الخيار سيعمل التسجيل تلقائيًا بدون توقف
   </span>
 </label>
-<button id="stopBtn" onclick="stopRecognition()">[X] إيقاف التسجيل</button>
+<button id="stopBtn" onclick="stopRecognition()">[X] إيقاف تسجيل</button>
 
 <div id="recordingIndicator">
   <span id="recordingDot"></span> ▶︎ جاري التسجيل...
@@ -258,11 +258,12 @@ const db = firebase.database();
        
         0. لتسجيل الدخول أدخل اسم المستخدم وكلمة المرور. <br>
         1. اضغط على زر ▶︎ لبدء التسجيل الصوتي.<br>
-        2. اضغط على زر X لإيقاف التسجيل.<br>
-        3. يدعم الغة العربية فصحى×عراقية وارقام لاتينية.<br>
-        4. يمكنك نسخ النتائج من صندوق التاريخ.<br>
-        5. يمكنك كتابة تصحيح وحفظ لا يتعرف عليه محرك
-        6.يجب ان يتوفر لديك مكرفون وأنترنت مستقر  <br>
+        2. اضغط على زر X لإيقاف التسجيل كلام.<br>
+        3. يدعم الغة العربية فصحى-عراقية وارقام لاتينية.<br>
+        4. يمكنك نسخ النتائج وحذفها من صندوق التاريخ.<br>
+        5. يمكنك كتابة تصحيح وحفظ لا يتعرف عليه محرك<br>
+        6.دعم للسنوات واشهر والايام عند نطق بها كلام عند<br>
+        7.يجب ان يتوفر لديك مكرفون وأنترنت مستقر  <br><br>
       ®جميع حقوق محفوظة™
     </p>
     <button onclick="helpModal.style.display='none'" 
