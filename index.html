@@ -296,6 +296,7 @@ document.getElementById("username").addEventListener("keydown", function(e){
 // === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
 let recognition;
 let smartWords = {};
+const autoRestartCheckbox = document.getElementById("autoRestartCheckbox");
 
 function applySmartWords(text) {
   for (const wrong in smartWords) {
@@ -462,21 +463,10 @@ function startRecognition(){
     try {
       const transcript = event.results[0][0].transcript || "";
 
-      // 1) طبق الكلمات الذكية على النص الخام (حتى لو المستخدم نطق الكلمة الخاطئة)
       let preApplied = applySmartWords(transcript);
-
-      // 2) حول الكلمات إلى أرقام
       let converted = wordsToNumbersInText(preApplied || "");
-
-      // 3) طبق الكلمات الذكية أيضاً بعد التحويل (لو التصحيح ينتج عنه كلمات/أرقام لها تأثير)
       converted = applySmartWords(converted);
 
-      // DEBUG: افتح Console (F12) لو حبيت تشوف القيم
-      console.log("transcript:", transcript);
-      console.log("after apply (raw):", preApplied);
-      console.log("converted:", converted);
-
-      // 4) تحقق إذا حصلنا على صيغة تاريخ ثم اعرض
       const dateFormat = extractDateFromText(converted);
       const outputText = dateFormat ? dateFormat : converted;
 
@@ -493,34 +483,22 @@ function startRecognition(){
     document.getElementById("recordingIndicator").style.display = "none";
     document.getElementById("startBtn").style.display = "inline-block";
     document.getElementById("stopBtn").style.display = "none";
+
+    // إعادة تشغيل التسجيل تلقائيًا إذا تم التفعيل
+    if(autoRestartCheckbox.checked) {
+      startRecognition();
+    }
   };
 
   recognition.start();
 }
 
-function stopRecognition(){if(recognition){recognition.stop();}}
-// الحصول على CheckBox
-const autoRestartCheckbox = document.getElementById("autoRestartCheckbox");
-
-// تعديل onend في startRecognition لدعم التشغيل المستمر
-const originalStartRecognition = startRecognition; // للحفاظ على الدالة الأصلية
-
-function startRecognitionWithAutoRestart() {
-  originalStartRecognition();
-
-  // عند انتهاء التسجيل
-  recognition.onend = function(){
-    document.querySelector(".container").classList.remove("recording");
-    document.getElementById("recordingIndicator").style.display = "none";
-    document.getElementById("startBtn").style.display = "inline-block";
-    document.getElementById("stopBtn").style.display = "none";
-
-    // إعادة تشغيل التسجيل تلقائيًا إذا تم التفعيل
-    if(autoRestartCheckbox.checked) {
-      startRecognitionWithAutoRestart();
-    }
-  };
+function stopRecognition(){ 
+  if(recognition){ recognition.stop(); }
 }
+document.getElementById("startBtn").onclick = startRecognition;
+document.getElementById("stopBtn").onclick = stopRecognition;
+
 // === سجل التاريخ ===
 const historyEl = document.getElementById("history");
 const toggleBtn = document.getElementById("toggleHistoryBtn");
