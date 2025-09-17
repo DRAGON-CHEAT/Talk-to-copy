@@ -169,36 +169,46 @@ const db = firebase.database();
   </div>
 </div>
 
-<div id="historyContainer" style="width:96%; min-height:110px; max-height:200px; 
+<!-- ==== استبدال قسم السجل (history) هذا ==== -->
 <div id="historyContainer" style="
-  width:96%; min-height:110px; max-height:200px;
-  border:1px solid #555; border-radius:6px; background:#1a1a1a; 
-  top:18px; position:relative; padding:12px; overflow-y:auto; 
-  display:flex; flex-direction:column; gap:4px;">
-  
-  <!-- صف علوي للأزرار -->
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-    <button id="toggleHistoryBtn" title="تبديل العرض" 
-            style="background-color:#564d4d; color:#c5b4b4; padding:3px 8px; font-size:12px;">⇄</button>
-
-    <button id="copyAllHistoryBtn" title="نسخ الكل" 
-            style="background-color:#353d48; color:#c5b4b4; padding:3px 8px; font-size:12px;">نسخ الكل</button>
+     width:96%;
+     min-height:110px;
+     max-height:200px;
+     border:1px solid #555;
+     border-radius:6px;
+     background:#1a1a1a;
+     padding:12px;
+     overflow-y:auto;
+     display:flex;
+     flex-direction:column;
+     gap:8px;
+     ">
+  <!-- صف الأزرار (أصبح داخل التدفق لذا سينزل مع المحتوى عند التمرير) -->
+  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+    <button id="toggleHistoryBtn" title="تبديل العرض"
+            style="background-color:#564d4d; color:#c5b4b4; padding:6px 8px; font-size:12px; border-radius:6px; border:none; cursor:pointer;">
+      ⇄
+    </button>
+    <button id="copyAllHistoryBtn" title="نسخ الكل"
+            style="background-color:#353d48; color:#c5b4b4; padding:6px 8px; font-size:12px; border-radius:6px; border:none; cursor:pointer;">
+      نسخ الكل
+    </button>
   </div>
 
-  <!-- منطقة التاريخ -->
-  <div id="history" style="width:100%; display:flex; flex-direction:column; 
-       gap:4px; align-items:center; justify-content:flex-start; text-align:center;">
+  <!-- منطقة السجل نفسها (نلصق العناصر هنا) -->
+  <div id="historyList" style="width:100%; display:flex; flex-direction:column; gap:4px; align-items:center; justify-content:flex-start; text-align:center;">
+    <!-- العناصر تُضاف ديناميكياً بواسطة JS -->
   </div>
 
-  <!-- زر حذف الكل تحت -->
-  <div style="text-align:center; margin-top:6px;">
-    <button id="clearHistoryBtn" title="حذف الكل" 
-            style="background-color:#8f2424; color:#c5b4b4; border:none;
-                   border-radius:6px; font-size:12px; padding:4px 8px; cursor:pointer;">
+  <!-- زر حذف الكل أسفل -->
+  <div style="display:flex; justify-content:center; margin-top:6px;">
+    <button id="clearHistoryBtn" title="حذف الكل"
+            style="background-color:#8f2424; color:#c5b4b4; border:none; border-radius:6px; font-size:12px; padding:6px 10px; cursor:pointer;">
       حذف الكل
     </button>
-  </div>  
+  </div>
 </div>
+
 <br>
 <footer>
   &copy; DRAGON&CHEAT 2025 @
@@ -456,16 +466,20 @@ function startRecognition(){
 
 function stopRecognition(){if(recognition){recognition.stop();}}
 
-// === سجل التاريخ ===
-const historyEl = document.getElementById("history");
+// === سجل التاريخ (معدّل) ===
+const historyContainer = document.getElementById("historyContainer"); // الحاوية القابلة للتمرير
+const historyEl = document.getElementById("historyList"); // هنا نلصق العناصر فعلياً
 const toggleBtn = document.getElementById("toggleHistoryBtn");
 const copyAllBtn = document.getElementById("copyAllHistoryBtn");
 let isHorizontal = false;
 const clearAllBtn = document.getElementById("clearHistoryBtn");
+
+// حذف الكل
 clearAllBtn.addEventListener("click", ()=>{
-  historyEl.innerHTML = ""; // يمسح كل السجل مباشرة
+  historyEl.innerHTML = ""; // يمسح كل السجل
 });
 
+// تبديل الاتجاه (عمودي <-> أفقي)
 toggleBtn.addEventListener("click", ()=>{
   if(isHorizontal){
     historyEl.style.flexDirection = "column";
@@ -477,8 +491,10 @@ toggleBtn.addEventListener("click", ()=>{
   isHorizontal = !isHorizontal;
 });
 
+// نسخ الكل — يلتقط فقط العناصر التي أضفناها (class = history-line)
 copyAllBtn.addEventListener("click", ()=>{
-  const allText = Array.from(historyEl.children).map(d=>d.innerText).join("\n");
+  const lines = Array.from(historyEl.querySelectorAll(".history-line"));
+  const allText = lines.map(d => d.innerText).join("\n");
   navigator.clipboard.writeText(allText).then(()=>{
     const existingIcon = copyAllBtn.querySelector("span");
     if(existingIcon) existingIcon.remove();
@@ -490,8 +506,10 @@ copyAllBtn.addEventListener("click", ()=>{
   });
 });
 
+// دالة إضافة سطر إلى السجل (تُدعى من startRecognition)
 function addToHistory(text){
   const lineDiv = document.createElement("div");
+  lineDiv.className = "history-line"; // مهم لتمييز العناصر الحقيقية عن الأزرار
   lineDiv.style.display = "flex";
   lineDiv.style.alignItems = "center";
   lineDiv.style.gap = "6px";
@@ -519,7 +537,7 @@ function addToHistory(text){
     });
   });
 
-  // زر الحذف ❌
+  // زر الحذف لكل سطر
   const delBtn = document.createElement("button");
   delBtn.innerText = "X";
   delBtn.style.background = "red";
@@ -531,7 +549,7 @@ function addToHistory(text){
   delBtn.style.padding = "0 3px";
 
   delBtn.addEventListener("click", (e)=>{
-    e.stopPropagation(); // منع تفعيل نسخ النص
+    e.stopPropagation(); // منع نسخ النص عند حذف
     lineDiv.remove();
   });
 
@@ -539,12 +557,13 @@ function addToHistory(text){
   lineDiv.appendChild(delBtn);
 
   if (historyEl.firstChild) {
-    historyEl.insertBefore(lineDiv, historyEl.firstChild); 
+    historyEl.insertBefore(lineDiv, historyEl.firstChild);
   } else {
     historyEl.appendChild(lineDiv);
   }
 
-  historyEl.scrollTop = 0;
+  // لأن الحاوية هي التي تتمرّر الآن، نضع scrollTop = 0 لنرى الأحدث
+  historyContainer.scrollTop = 0;
 }
 
 function toggleSmartMenu(){smartMenu.style.display="none";}
