@@ -169,46 +169,42 @@ const db = firebase.database();
   </div>
 </div>
 
-<!-- ==== استبدال قسم السجل (history) بالكامل ==== -->
 <div id="historyContainer" style="
-     width:96%;
-     min-height:110px;
-     max-height:200px;
-     border:1px solid #555;
-     border-radius:6px;
-     background:#1a1a1a;
-     padding:12px;
-     display:flex;
-     flex-direction:column;
-     gap:8px;
-     ">
-  <!-- المربع القابل للتمرير: كل شيء داخله سيتحرك مع التمرير -->
-  <div id="history" style="width:100%; display:flex; flex-direction:column; gap:6px; align-items:center; justify-content:flex-start; text-align:center; max-height:160px; overflow-y:auto; padding-right:6px;">
+    width:96%; min-height:110px; max-height:200px;
+    border:1px solid #555; border-radius:6px;
+    background:#1a1a1a; margin-top:18px;
+    display:flex; flex-direction:column; gap:6px;
+">
 
-    <!-- صف الأزرار العلوي (داخل المحتوى حتى ينزل ويطلع مع السجل) -->
-    <div id="historyControls" style="display:flex; justify-content:space-between; align-items:center; width:100%; gap:8px;">
-      <button id="toggleHistoryBtn" title="تبديل العرض"
-              style="background-color:#564d4d; color:#c5b4b4; padding:6px 8px; font-size:12px; border-radius:6px; border:none; cursor:pointer;">
-        ⇄
-      </button>
+  <!-- الشريط العلوي للأزرار -->
+  <div style="display:flex; justify-content:space-between; padding:4px;">
+    <button id="toggleHistoryBtn" title="تبديل العرض"
+      style="background-color:#564d4d; color:#c5b4b4; padding:3px 8px; font-size:12px;">
+      ⇄
+    </button>
 
-      <button id="copyAllHistoryBtn" title="نسخ الكل"
-              style="background-color:#353d48; color:#c5b4b4; padding:6px 8px; font-size:12px; border-radius:6px; border:none; cursor:pointer;">
-        نسخ الكل
-      </button>
-    </div>
+    <button id="copyAllHistoryBtn" title="نسخ الكل"
+      style="background-color:#353d48; color:#c5b4b4; padding:3px 8px; font-size:12px;">
+      نسخ الكل
+    </button>
+  </div>
 
-    <!-- هنا ستُضاف عناصر السجل ديناميكياً -->
-    <div id="historyItems" style="width:100%; display:flex; flex-direction:column; gap:6px; align-items:center;"></div>
+  <!-- قائمة السجل -->
+  <div id="history" style="
+      flex:1; overflow-y:auto; padding:6px;
+      display:flex; flex-direction:column; gap:4px;
+      align-items:center; text-align:center;
+  ">
+  </div>
 
-    <!-- زر حذف الكل أيضاً داخل نفس الصندوق (فيرجع معه أثناء التمرير) -->
-    <div style="display:flex; justify-content:center; width:100%; margin-top:6px;">
-      <button id="clearHistoryBtn" title="حذف الكل"
-              style="background-color:#8f2424; color:#c5b4b4; border:none; border-radius:6px; font-size:12px; padding:6px 10px; cursor:pointer;">
-        حذف الكل
-      </button>
-    </div>
-
+  <!-- الشريط السفلي -->
+  <div style="display:flex; justify-content:flex-end; padding:4px;">
+    <button id="clearHistoryBtn" title="حذف الكل"
+      style="background-color:#8f2424; color:#c5b4b4;
+             border:none; border-radius:6px;
+             font-size:12px; padding:4px 8px; cursor:pointer;">
+      حذف الكل
+    </button>
   </div>
 </div>
 
@@ -469,65 +465,59 @@ function startRecognition(){
 
 function stopRecognition(){if(recognition){recognition.stop();}}
 
-// === سجل التاريخ (مُحدَّث) ===
-const historyContainer = document.getElementById("historyContainer");
-const history = document.getElementById("history"); // العنصر القابل للتمرير
-const historyItems = document.getElementById("historyItems"); // نضيف إليه السطور
+// === سجل التاريخ ===
+const historyEl = document.getElementById("history");
 const toggleBtn = document.getElementById("toggleHistoryBtn");
 const copyAllBtn = document.getElementById("copyAllHistoryBtn");
-const clearAllBtn = document.getElementById("clearHistoryBtn");
 let isHorizontal = false;
-
-// حذف الكل
+const clearAllBtn = document.getElementById("clearHistoryBtn");
 clearAllBtn.addEventListener("click", ()=>{
-  historyItems.innerHTML = "";
+  historyEl.innerHTML = ""; // يمسح كل السجل مباشرة
 });
 
-// تبديل الاتجاه (عمودي <-> أفقي)
 toggleBtn.addEventListener("click", ()=>{
   if(isHorizontal){
-    historyItems.style.flexDirection = "column";
-    historyItems.style.flexWrap = "nowrap";
+    historyEl.style.flexDirection = "column";
+    historyEl.style.flexWrap = "nowrap";
   } else {
-    historyItems.style.flexDirection = "row";
-    historyItems.style.flexWrap = "wrap";
+    historyEl.style.flexDirection = "row";
+    historyEl.style.flexWrap = "wrap";
   }
   isHorizontal = !isHorizontal;
 });
 
-// نسخ الكل
 copyAllBtn.addEventListener("click", ()=>{
-  const lines = Array.from(historyItems.querySelectorAll(".history-line"));
-  const allText = lines.map(d => d.innerText.replace(/\[√\]/g,'').trim()).join("\n");
+  const allText = Array.from(historyEl.children).map(d=>d.innerText).join("\n");
   navigator.clipboard.writeText(allText).then(()=>{
+    const existingIcon = copyAllBtn.querySelector("span");
+    if(existingIcon) existingIcon.remove();
     const icon = document.createElement("span");
     icon.innerText = "[√]";
     icon.style.marginLeft = "6px";
     copyAllBtn.appendChild(icon);
-    setTimeout(()=>icon.remove(),1000);
-  }).catch(()=>{ /* ignore */ });
+    setTimeout(()=>{icon.remove();},1000);
+  });
 });
 
-// دالة لإضافة سطر إلى السجل (تبقي متوافقة مع استدعاءاتك الحالية)
 function addToHistory(text){
   const lineDiv = document.createElement("div");
-  lineDiv.className = "history-line";
   lineDiv.style.display = "flex";
   lineDiv.style.alignItems = "center";
   lineDiv.style.gap = "6px";
-  lineDiv.style.padding = "6px 8px";
-  lineDiv.style.background = "#111";
-  lineDiv.style.borderRadius = "6px";
-  lineDiv.style.margin = "4px 0";
-  lineDiv.style.width = "calc(100% - 12px)";
+  lineDiv.style.padding = "2px 6px";
+  lineDiv.style.background = "#1a1a1a";
+  lineDiv.style.borderRadius = "4px";
+  lineDiv.style.margin = "2px 2px";
+  lineDiv.style.width = "auto";
 
-  // النص (انسخه عند الضغط)
+  // النص
   const spanText = document.createElement("span");
   spanText.innerText = text;
   spanText.style.cursor = "pointer";
   spanText.style.flex = "1";
   spanText.style.textAlign = "center";
-  spanText.style.color = "#ddd";
+
+  // نسخ عند الضغط
   spanText.addEventListener("click", ()=>{
     navigator.clipboard.writeText(text).then(()=>{
       const copyIcon = document.createElement("span");
@@ -535,10 +525,10 @@ function addToHistory(text){
       copyIcon.style.marginLeft = "6px";
       spanText.appendChild(copyIcon);
       setTimeout(()=>{copyIcon.remove();},1000);
-    }).catch(()=>{});
+    });
   });
 
-  // زر الحذف
+  // زر الحذف ❌
   const delBtn = document.createElement("button");
   delBtn.innerText = "X";
   delBtn.style.background = "red";
@@ -547,21 +537,25 @@ function addToHistory(text){
   delBtn.style.borderRadius = "3px";
   delBtn.style.cursor = "pointer";
   delBtn.style.fontSize = "12px";
-  delBtn.style.padding = "0 6px";
+  delBtn.style.padding = "0 3px";
+
   delBtn.addEventListener("click", (e)=>{
-    e.stopPropagation();
+    e.stopPropagation(); // منع تفعيل نسخ النص
     lineDiv.remove();
   });
 
   lineDiv.appendChild(spanText);
   lineDiv.appendChild(delBtn);
 
-  // اضف الأحدث في الأعلى
-  historyItems.insertBefore(lineDiv, historyItems.firstChild);
+  if (historyEl.firstChild) {
+    historyEl.insertBefore(lineDiv, historyEl.firstChild); 
+  } else {
+    historyEl.appendChild(lineDiv);
+  }
 
-  // أظهر الأعلى (الأحدث)
-  history.scrollTop = 0;
+  historyEl.scrollTop = 0;
 }
+
 function toggleSmartMenu(){smartMenu.style.display="none";}
 
 // === زر القائمة العلوية ===
