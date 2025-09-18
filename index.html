@@ -521,7 +521,10 @@ toggleBtn.addEventListener("click", ()=>{
 });
 
 copyAllBtn.addEventListener("click", ()=>{
-  const allText = Array.from(historyEl.children).map(d=>d.innerText).join("\n");
+  let allText = Array.from(historyEl.children)
+    .map(d => d.childNodes[0].textContent.trim()) // استبعاد زر الحذف (X)
+    .join(isHorizontal ? " " : "\n"); // أفقي = مسافة / عمودي = سطر جديد
+
   navigator.clipboard.writeText(allText).then(()=>{
     const existingIcon = copyAllBtn.querySelector("span");
     if(existingIcon) existingIcon.remove();
