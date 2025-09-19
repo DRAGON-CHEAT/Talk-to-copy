@@ -740,13 +740,26 @@ function importSmartWords(event) {
 }
 
 // === زر "إدراج تصحيح" ===
+// === زر "إدراج تصحيح" مع تغيير النص وإغلاق عند الضغط خارج ===
 const smartBtn = document.getElementById("smartWordsBtn");
 const smartMenu = document.getElementById("smartWordsMenu");
+let menuOpen = false;
 
-// عند الضغط على الزر يبدل بين إظهار/إخفاء القائمة
-smartBtn.addEventListener("click", () => {
-  smartMenu.style.display = (smartMenu.style.display === "flex") ? "none" : "flex";
+smartBtn.addEventListener("click", (e) => {
+  e.stopPropagation(); // منع حدث الإغلاق عند الضغط على الزر نفسه
+  menuOpen = !menuOpen;
+  smartMenu.style.display = menuOpen ? "flex" : "none";
+  smartBtn.innerText = menuOpen ? "إغلاق" : "ادراج تصحيح";
   smartMenu.style.flexDirection = "column";
+});
+
+// إغلاق القائمة عند الضغط في أي مكان آخر
+window.addEventListener("click", (e) => {
+  if(menuOpen && !smartMenu.contains(e.target) && e.target !== smartBtn) {
+    smartMenu.style.display = "none";
+    smartBtn.innerText = "ادراج تصحيح";
+    menuOpen = false;
+  }
 });
 
 // دالة لإضافة الكلمة الخاطئة + التصحيح
