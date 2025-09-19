@@ -87,18 +87,65 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
     cursor: pointer;
     z-index: 1000;
 }
-#menuDropdown{
+/* === القائمة الجانبية المصغرة والمنسقة === */
+#sideMenu {
     position: absolute;
     top: 48px;
     left: 17px;
-    background-color: #222;
-    border: 1px solid #555;
-    border-radius: 6px;
-    padding: 8px;
+    width: 200px; /* جعلها أقل عرضًا */
+    background-color: #111;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 12px 8px 12px 12px; /* تقليل البادينج من اليمين */
     display: none;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
     z-index: 1000;
+    box-shadow: 3px 3px 12px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateX(-220px);
+    opacity: 0;
+}
+
+/* ظهور القائمة */
+#sideMenu.show {
+    display: flex;
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* كلمة الرجوع الصغيرة في أعلى القائمة */
+#backBtn {
+    background: none;
+    border: none;
+    color: #ffcc00;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: left;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 8px;
+    transition: color 0.2s ease;
+}
+#backBtn:hover {
+    color: #ffff66;
+}
+
+/* أزرار القائمة الأخرى */
+#sideMenu .menuItem {
+    padding: 8px 10px; /* تقليل البادينج قليلاً */
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+#sideMenu .menuItem:hover {
+    background-color: #444;
+    transform: translateX(3px);
 }
 
 /* === استجابة الشاشة === */
@@ -135,11 +182,16 @@ const db = firebase.database();
 <div class="container" id="app">
 <div id="userCountContainer">
   <div id="userCount"># الأعضاء: 0</div>
-  <button id="menuBtn">☰ قائمة</button>
-<div id="menuDropdown">
-    <button onclick="logout()" style="padding:8px 12px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;">تسجيل خروج</button>
-    <button onclick="helpModal.style.display='block'" style="padding:8px 12px;border-radius:6px;border:none;background-color:#4CAF50;color:white;cursor:pointer;">التعليمات</button>
-</div>  
+ <!-- الزر الأصلي للقائمة -->
+<button id="menuBtn">☰ قائمة</button>
+
+<!-- القائمة الجانبية -->
+<div id="sideMenu">
+    <button id="backBtn">رجوع</button>
+    <button class="menuItem" onclick="logout()">تسجيل خروج</button>
+    <button class="menuItem" onclick="helpModal.style.display='block'">التعليمات</button>
+</div>
+ 
 </div>
 <br>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
@@ -597,19 +649,26 @@ function toggleSmartMenu(){smartMenu.style.display="none";}
 
 // === زر القائمة العلوية ===
 const menuBtn = document.getElementById('menuBtn');
-const menuDropdown = document.getElementById('menuDropdown');
+const sideMenu = document.getElementById('sideMenu');
+const backBtn = document.getElementById('backBtn');
 
-menuBtn.addEventListener('click', ()=>{
-    menuDropdown.style.display = menuDropdown.style.display === 'flex' ? 'none' : 'flex';
-    menuDropdown.style.flexDirection = 'column';
+menuBtn.addEventListener('click', () => {
+    sideMenu.classList.add('show');
+    menuBtn.style.display = 'none';
 });
 
-// إغلاق القائمة عند الضغط خارجها
-window.addEventListener('click', (e)=>{
-    if(!menuBtn.contains(e.target) && !menuDropdown.contains(e.target)){
-        menuDropdown.style.display = 'none';
+backBtn.addEventListener('click', () => {
+    sideMenu.classList.remove('show');
+    setTimeout(() => menuBtn.style.display = 'inline-block', 300); 
+});
+
+window.addEventListener('click', (e) => {
+    if (!menuBtn.contains(e.target) && !sideMenu.contains(e.target)) {
+        sideMenu.classList.remove('show');
+        setTimeout(() => menuBtn.style.display = 'inline-block', 300);
     }
-  });
+});
+
 // === زر الاستعلام الدائري أسفل الفوتر ===
 //هناك عنصر مع id="helpBtn" لذا نتحقق من وجوده قبل إضافة مستمعي الأحداث حتى لا يسبب خطأ.
 const helpBtn = document.getElementById('helpBtn');
