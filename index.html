@@ -425,25 +425,30 @@ function applySmartWords(text) {
   let numberBuffer = [];
 
   function processBuffer(buffer) {
-    let total = 0, current = 0;
-    buffer.forEach(word => {
-      if (teens[word] !== undefined) current += teens[word];
-      else if (units[word] !== undefined) current += units[word];
-      else if (tens[word] !== undefined) current += tens[word];
-      else if (hundreds[word] !== undefined) current += hundreds[word];
-      else if (multipliers[word] !== undefined) {
-        if (multipliers[word] >= 1000) {
-          current = (current === 0 ? 1 : current) * multipliers[word];
-          total += current;
-          current = 0;
-        } else {
-          current *= multipliers[word];
-        }
-      }
-    });
-    total += current;
-    return total.toLocaleString("en-US");
+  // لو كل الكلمات مجرد أرقام مفردة (0-9)
+  if (buffer.every(word => units[word] !== undefined && units[word] <= 9)) {
+    return buffer.map(word => units[word]).join("");
   }
+  // لو أعداد كبيرة (مائة، ألف، عشرون...)
+  let total = 0, current = 0;
+  buffer.forEach(word => {
+    if (teens[word] !== undefined) current += teens[word];
+    else if (units[word] !== undefined) current += units[word];
+    else if (tens[word] !== undefined) current += tens[word];
+    else if (hundreds[word] !== undefined) current += hundreds[word];
+    else if (multipliers[word] !== undefined) {
+      if (multipliers[word] >= 1000) {
+        current = (current === 0 ? 1 : current) * multipliers[word];
+        total += current;
+        current = 0;
+      } else {
+        current *= multipliers[word];
+      }
+    }
+  });
+  total += current;
+  return total.toLocaleString("en-US");
+}
 
   for (let i = 0; i < tokens.length; i++) {
     const word = tokens[i];
