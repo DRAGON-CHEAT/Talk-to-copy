@@ -360,7 +360,27 @@ function applySmartWords(text) {
   }
   return text;
 }
-  
+// ===== هنا ضع الدالة =====
+function normalizeRepeats(text) {
+  const tokens = text.trim().split(/\s+/);
+  let result = [];
+  let prev = null;
+  let count = 0;
+
+  tokens.forEach(word => {
+    if(word === prev) {
+      count++;
+      if(count <= 10) result.push(word); // تعديل الحد حسب حاجتك
+    } else {
+      prev = word;
+      count = 1;
+      result.push(word);
+    }
+  });
+
+  return result.join(" ");
+}
+
   function wordsToNumbersInText(text) {
   const units = {
     "صفر":0,
@@ -426,11 +446,14 @@ function applySmartWords(text) {
   let numberBuffer = [];
 
   function processBuffer(buffer) {
-  // لو كل الكلمات مجرد أرقام مفردة (0-9)
+  function processBuffer(buffer) {
+  // لو كل الكلمات أرقام مفردة (0 - 9) → رجعها كسلسلة نصية
   if (buffer.every(word => units[word] !== undefined && units[word] <= 9)) {
+    // إزالة التكرار العشوائي: نجمعها فقط بالترتيب
     return buffer.map(word => units[word]).join("");
   }
-  // لو أعداد كبيرة (مائة، ألف، عشرون...)
+
+  // المعالجة للأعداد الكبيرة (عشرات، مئات، آلاف...)
   let total = 0, current = 0;
   buffer.forEach(word => {
     if (teens[word] !== undefined) current += teens[word];
@@ -519,11 +542,11 @@ function startRecognition(){
 
   recognition.onresult = function(event) {
     try {
-      const transcript = event.results[0][0].transcript || "";
-
-      let preApplied = applySmartWords(transcript);
-      let converted = wordsToNumbersInText(preApplied || "");
-      converted = applySmartWords(converted);
+let transcript = event.results[0][0].transcript || "";
+transcript = normalizeRepeats(transcript);   // ✅ إزالة التكرار الزائد
+let preApplied = applySmartWords(transcript);
+let converted = wordsToNumbersInText(preApplied || "");
+converted = applySmartWords(converted);
 
       const dateFormat = extractDateFromText(converted);
       const outputText = dateFormat ? dateFormat : converted;
