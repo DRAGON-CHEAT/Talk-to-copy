@@ -354,14 +354,14 @@ function applySmartWords(text) {
   for (const wrong in smartWords) {
     if (smartWords.hasOwnProperty(wrong)) {
       const correct = smartWords[wrong];
-      // استبدال كل كلمة خاطئة بالتصحيح
       text = text.split(wrong).join(correct);
     }
   }
   return text;
 }
-  
-  function wordsToNumbersInText(text) {
+
+// ** هنا ضع الدالة الجديدة بالكامل **
+function wordsToNumbersInText(text) {
   const units = {
     "صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,
     "اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,
@@ -422,46 +422,19 @@ function applySmartWords(text) {
 
   const tokens = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
   let resultWords = [];
-  let numberBuffer = [];
 
-  function processBuffer(buffer) {
-  // لكل كلمة رقمية نحولها مباشرة للرقم بدون جمع
-  return buffer.map(word => {
-    if(teens[word] !== undefined) return teens[word];
-    if(units[word] !== undefined) return units[word];
-    if(tens[word] !== undefined) return tens[word];
-    if(hundreds[word] !== undefined) return hundreds[word];
-    if(multipliers[word] !== undefined) return multipliers[word];
-    return word;
-  }).join(" ");
-}
-
-  for (let i = 0; i < tokens.length; i++) {
-    const word = tokens[i];
-    const twoWords = word + " " + (tokens[i+1] || "");
-    if (teens[twoWords]) {
-      numberBuffer.push(twoWords);
-      i++;
-      continue;
-    }
-    if (allWords[word]) {
-      numberBuffer.push(word);
+  tokens.forEach(word => {
+    if (allWords[word] !== undefined) {
+      // حوّل الكلمة إلى رقم مباشرة بدون جمع
+      resultWords.push('<span class="ltr-num">' + allWords[word] + '</span>');
     } else {
-      if (numberBuffer.length > 0) {
-        const num = processBuffer(numberBuffer);
-        resultWords.push('<span class="ltr-num">' + num + '</span>');
-        numberBuffer = [];
-      }
       resultWords.push(" " + word);
     }
-  }
-  if (numberBuffer.length > 0) {
-    const num = processBuffer(numberBuffer);
-    resultWords.push('<span class="ltr-num">' + num + '</span>');
+  });
 
-  }
   return resultWords.join(" ").trim();
-}  
+}
+  
 // === دالة لمعالجة التكرار مع السماح للأرقام ===
 function normalizeRepeats(text) {
   const tokens = text.trim().split(/\s+/);
