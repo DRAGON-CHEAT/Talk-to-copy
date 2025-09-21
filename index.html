@@ -1,824 +1,184 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>Convert audio</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>اختبار — تحويل أرقام من الكلام</title>
 <style>
-/* === التنسيقات الأصلية مع تعديل زر الكلمات الذكية === */
-body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
-.login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}
-.login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}
-.login-container input{width:90%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #444;background-color:#1a1a1a;color:#fff;font-size:16px;text-align:center;direction:ltr;unicode-bidi:embed}
-.login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}
-.login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}
-.login-container button:hover{opacity:0.85}
-.container{background-color:#111;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:82%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
-h1{font-family:bodoni,cursive; color:rgba(196, 144, 217, 0.70); margin-bottom:20px;font-size:25px;transition:font-size 0.3s ease}
-button{padding:12px 24px;font-size:18px;margin:0px 0px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}
-#startBtn{background-color:#4CAF50;color:white}
-#stopBtn{background-color:#f44336;color:white;display:none}
-button:hover{opacity:0.85}
-#recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}
-#recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-#output{background:#222;border:1px solid #444;padding:15px; width:95%; border-radius:8px;margin-top:20px;font-size:18px;min-height:50px; /*white-space:pre-wrap;*/color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:rtl;unicode-bidi:embed;text-align:center;position:relative;user-select:none}
-#outputText{pointer-events:none} 
-textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}
-#userCountContainer{top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:13px;opacity:0.8;justify-content:space-between}
-#userCount{color:#0f0}
-#logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}
-footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
-@keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
-.container.recording{animation:rgbGlow 10s infinite linear}
-.ltr-num {
-  direction: ltr;
-  unicode-bidi: embed;
-}
-  
-#autoRestartCheckbox:hover + #autoRestartTooltip {
-    visibility: visible;
-    opacity: 1;
-}
-/* === تعديل زر الكلمات الذكية === */
-#smartWordsBtn {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    padding: 4px 8px;
-    font-size: 12px;
-    background-color: #564d4d;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    z-index: 50;
-}
-#smartWordsMenu {
-    position: absolute;
-    top: 25px;
-    left: 5px;
-    background: #222;
-    border: 1px solid #555;
-    border-radius: 6px;
-    padding: 6px;
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 51;
-}
-.smartWordItem{display:flex;justify-content:space-between;align-items:center;background:#333;padding:2px 6px;border-radius:4px;cursor:pointer}
-.smartWordItem span{flex:1;text-align:center}
-.smartWordItem button{background:red;color:#fff;border:none;border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
-#smartAddInput{display:flex;gap:4px;margin-bottom:4px}
-#smartAddInput input{flex:1;padding:4px;border-radius:4px;border:1px solid #555;background:#111;color:#fff;font-size:14px}
-#smartAddInput button{padding:4px 8px;border-radius:4px;border:none;background:#4CAF50;color:#fff;font-size:12px;cursor:pointer}
-
-/* === زر القائمة العلوية === */
-#menuBtn{
-    position: absolute;
-    /*top: 0px;*/
-    left: 17px;
-    padding: 6px 12px;
-    font-size: 14px;
-    border-radius: 6px;
-    border: none;
-    background-color: #444;
-    color: #fff;
-    cursor: pointer;
-    z-index: 1000;
-}
-/* === القائمة الجانبية المصغرة والمنسقة === */
-#sideMenu {
-    position: absolute;
-    top: 17px;
-    left: 17px;
-    width: 111px; /* جعلها أقل عرضًا */
-    background-color: #0a0909;
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 12px 8px 12px 12px; /* تقليل البادينج من اليمين */
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 1000;
-    box-shadow: 3px 3px 12px rgba(0,0,0,0.5);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    transform: translateX(-220px);
-    opacity: 0;
-}
-
-/* ظهور القائمة */
-#sideMenu.show {
-    display: flex;
-    transform: translateX(0);
-    opacity: 1;
-}
-
-/* كلمة الرجوع الصغيرة في أعلى القائمة */
-#backBtn {
-    background: none;
-    border: none;
-    color: #ffcc00;
-    font-size: 13px;
-    font-weight: bold;
-    text-align: left;
-    cursor: pointer;
-    padding: 0;
-    margin-bottom: 8px;
-    transition: color 0.2s ease;
-}
-#backBtn:hover {
-    color: #ffff66;
-}
-
-/* أزرار القائمة الأخرى */
-#sideMenu .menuItem {
-    padding: 8px 10px; /* تقليل البادينج قليلاً */
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    background-color: #222;
-    color: #fff;
-    text-align: center;
-    font-size: 14px;
-    transition: background 0.2s ease, transform 0.2s ease;
-}
-#sideMenu .menuItem:hover {
-    background-color: #444;
-    transform: translateX(3px);
-}
-
-/* === استجابة الشاشة === */
-@media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
-@media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
+  body{font-family:tahoma, Arial; background:#0b0b0b; color:#eee; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:20px}
+  .card{background:#111;padding:18px;border-radius:10px; width:100%; max-width:520px; box-shadow:0 6px 24px rgba(0,0,0,0.6)}
+  button{padding:10px 14px;border-radius:8px;border:none;cursor:pointer;margin:6px}
+  #start{background:#2ecc71;color:#012}
+  #stop{background:#e74c3c;color:#fff;display:none}
+  #raw,#clean,#result{background:#0f0f0f;padding:10px;border-radius:6px;margin-top:8px;min-height:28px}
+  .label{font-size:13px;color:#9a9a9a;margin-top:8px}
+  .ltr-num{direction:ltr;unicode-bidi:embed;font-weight:700;color:#9fe}
 </style>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyDa1_gisk5GuTvRzACp0lA1TGe3-b2Sz8A",
-  authDomain: "dragon-tv-3e8c1.firebaseapp.com",
-  databaseURL: "https://dragon-tv-3e8c1-default-rtdb.firebaseio.com",
-  projectId: "dragon-tv-3e8c1",
-  storageBucket: "dragon-tv-3e8c1.firebasestorage.app",
-  messagingSenderId: "909817368695",
-  appId: "1:909817368695:web:b5e9ffccafefcbc41a7672"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-</script>
 </head>
 <body>
-
-<div class="login-container" id="login">
-<h2>⟱ تسجيل الدخول ⟱</h2>
-<input type="text" id="username" placeholder="اسم المستخدم">
-<input type="password" id="password" placeholder="كلمة المرور">
-<label><input type="checkbox" id="rememberMe">ذكرني</label>
-<button onclick="checkLogin()">دخول</button>
-<p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
-</div>
-<div class="container" id="app">
-<div id="userCountContainer">
-  <div id="userCount"># الأعضاء: 0</div>
- <!-- الزر الأصلي للقائمة -->
-<button id="menuBtn">☰ قائمة</button>
-
-<!-- القائمة الجانبية -->
-<div id="sideMenu">
-    <button id="backBtn">رجوع</button>
-    <button class="menuItem" onclick="logout()">تسجيل خروج</button>
-    <button class="menuItem" onclick="helpModal.style.display='block'">التعليمات</button>
-</div>
- 
-</div>
-<br>
-<h1> [ Convert Audio To Text In Iraqi ]</h1><br>
-<button id="startBtn" onclick="startRecognition()">[▶︎] أبدء الكلام</button>
-<label style="display:inline-flex;/*margin-right:10px;*/ cursor:pointer; user-select:none; position:relative; flex-direction:column; top:-2%">
-  <input type="checkbox" id="autoRestartCheckbox">  مستمر
-  <span id="autoRestartTooltip" style="
-        visibility:hidden;
-        background-color:#333;
-        color:#fff;
-        text-align:center;
-        border-radius:6px;
-        padding:5px;
-        position:absolute;
-        z-index:100;
-        font-size:12px;
-        top:-30px;
-        right:0;
-        opacity:0;
-        transition: opacity 0.3s;">
-    عند تفعيل هذا الخيار سيعمل التسجيل تلقائيًا بدون توقف
-  </span>
-</label>
-<button id="stopBtn" onclick="stopRecognition()">[X] إيقاف الكلام</button>
-
-<div id="recordingIndicator">
-  <span id="recordingDot"></span> ▶︎ جاري التحويل...
-</div>
-
-<div id="output">
-  <div id="outputText"></div>
-  <button id="smartWordsBtn">ادراج تصحيح</button>
-  <div id="smartWordsMenu">
-    <div id="smartAddInput">
-      <input type="text" id="wrongWord" placeholder="أدخل الكلمة الخاطئة">
-      <input type="text" id="correctWord" placeholder="أدخل التصحيح">
-      <button onclick="addSmartWord()">إضافة</button>
+  <div class="card">
+    <h3 style="margin:0 0 8px 0;text-align:center">اختبار تحويل أرقام من الكلام</h3>
+    <div style="text-align:center">
+      <button id="start">▶ بدء التسجيل</button>
+      <button id="stop">■ إيقاف</button>
     </div>
-    <div id="smartWordsList"></div>
 
-    <!-- أزرار التصدير والاستيراد (صغيرتان ومتناسقتان) -->
-    <div style="display:flex; gap:4px; margin-top:-6px; justify-content:right;">
-      <button onclick="exportSmartWords()" 
-              style="padding:2px 6px;background:#4CAF50;color:#fff;border:none;border-radius:4px;font-size:12px;">تصدير</button>
-      
-      <button onclick="document.getElementById('importFile').click()" 
-              style="padding:2px 6px;background:#2196F3;color:#fff;border:none;border-radius:4px;font-size:12px;">استيراد</button>
-      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importSmartWords(event)">
-    </div>
-  </div>
-</div>
+    <div class="label">raw (النص المسموع):</div>
+    <div id="raw"></div>
 
-<div id="historyContainer" style="
-    width:100%; min-height:170px; max-height:200px;
-    border:1px solid #555; border-radius:6px;
-    background:#1a1a1a; margin-top:18px;
-    display:flex; flex-direction:column; gap:6px;
-">
+    <div class="label">clean (بعد التنظيف):</div>
+    <div id="clean"></div>
 
-  <!-- الشريط العلوي للأزرار -->
-  <div style="display:flex; justify-content:space-between; padding:3px;">
-    <button id="toggleHistoryBtn" title="تبديل العرض"
-      style="background-color:#564d4d; color:#c5b4b4; padding:3px 8px; font-size:12px;">
-      ⇄
-    </button>
+    <div class="label">الناتج (سلاسل أرقام كما نطق):</div>
+    <div id="result"></div>
 
-    <button id="copyAllHistoryBtn" title="نسخ الكل"
-      style="background-color:#353d48; color:#c5b4b4; padding:3px 8px; font-size:12px;">
-      نسخ الكل
-    </button>
-  </div>
-
-  <!-- قائمة السجل -->
-  <div id="history" style="
-      flex:1; overflow-y:auto; padding:5px;
-      display:flex; flex-direction:column; gap:4px;
-      align-items:center; text-align:center;
-  ">
-  </div>
-
-  <!-- الشريط السفلي -->
-  <div style="display:flex; justify-content:right; padding:3px;">
-    <button id="clearHistoryBtn" title="حذف الكل"
-      style=" background-color:#8f2424; color:#c5b4b4;
-             border:none; border-radius:6px;
-             font-size:12px; padding:4px 8px; cursor:pointer;">
-      حذف الكل
-    </button>
-  </div>
-</div>
-
-<br>
-<footer>
-  &copy; DRAGON&CHEAT 2025 @
-</footer>
-
-<div id="helpModal" style="
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    max-width: 400px;
-    background-color: #111;
-    color: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(255,255,255,0.3);
-    text-align: center;
-    z-index: 10000;
-">
-    <h3>تعليمات الاستخدام</h3>
-    <p>
-
-       
-        0. لتسجيل الدخول أدخل اسم المستخدم وكلمة المرور. <br>
-        1. اضغط على زر ▶︎ لبدء التسجيل الصوتي للكلام.<br>
-        2. اضغط على زر X لإيقاف التسجيل صوتي كلام.<br>
-        3. يدعم الغة العربية فصحى-عراقية وارقام لاتينية.<br>
-        4. يمكنك نسخ النتائج وحذفها من صندوق التاريخ.<br>
-        5. يمكنك كتابة تصحيح وحفظ لايفهمه محرك<br>
-        6.دعم للسنوات واشهر والايام عند نطق بها عند كلام <br>
-        7.يجب ان يتوفر لديك مكرفون وأنترنت مستقر  <br><br>
-      ®جميع حقوق محفوظة™
+    <p style="margin-top:12px;color:#c7c7c7;font-size:13px">
+      جرّب: "صفر صفر صفر صفر صفر تلاتة تلاتة تلاتة" أو "خمسمائة خمسمائة"
     </p>
-    <button onclick="helpModal.style.display='none'" 
-        style="margin-top:15px;padding:8px 16px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;">
-        إغلاق
-    </button>
-</div>
+  </div>
 
 <script>
-// === دوال Firebase + تسجيل دخول ===
-function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
-const deviceId = crypto.randomUUID();
-function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
-db.ref('onlineUsers').on('value',snapshot=>{document.getElementById("userCount").textContent="# الأعضاء: "+snapshot.numChildren();});
-function checkLogin(){const user=document.getElementById("username").value.trim();const pass=document.getElementById("password").value.trim();const remember=document.getElementById("rememberMe").checked;const encodedUser="2LnZhNin2KE=";const encodedPass="MjI0NA==";if(base64EncodeUnicode(user)===encodedUser && base64EncodeUnicode(pass)===encodedPass){if(remember)localStorage.setItem("loggedIn","true");else sessionStorage.setItem("loggedInSession","true");document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("error").style.display="block";}}
-function logout(){const user=document.getElementById("username").value.trim();updateUserOnlineStatus(user,false);localStorage.removeItem("loggedIn");sessionStorage.removeItem("loggedInSession");document.getElementById("app").style.display="none";document.getElementById("login").style.display="block";}
-window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(loggedInPermanent && !loggedInSession){alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");sessionStorage.setItem("loggedInSession","true");location.reload();return;}if(loggedInPermanent||loggedInSession){const user=document.getElementById("username").value.trim();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("login").style.display="block";}}
-</script>
-<script>
-// انتقال بالإنتر من اسم المستخدم إلى كلمة المرور
-document.getElementById("username").addEventListener("keydown", function(e){
-  if(e.key === "Enter"){
-    e.preventDefault();
-    document.getElementById("password").focus();
-  }
-});
-</script>
-
-<script>
-// === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
-let recognition;
-let smartWords = {};
-const autoRestartCheckbox = document.getElementById("autoRestartCheckbox");
-
-function applySmartWords(text) {
-  for (const wrong in smartWords) {
-    if (smartWords.hasOwnProperty(wrong)) {
-      const correct = smartWords[wrong];
-      text = text.split(wrong).join(correct);
-    }
-  }
-  return text;
+/* ======== دوال الاختبار ======== */
+function escapeHtml(s){
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-// ** هنا ضع الدالة الجديدة بالكامل **
-function wordsToNumbersInText(text) {
-// === استبدل كامل تعريف wordsToNumbersInText بهذه الدالة ===
-function wordsToNumbersInText(text) {
-  if (!text) return "";
+function normalizeRepeats(text){
+  if(!text) return "";
+  // نظف علامات الترقيم ودمج المسافات — لا نقلص تكرار الكلمات
+  return text.replace(/[.,;؟!،\u060C]/g,' ').replace(/\s+/g,' ').trim();
+}
 
-  // 1) تنظيف مبدئي (حروف صغيرة، إزالة علامات ترقيم، مسافات موحدة)
-  text = String(text).toLowerCase()
-          .replace(/[.,;؟!،\u060C]/g, ' ')
-          .replace(/\s+/g, ' ')
-          .trim();
+function wordsToNumbersInText(text){
+  if(!text) return "";
+  // تنظيف ابتدائي
+  text = String(text).toLowerCase().replace(/[.,;؟!،\u060C]/g,' ').replace(/\s+/g,' ').trim();
 
-  // 2) بعض تصحيحات إملائية/لفظية شائعة (أضف هنا حالات أخرى عند الحاجة)
-  text = text.replace(/\bخمسمه\b/gi, 'خمسمائة')
-             .replace(/\bاتلاثه\b/gi, 'تلاتة')
-             .replace(/\bاتلاث\b/gi, 'تلاتة');
+  // تصحيحات شائعة (أضف حالات أخرى لو احتجت)
+  text = text.replace(/\bخمسمه\b/gi,'خمسمائة')
+             .replace(/\bاتلاثه\b/gi,'تلاتة')
+             .replace(/\bاتلاث\b/gi,'تلاتة')
+             .replace(/\bاتنين\b/gi,'اثنين');
 
-  // 3) فصل "و" الملصوقة بالكلمة (مثل "وثلاثة" -> "و" + "ثلاثة")
-  // سنقسّم لاحقًا إلى توكنز ونتجاهل "و" كحرف ربط.
-  // لا نقوم باستبدال داخل الكلمات الأخرى — نكتفي بالتقسيم أثناء البوت
-
-  // 4) جداول تحويل للكلمات إلى سلاسل رقمية
-  const digitMap = {
+  // خرايط التحويل إلى سلاسل رقمية (نحتفظ بالقيم كسلاسل حتى نلصق بالترتيب)
+  const numericMap = {
     "صفر":"0","٠":"0",
     "واحد":"1","واحدة":"1","احد":"1","احدى":"1",
     "اثنان":"2","اثنين":"2","اثنتان":"2","اثنتين":"2","ثنين":"2",
     "ثلاثة":"3","ثلاث":"3","تلاتة":"3","تلات":"3","تلث":"3",
-    "اربعة":"4","أربعة":"4","اربع":"4","أربعه":"4",
+    "اربع":"4","اربعة":"4","أربعة":"4","اربع":"4",
     "خمسة":"5","خمس":"5",
     "ستة":"6","ست":"6",
     "سبعة":"7","سبع":"7",
     "ثمانية":"8","ثمان":"8","ثمن":"8",
-    "تسعة":"9","تسع":"9"
-  };
-
-  const teenMap = {
+    "تسعة":"9","تسع":"9",
+    // عشرات/مئات/آلاف نضع تمثيلها كقيم نصية (قد تكون أكثر من رقم واحد)
     "عشرة":"10","عشر":"10",
-    "احد عشر":"11","أحد عشر":"11","احدى عشر":"11","إحدى عشر":"11",
-    "اثنا عشر":"12","اثني عشر":"12",
-    "ثلاثة عشر":"13","ثلاث عشر":"13",
-    "أربعة عشر":"14","اربعة عشر":"14",
-    "خمسة عشر":"15","ستة عشر":"16","سبعة عشر":"17","ثمانية عشر":"18","تسعة عشر":"19"
-  };
-
-  const tensMap = {
-    "عشرون":"20","عشرين":"20",
-    "ثلاثون":"30","ثلاثين":"30",
-    "أربعون":"40","اربعين":"40",
-    "خمسون":"50","خمسين":"50",
-    "ستون":"60","ستين":"60",
-    "سبعون":"70","سبعين":"70",
-    "ثمانون":"80","ثمانين":"80",
-    "تسعون":"90","تسعين":"90"
-  };
-
-  const hundredsMap = {
-    "مائة":"100","مئة":"100","مية":"100","ميّه":"100",
+    "عشرون":"20","عشرين":"20","ثلاثون":"30","ثلاثين":"30","اربعون":"40","اربعين":"40",
+    "خمسون":"50","خمسين":"50","ستون":"60","ستين":"60","سبعون":"70","سبعين":"70",
+    "ثمانون":"80","ثمانين":"80","تسعون":"90","تسعين":"90",
+    "مئة":"100","مائة":"100","مية":"100",
     "مئتين":"200","ميتين":"200",
-    "ثلاثمائة":"300","ثلاثمية":"300","تلثمية":"300",
-    "أربعمائة":"400","اربعماية":"400","اربعمية":"400",
-    "خمسمائة":"500","خمسماية":"500",
-    "ستمائة":"600","ستمية":"600",
-    "سبعمائة":"700","سبعمية":"700",
-    "ثمانمائة":"800","ثمانمية":"800",
-    "تسعمائة":"900","تسعمية":"900"
+    "ثلاثمائة":"300","خمسمائة":"500","ستمائة":"600","سبعمائة":"700","ثمانمائة":"800","تسعمائة":"900",
+    "الف":"1000","ألف":"1000","الفين":"2000","مليون":"1000000","ملايين":"1000000"
   };
 
-  const multipliersMap = {
-    "ألف":"1000","الف":"1000","آلاف":"1000",
-    "ألفين":"2000","الفين":"2000",
-    "مليون":"1000000","مليونان":"2000000","ملايين":"1000000"
-  };
-
-  // اندماج الجداول في خريطة واحدة تسند إلى سلسلة رقمية
-  const numericMap = Object.assign({}, digitMap, teenMap, tensMap, hundredsMap, multipliersMap);
-
-  // 5) تكوين التوكنز مع فصل "و" الملصوقة
+  // فصل التوكنز وفصل 'و' الملصوقة
   let rawTokens = text.split(/\s+/);
   let tokens = [];
-  rawTokens.forEach(t => {
-    if (!t) return;
-    // إذا الكلمة تبدأ بـ"و" متبوعة بحروف، نفصلها
-    if (t.length > 1 && t[0] === 'و') {
+  rawTokens.forEach(t=>{
+    if(!t) return;
+    if(t.length>1 && t[0]==='و'){
       tokens.push('و');
       tokens.push(t.slice(1));
-    } else {
-      tokens.push(t);
-    }
+    } else tokens.push(t);
   });
 
-  // 6) تحويل التوكنز إلى ناتج نصي: نلصق الأرقام المتتالية معًا، ونفصل الكلمات العادية بمسافة.
-  let numericRun = ""; // يجمع سلسلة الأرقام المتتالية
-  let resultParts = [];
+  // نبني الناتج: كل كلمة رقمية تضيف تمثيلها النصي مباشرة إلى numericRun
+  let numericRun = "";
+  let parts = [];
 
-  tokens.forEach(tok => {
-    if (tok === 'و') {
-      // تجاهل حرف العطف (يمكن تغييره لو أردت الاحتفاظ به)
-      return;
-    }
-
-    if (numericMap.hasOwnProperty(tok)) {
-      // إن كانت كلمة رقمية، نضيف تمثيلها الرقمي إلى numericRun (بدون مسافات)
+  tokens.forEach(tok=>{
+    if(tok === 'و') return; // نتجاهل حرف العطف
+    if(numericMap.hasOwnProperty(tok)){
       numericRun += String(numericMap[tok]);
     } else {
-      // ليست رقمية: نفرغ أي numericRun موجود ثم نضيف الكلمة العادية
-      if (numericRun.length > 0) {
-        resultParts.push('<span class="ltr-num">' + numericRun + '</span>');
+      if(numericRun.length>0){
+        parts.push('<span class="ltr-num">'+ numericRun +'</span>');
         numericRun = "";
       }
-      resultParts.push(" " + tok);
+      // كلمة غير رقمية: نضيفها ككلمة نصية مفصولة بمسافة
+      parts.push(" " + escapeHtml(tok));
     }
   });
 
-  // في النهاية نفرغ أي numericRun متبقّي
-  if (numericRun.length > 0) {
-    resultParts.push('<span class="ltr-num">' + numericRun + '</span>');
-  }
+  if(numericRun.length>0) parts.push('<span class="ltr-num">'+ numericRun +'</span>');
 
-  // نُعيد الناتج مع trim للتخلص من مسافة بادئة محتملة
-  return resultParts.join("").trim();
+  return parts.join("").trim();
 }
-      
-function extractDateFromText(text){
-  const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
-  const match=text.match(regex);
-  if(match){
-    let [_,year,month,day]=match.map(Number);
-    if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){
-      return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
-    }
-  }
-  if(/سنة|شهر|يوم/.test(text)){
-    const parts=text.split(/\s+/).map(p=>parseInt(p)).filter(n=>!isNaN(n));
-    if(parts.length>=3){
-      const [year,month,day]=parts;
-      if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){
-        return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
-      }
-    }
-  }
-  return null;
-}
+
+/* ======== التعرف الصوتي ======== */
+let recognition = null;
+const startBtn = document.getElementById('start');
+const stopBtn  = document.getElementById('stop');
+const rawEl    = document.getElementById('raw');
+const cleanEl  = document.getElementById('clean');
+const resEl    = document.getElementById('result');
+
+startBtn.addEventListener('click', startRecognition);
+stopBtn.addEventListener('click', stopRecognition);
 
 function startRecognition(){
-  const SpeechRecognition = window.webkitSpeechRecognition;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SpeechRecognition){
-    alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");
+    alert('الميكروفون الصوتي يتطلب متصفح يدعم SpeechRecognition (Chrome متاح عادة).');
     return;
   }
-
   recognition = new SpeechRecognition();
   recognition.lang = 'ar-IQ';
   recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
 
-  recognition.onstart = function(){
-    document.querySelector(".container").classList.add("recording");
-    document.getElementById("recordingIndicator").style.display = "block";
-    document.getElementById("startBtn").style.display = "none";
-    document.getElementById("stopBtn").style.display = "inline-block";
+  recognition.onstart = ()=>{
+    startBtn.style.display = 'none';
+    stopBtn.style.display  = 'inline-block';
+    rawEl.textContent = cleanEl.textContent = resEl.textContent = '';
   };
 
-  recognition.onresult = function(event) {
-  try {
-    const transcript = (event.results[0] && event.results[0][0] && event.results[0][0].transcript) ? event.results[0][0].transcript : "";
-    console.log('raw transcript:', transcript);
+  recognition.onresult = function(event){
+    try {
+      const transcript = (event.results[0] && event.results[0][0] && event.results[0][0].transcript) ? event.results[0][0].transcript : "";
+      rawEl.textContent = transcript;
 
-    let preApplied = applySmartWords(transcript || "");
-    preApplied = preApplied.replace(/\bخمسمه\b/gi, 'خمسمائة');
-    preApplied = normalizeRepeats(preApplied);
+      let cleaned = normalizeRepeats(transcript);
+      cleanEl.textContent = cleaned;
 
-    console.log('normalized:', preApplied);
+      let converted = wordsToNumbersInText(cleaned);
+      resEl.innerHTML = converted || '(لا توجد نتيجة رقمية)';
 
-    let converted = wordsToNumbersInText(preApplied || "");
-    converted = applySmartWords(converted);
+      console.log('raw:', transcript);
+      console.log('clean:', cleaned);
+      console.log('converted:', converted);
+    } catch(err){
+      console.error('onresult error', err);
+    }
+  };
 
-    console.log('converted result:', converted);
-
-    const debugPrefix = `<div style="font-size:12px;color:#9f9;margin-bottom:6px;text-align:center">
-      <div>raw: ${escapeHtml(transcript)}</div>
-      <div>clean: ${escapeHtml(preApplied)}</div>
-    </div>`;
-
-    document.getElementById("outputText").innerHTML = debugPrefix + converted;
-    addToHistory(converted);
-    navigator.clipboard.writeText(converted).catch(()=>{});
-  } catch (err) {
-    console.error("onresult error:", err);
-  }
-};
-
-function escapeHtml(s){
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+  recognition.onerror = function(e){
+    console.error('recognition error', e);
+  };
 
   recognition.onend = function(){
-    document.querySelector(".container").classList.remove("recording");
-    document.getElementById("recordingIndicator").style.display = "none";
-    document.getElementById("startBtn").style.display = "inline-block";
-    document.getElementById("stopBtn").style.display = "none";
-
-    // إعادة تشغيل التسجيل تلقائيًا إذا تم التفعيل
-    if(autoRestartCheckbox.checked) {
-      startRecognition();
-    }
+    startBtn.style.display = 'inline-block';
+    stopBtn.style.display  = 'none';
   };
 
-  recognition.start();
+  try { recognition.start(); } catch(e) { console.error(e); alert('فشل بدء التسجيل: '+ e.message); }
 }
 
-function stopRecognition(){ 
-  if(recognition){ recognition.stop(); }
+function stopRecognition(){
+  if(recognition) recognition.stop();
 }
-document.getElementById("startBtn").onclick = startRecognition;
-document.getElementById("stopBtn").onclick = stopRecognition;
-
-// === سجل التاريخ ===
-const historyEl = document.getElementById("history");
-const toggleBtn = document.getElementById("toggleHistoryBtn");
-const copyAllBtn = document.getElementById("copyAllHistoryBtn");
-let isHorizontal = false;
-const clearAllBtn = document.getElementById("clearHistoryBtn");
-clearAllBtn.addEventListener("click", ()=>{
-  historyEl.innerHTML = ""; // يمسح كل السجل مباشرة
-});
-
-toggleBtn.addEventListener("click", ()=>{
-  if(isHorizontal){
-    historyEl.style.flexDirection = "column";
-    historyEl.style.flexWrap = "nowrap";
-  } else {
-    historyEl.style.flexDirection = "row";
-    historyEl.style.flexWrap = "wrap";
-  }
-  isHorizontal = !isHorizontal;
-});
-
-copyAllBtn.addEventListener("click", ()=>{
-  let allText = Array.from(historyEl.children)
-    .map(d => d.childNodes[0].textContent.trim()) // استبعاد زر الحذف (X)
-    .join(isHorizontal ? " " : "\n"); // أفقي = مسافة / عمودي = سطر جديد
-
-  navigator.clipboard.writeText(allText).then(()=>{
-    const existingIcon = copyAllBtn.querySelector("span");
-    if(existingIcon) existingIcon.remove();
-    const icon = document.createElement("span");
-    icon.innerText = "[√]";
-    icon.style.marginLeft = "6px";
-    copyAllBtn.appendChild(icon);
-    setTimeout(()=>{icon.remove();},1000);
-  });
-});
-
-function addToHistory(text){
-  const lineDiv = document.createElement("div");
-  lineDiv.style.display = "flex";
-  lineDiv.style.alignItems = "center";
-  lineDiv.style.gap = "6px";
-  lineDiv.style.padding = "2px 6px";
-  lineDiv.style.background = "#1a1a1a";
-  lineDiv.style.borderRadius = "4px";
-  lineDiv.style.margin = "2px 2px";
-  lineDiv.style.width = "auto";
-
-  // النص
-  const spanText = document.createElement("span");
-  spanText.innerText = text;
-  spanText.style.cursor = "pointer";
-  spanText.style.flex = "1";
-  spanText.style.textAlign = "center";
-
-  // نسخ عند الضغط
-  spanText.addEventListener("click", ()=>{
-    navigator.clipboard.writeText(text).then(()=>{
-      const copyIcon = document.createElement("span");
-      copyIcon.innerText = "[√]";
-      copyIcon.style.marginLeft = "6px";
-      spanText.appendChild(copyIcon);
-      setTimeout(()=>{copyIcon.remove();},1000);
-    });
-  });
-
-  // زر الحذف ❌
-  const delBtn = document.createElement("button");
-  delBtn.innerText = "X";
-  delBtn.style.background = "red";
-  delBtn.style.color = "white";
-  delBtn.style.border = "none";
-  delBtn.style.borderRadius = "3px";
-  delBtn.style.cursor = "pointer";
-  delBtn.style.fontSize = "12px";
-  delBtn.style.padding = "0 3px";
-
-  delBtn.addEventListener("click", (e)=>{
-    e.stopPropagation(); // منع تفعيل نسخ النص
-    lineDiv.remove();
-  });
-
-  lineDiv.appendChild(spanText);
-  lineDiv.appendChild(delBtn);
-
-  if (historyEl.firstChild) {
-    historyEl.insertBefore(lineDiv, historyEl.firstChild); 
-  } else {
-    historyEl.appendChild(lineDiv);
-  }
-
-  historyEl.scrollTop = 0;
-}
-
-function toggleSmartMenu(){smartMenu.style.display="none";}
-
-// === زر القائمة العلوية ===
-const menuBtn = document.getElementById('menuBtn');
-const sideMenu = document.getElementById('sideMenu');
-const backBtn = document.getElementById('backBtn');
-
-menuBtn.addEventListener('click', () => {
-    sideMenu.classList.add('show');
-    menuBtn.style.display = 'none';
-});
-
-backBtn.addEventListener('click', () => {
-    sideMenu.classList.remove('show');
-    setTimeout(() => menuBtn.style.display = 'inline-block', 300); 
-});
-
-window.addEventListener('click', (e) => {
-    if (!menuBtn.contains(e.target) && !sideMenu.contains(e.target)) {
-        sideMenu.classList.remove('show');
-        setTimeout(() => menuBtn.style.display = 'inline-block', 300);
-    }
-});
-
-// === زر الاستعلام الدائري أسفل الفوتر ===
-//هناك عنصر مع id="helpBtn" لذا نتحقق من وجوده قبل إضافة مستمعي الأحداث حتى لا يسبب خطأ.
-const helpBtn = document.getElementById('helpBtn');
-const helpModal = document.getElementById('helpModal');
-if(helpBtn){
-  helpBtn.addEventListener('mouseenter', ()=>{
-      helpBtn.style.backgroundColor = 'rgba(255, 204, 0, 1)';
-      helpBtn.style.boxShadow = '0 0 20px rgba(255,255,0,0.8)';
-  });
-
-  helpBtn.addEventListener('mouseleave', ()=>{
-      helpBtn.style.backgroundColor = 'rgba(255, 204, 0, 0.4)';
-      helpBtn.style.boxShadow = '0 0 10px rgba(255,255,0,0.3)';
-  });
-
-  helpBtn.addEventListener('click', ()=>{
-      helpModal.style.display = 'block';
-  });
-}
-
-window.addEventListener('click', (e)=>{
-    if(e.target === helpModal){
-        helpModal.style.display = 'none';
-    }
-});
-
-// === تصدير الكلمات الذكية كملف JSON ===
-function exportSmartWords() {
-  try {
-    const dataStr = JSON.stringify(smartWords, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    // اسم الملف قابل للتغيير لو أردت
-    a.download = "recovery_txt.json";
-    a.click();
-
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    alert("فشل التصدير");
-  }
-}
-
-// === استيراد الكلمات الذكية من ملف JSON ===
-function importSmartWords(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const imported = JSON.parse(e.target.result);
-      if (typeof imported === "object" && imported !== null) {
-        // دمج المحتوى المستورد مع smartWords الحالي
-        smartWords = { ...smartWords, ...imported };
-        renderSmartWords();
-        alert("√ تم استيراد الكلمات بنجاح");
-      } else {
-        alert("X تنسيق الملف غير صحيح");
-      }
-    } catch (err) {
-      alert("X ملف غير صالح");
-    }
-    // إعادة تعيين قيمة input حتى تسمح بتحميل نفس الملف مرة ثانية إذا رغب المستخدم
-    event.target.value = "";
-  };
-  reader.readAsText(file);
-}
-
-// === زر "إدراج تصحيح" ===
-// === زر "إدراج تصحيح" مع تغيير النص وإغلاق عند الضغط خارج ===
-const smartBtn = document.getElementById("smartWordsBtn");
-const smartMenu = document.getElementById("smartWordsMenu");
-let menuOpen = false;
-
-smartBtn.addEventListener("click", (e) => {
-  e.stopPropagation(); // منع حدث الإغلاق عند الضغط على الزر نفسه
-  menuOpen = !menuOpen;
-  smartMenu.style.display = menuOpen ? "flex" : "none";
-  smartBtn.innerText = menuOpen ? "إغلاق" : "ادراج تصحيح";
-  smartMenu.style.flexDirection = "column";
-});
-
-// إغلاق القائمة عند الضغط في أي مكان آخر
-window.addEventListener("click", (e) => {
-  if(menuOpen && !smartMenu.contains(e.target) && e.target !== smartBtn) {
-    smartMenu.style.display = "none";
-    smartBtn.innerText = "ادراج تصحيح";
-    menuOpen = false;
-  }
-});
-
-// دالة لإضافة الكلمة الخاطئة + التصحيح
-function addSmartWord() {
-  const wrong = document.getElementById("wrongWord").value.trim();
-  const correct = document.getElementById("correctWord").value.trim();
-
-  if (wrong && correct) {
-    smartWords[wrong] = correct;
-    renderSmartWords();
-    document.getElementById("wrongWord").value = "";
-    document.getElementById("correctWord").value = "";
-  }
-}
-
-// دالة عرض الكلمات المضافة
-function renderSmartWords() {
-  const list = document.getElementById("smartWordsList");
-  list.innerHTML = "";
-  for (const wrong in smartWords) {
-    const div = document.createElement("div");
-    div.className = "smartWordItem";
-    div.innerHTML = `<span>${wrong} → ${smartWords[wrong]}</span>`;
-    const delBtn = document.createElement("button");
-    delBtn.innerText = "X";
-    delBtn.onclick = () => {
-      delete smartWords[wrong];
-      renderSmartWords();
-    };
-    div.appendChild(delBtn);
-    list.appendChild(div);
-  }
-}
-  
 </script>
-
 </body>
 </html>
