@@ -437,32 +437,37 @@ function applySmartWords(text) {
     return total.toLocaleString("en-US");
   }
 
-  for (let i = 0; i < tokens.length; i++) {
-    const word = tokens[i];
-    const twoWords = word + " " + (tokens[i+1] || "");
-    if (teens[twoWords]) {
-      numberBuffer.push(twoWords);
-      i++;
-      continue;
-    }
-    if (allWords[word]) {
-      numberBuffer.push(word);
-    } else {
-      if (numberBuffer.length > 0) {
-        const num = processBuffer(numberBuffer);
-        resultWords.push('<span class="ltr-num">' + num + '</span>');
-        numberBuffer = [];
-      }
-      resultWords.push(" " + word);
-    }
-  }
-  if (numberBuffer.length > 0) {
-    const num = processBuffer(numberBuffer);
-    resultWords.push('<span class="ltr-num">' + num + '</span>');
+  let lastWord = null;
 
+for (let i = 0; i < tokens.length; i++) {
+  const word = tokens[i];
+  const twoWords = word + " " + (tokens[i+1] || "");
+
+  if (teens[twoWords]) {
+    numberBuffer.push(twoWords);
+    i++;
+    lastWord = twoWords;
+    continue;
   }
-  return resultWords.join(" ").trim();
-}  
+
+  if (allWords[word]) {
+    if (lastWord === word) {
+      const num = processBuffer(numberBuffer);
+      resultWords.push('<span class="ltr-num">' + num + '</span>');
+      numberBuffer = [];
+    }
+    numberBuffer.push(word);
+    lastWord = word;
+  } else {
+    if (numberBuffer.length > 0) {
+      const num = processBuffer(numberBuffer);
+      resultWords.push('<span class="ltr-num">' + num + '</span>');
+      numberBuffer = [];
+    }
+    resultWords.push(" " + word);
+    lastWord = null;
+  }
+}
       
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
