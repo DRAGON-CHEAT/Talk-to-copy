@@ -4,126 +4,102 @@
 <meta charset="UTF-8">
 <title>Convert audio</title>
 <style>
-/* ===== تنسيقات أساسية ===== */
-body{margin:0;padding:0;background-color:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
-.container{background-color:#111;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:82%;max-width:600px;transition:all 0.3s ease;position:relative}
-h1{font-family:bodoni,cursive;color:rgba(196,144,217,0.70);margin-bottom:20px;font-size:25px;transition:font-size 0.3s ease}
-button{padding:12px 24px;font-size:18px;margin:0px 0px;border:none;border-radius:8px;cursor:pointer;transition:0.3s}
-#startBtn{background-color:#4CAF50;color:white}
-#stopBtn{background-color:#f44336;color:white;display:none}
+body{margin:0;padding:0;background:#000;color:#fff;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
+.container{background:#111;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:82%;max-width:600px;transition:all 0.3s ease}
+h1{font-family:bodoni,cursive;color:rgba(196,144,217,0.70);margin-bottom:20px;font-size:25px}
+button{padding:12px 24px;font-size:18px;margin:5px;border:none;border-radius:8px;cursor:pointer;transition:0.3s}
+#startBtn{background:#4CAF50;color:white}
+#stopBtn{background:#f44336;color:white;display:none}
 #recordingIndicator{display:none;color:#ff5252;font-weight:bold;margin-top:10px}
-#recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
+#recordingDot{display:inline-block;width:12px;height:12px;background:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-#output{background:#222;border:1px solid #444;padding:15px;width:95%;border-radius:8px;margin-top:20px;font-size:18px;min-height:50px;color:#ddd;direction:rtl;text-align:center;user-select:none}
+#output{background:#222;border:1px solid #444;padding:15px;width:95%;border-radius:8px;margin-top:20px;font-size:18px;min-height:50px;color:#ddd;direction:rtl;text-align:center}
 .ltr-num{direction:ltr;unicode-bidi:embed}
 </style>
 </head>
 <body>
 
 <div class="container">
-<h1>Convert Audio To Text In Iraqi</h1>
-<button id="startBtn">▶︎ أبدء الكلام</button>
-<button id="stopBtn">X إيقاف الكلام</button>
-<label><input type="checkbox" id="autoRestartCheckbox"> مستمر</label>
-
-<div id="recordingIndicator">
-  <span id="recordingDot"></span> جاري التحويل...
+  <h1>🎤 تحويل الصوت إلى نص (Whisper للأرقام فقط)</h1>
+  <button id="startBtn">▶︎ أبدأ الكلام</button>
+  <button id="stopBtn">X إيقاف</button>
+  <label><input type="checkbox" id="autoRestartCheckbox"> مستمر</label>
+  <div id="recordingIndicator"><span id="recordingDot"></span> جاري التحويل...</div>
+  <div id="output"></div>
 </div>
 
-<div id="output"></div>
-</div>
-
+<!-- مكتبة Whisper -->
 <script src="https://cdn.jsdelivr.net/gh/ggerganov/whisper.cpp/web/whisper.js"></script>
+
 <script>
-// ===== دوالك القديمة =====
-function applySmartWords(text){ return text; } // احتفظ بها كما هي في كودك القديم
-function addToHistory(text){ console.log("History:", text); } // يمكن استبدالها بدالتك الحقيقية
+// ===== دوالك القديمة (كما هي) =====
+function applySmartWords(text){ return text; }
+function addToHistory(text){ console.log("History:", text); }
 
-// ===== القاموس للأرقام الفصحى واللهجة العراقية =====
-const numbersDict = {
-    "صفر":0,"واحد":1,"واحدة":1,"احد":1,"اثنان":2,"اثنين":2,"اثنتان":2,
-    "ثلاثة":3,"ثلاث":3,"تلاتة":3,"تلات":3,"تلث":3,
-    "أربعة":4,"اربعة":4,"اربع":4,"أربع":4,
-    "خمسة":5,"خمس":5,"ستة":6,"ست":6,"سبعة":7,"سبع":7,
-    "ثمانية":8,"ثمان":8,"تسعة":9,"تسع":9,
-    "عشرة":10,"تلاتة عشر":13,"ألف":1000,"الف":1000,"مليون":1000000
-};
-
-// ===== دالة تقسيم النص إلى أرقام وكلمات =====
-function splitTextParts(text){
-    const regex = new RegExp(Object.keys(numbersDict).join("|") + "|\\d+", "gi");
-    let parts = [];
-    let lastIndex = 0;
-    let match;
-    while((match = regex.exec(text))!==null){
-        if(match.index>lastIndex){
-            parts.push({type:"text", value:text.slice(lastIndex, match.index)});
-        }
-        parts.push({type:"number", value:match[0]});
-        lastIndex = regex.lastIndex;
-    }
-    if(lastIndex<text.length) parts.push({type:"text", value:text.slice(lastIndex)});
-    return parts;
+// ===== Whisper كدالة أرقام =====
+async function whisperNumber(numText){
+  try {
+    const model = new WhisperJS.Model();
+    const result = await model.transcribe(numText);
+    return `<span class="ltr-num">${result.text || numText}</span>`;
+  } catch(e){
+    console.error("Whisper error:", e);
+    return numText;
+  }
 }
 
-// ===== دالة Whisper لمعالجة الأرقام =====
-async function processNumberWithWhisper(numText){
-    try {
-        const model = new WhisperJS.Model();
-        const result = await model.transcribe(numText);
-        return result.text || numText;
-    } catch(e){ console.error(e); return numText; }
+// ===== تمرير النص إلى Whisper فقط إذا هو رقم =====
+async function processNumbersWithWhisper(text){
+  // نتأكد إذا النص كله عبارة عن أرقام أو كلمة رقمية
+  const regex = /^[\d٠-٩]+$|^(?:\S+)$/;
+  if(regex.test(text.trim())){
+    return await whisperNumber(text.trim());
+  }
+  return text;
 }
 
 // ===== التعرف الصوتي =====
 let recognition;
 const autoRestartCheckbox = document.getElementById("autoRestartCheckbox");
+
 async function startRecognition(){
-    const SpeechRecognition = window.webkitSpeechRecognition;
-    if(!SpeechRecognition){ alert("❌ هذه الميزة تعمل فقط على Chrome."); return; }
+  const SpeechRecognition = window.webkitSpeechRecognition;
+  if(!SpeechRecognition){ alert("❌ فقط كروم مدعوم حالياً"); return; }
 
-    recognition = new SpeechRecognition();
-    recognition.lang = 'ar-IQ';
-    recognition.interimResults = false;
+  recognition = new SpeechRecognition();
+  recognition.lang = "ar-IQ";
+  recognition.interimResults = false;
 
-    recognition.onstart = function(){
-        document.getElementById("recordingIndicator").style.display="block";
-        document.getElementById("startBtn").style.display="none";
-        document.getElementById("stopBtn").style.display="inline-block";
-    };
+  recognition.onstart = function(){
+    document.getElementById("recordingIndicator").style.display="block";
+    document.getElementById("startBtn").style.display="none";
+    document.getElementById("stopBtn").style.display="inline-block";
+  };
 
-    recognition.onresult = async function(event){
-        try{
-            let transcript = event.results[0][0].transcript || "";
-            transcript = applySmartWords(transcript);
+  recognition.onresult = async function(event){
+    try{
+      let transcript = event.results[0][0].transcript || "";
+      transcript = applySmartWords(transcript);
 
-            const parts = splitTextParts(transcript);
-            let finalHTML = "";
+      // لو النص رقم → Whisper
+      transcript = await processNumbersWithWhisper(transcript);
 
-            for(const part of parts){
-                if(part.type==="number"){
-                    const numText = await processNumberWithWhisper(part.value);
-                    finalHTML += `<span class="ltr-num">${numText}</span>`;
-                } else {
-                    finalHTML += part.value;
-                }
-            }
+      document.getElementById("output").innerHTML = transcript;
+      addToHistory(transcript);
+      navigator.clipboard.writeText(transcript).catch(()=>{});
+    } catch(err){ console.error(err); }
+  };
 
-            document.getElementById("output").innerHTML = finalHTML;
-            addToHistory(finalHTML);
-            navigator.clipboard.writeText(finalHTML).catch(()=>{});
-        } catch(err){ console.error(err); }
-    };
+  recognition.onend = function(){
+    document.getElementById("recordingIndicator").style.display="none";
+    document.getElementById("startBtn").style.display="inline-block";
+    document.getElementById("stopBtn").style.display="none";
+    if(autoRestartCheckbox.checked){ startRecognition(); }
+  };
 
-    recognition.onend = function(){
-        document.getElementById("recordingIndicator").style.display="none";
-        document.getElementById("startBtn").style.display="inline-block";
-        document.getElementById("stopBtn").style.display="none";
-        if(autoRestartCheckbox.checked){ startRecognition(); }
-    };
-
-    recognition.start();
+  recognition.start();
 }
+
 function stopRecognition(){ if(recognition) recognition.stop(); }
 
 document.getElementById("startBtn").onclick=startRecognition;
