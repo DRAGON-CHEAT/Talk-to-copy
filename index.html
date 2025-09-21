@@ -437,25 +437,12 @@ function wordsToNumbersInText(text) {
   
 // === دالة لمعالجة التكرار مع السماح للأرقام ===
 function normalizeRepeats(text) {
-  const tokens = text.trim().split(/\s+/);
-  let result = [];
-  let prev = null;
-  let count = 0;
-
-  tokens.forEach(word => {
-    if(word === prev){
-      count++;
-      // السماح بتكرار أي كلمة حتى 100 مرة
-      if(count <= 100) result.push(word);
-    } else {
-      prev = word;
-      count = 1;
-      result.push(word);
-    }
-  });
-
-  return result.join(" ");
+  if (!text) return "";
+  // تنظيف علامات الترقيم والمسافات فقط
+  text = text.replace(/[.,;؟!،\u060C]/g, ' ').replace(/\s+/g, ' ').trim();
+  return text; // نرجّع النص كما هو (بدون قص التكرارات)
 }
+
       
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
@@ -497,24 +484,37 @@ function startRecognition(){
   };
 
   recognition.onresult = function(event) {
-    try {
-      const transcript = event.results[0][0].transcript || "";
+  try {
+    const transcript = (event.results[0] && event.results[0][0] && event.results[0][0].transcript) ? event.results[0][0].transcript : "";
+    console.log('raw transcript:', transcript);
 
-      let preApplied = applySmartWords(transcript);
-      preApplied = normalizeRepeats(preApplied); // ✅ إضافة هنا لمعالجة التكرار
-      let converted = wordsToNumbersInText(preApplied || "");
-      converted = applySmartWords(converted);
+    let preApplied = applySmartWords(transcript || "");
+    preApplied = preApplied.replace(/\bخمسمه\b/gi, 'خمسمائة');
+    preApplied = normalizeRepeats(preApplied);
 
-      const dateFormat = extractDateFromText(converted);
-      const outputText = dateFormat ? dateFormat : converted;
+    console.log('normalized:', preApplied);
 
-      document.getElementById("outputText").innerHTML = outputText;
-      addToHistory(outputText);
-      navigator.clipboard.writeText(outputText).catch(()=>{});
-    } catch (err) {
-      console.error("onresult error:", err);
-    }
-  };
+    let converted = wordsToNumbersInText(preApplied || "");
+    converted = applySmartWords(converted);
+
+    console.log('converted result:', converted);
+
+    const debugPrefix = `<div style="font-size:12px;color:#9f9;margin-bottom:6px;text-align:center">
+      <div>raw: ${escapeHtml(transcript)}</div>
+      <div>clean: ${escapeHtml(preApplied)}</div>
+    </div>`;
+
+    document.getElementById("outputText").innerHTML = debugPrefix + converted;
+    addToHistory(converted);
+    navigator.clipboard.writeText(converted).catch(()=>{});
+  } catch (err) {
+    console.error("onresult error:", err);
+  }
+};
+
+function escapeHtml(s){
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
   recognition.onend = function(){
     document.querySelector(".container").classList.remove("recording");
