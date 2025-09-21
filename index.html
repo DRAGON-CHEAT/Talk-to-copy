@@ -425,25 +425,16 @@ function applySmartWords(text) {
   let numberBuffer = [];
 
   function processBuffer(buffer) {
-    let total = 0, current = 0;
-    buffer.forEach(word => {
-      if (teens[word] !== undefined) current += teens[word];
-      else if (units[word] !== undefined) current += units[word];
-      else if (tens[word] !== undefined) current += tens[word];
-      else if (hundreds[word] !== undefined) current += hundreds[word];
-      else if (multipliers[word] !== undefined) {
-        if (multipliers[word] >= 1000) {
-          current = (current === 0 ? 1 : current) * multipliers[word];
-          total += current;
-          current = 0;
-        } else {
-          current *= multipliers[word];
-        }
-      }
-    });
-    total += current;
-    return total.toLocaleString("en-US");
-  }
+  // لكل كلمة رقمية نحولها مباشرة للرقم بدون جمع
+  return buffer.map(word => {
+    if(teens[word] !== undefined) return teens[word];
+    if(units[word] !== undefined) return units[word];
+    if(tens[word] !== undefined) return tens[word];
+    if(hundreds[word] !== undefined) return hundreds[word];
+    if(multipliers[word] !== undefined) return multipliers[word];
+    return word;
+  }).join(" ");
+}
 
   for (let i = 0; i < tokens.length; i++) {
     const word = tokens[i];
