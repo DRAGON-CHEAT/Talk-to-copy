@@ -360,13 +360,12 @@ function applySmartWords(text) {
   }
   return text;
 }
-
-// تحويل الكلام إلى أرقام
-function wordsToNumbersInText(text) {
+  
+  function wordsToNumbersInText(text) {
   const units = {
-    "صفر":0,"واحد":1,"واحدة":1,"احد":1,
+    "صفر":0,"واحد":1,"واحدة":1,"احت":1,"احدع":1,
     "اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,
-    "ثلاثة":3,"ثلاث":3,"تلات":3,"تلث":3,
+    "ثلاثة":3,"ثلاث":3,"اتلاثه":3,"تلات":3,"تلث":3,
     "أربعة":4,"اربعه":4,"اربع":4,
     "خمسة":5,"خمسه":5,
     "ستة":6,"سته":6,
@@ -426,19 +425,13 @@ function wordsToNumbersInText(text) {
   let numberBuffer = [];
 
   function processBuffer(buffer) {
-    let total = 0;
-    let current = 0;
-
+    let total = 0, current = 0;
     buffer.forEach(word => {
-      if (teens[word] !== undefined) {
-        current += teens[word];
-      } else if (units[word] !== undefined) {
-        current += units[word];
-      } else if (tens[word] !== undefined) {
-        current += tens[word];
-      } else if (hundreds[word] !== undefined) {
-        current += hundreds[word];
-      } else if (multipliers[word] !== undefined) {
+      if (teens[word] !== undefined) current += teens[word];
+      else if (units[word] !== undefined) current += units[word];
+      else if (tens[word] !== undefined) current += tens[word];
+      else if (hundreds[word] !== undefined) current += hundreds[word];
+      else if (multipliers[word] !== undefined) {
         if (multipliers[word] >= 1000) {
           current = (current === 0 ? 1 : current) * multipliers[word];
           total += current;
@@ -448,7 +441,6 @@ function wordsToNumbersInText(text) {
         }
       }
     });
-
     total += current;
     return total.toLocaleString("en-US");
   }
@@ -465,19 +457,20 @@ function wordsToNumbersInText(text) {
       numberBuffer.push(word);
     } else {
       if (numberBuffer.length > 0) {
-        resultWords.push('<span class="ltr-num">' + processBuffer(numberBuffer) + '</span>');
+        const num = processBuffer(numberBuffer);
+        resultWords.push('<span class="ltr-num">' + num + '</span>');
         numberBuffer = [];
       }
       resultWords.push(" " + word);
     }
   }
-
   if (numberBuffer.length > 0) {
-    resultWords.push('<span class="ltr-num">' + processBuffer(numberBuffer) + '</span>');
-  }
+    const num = processBuffer(numberBuffer);
+    resultWords.push('<span class="ltr-num">' + num + '</span>');
 
+  }
   return resultWords.join(" ").trim();
-}
+}  
       
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
