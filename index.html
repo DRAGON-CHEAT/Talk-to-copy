@@ -360,12 +360,13 @@ function applySmartWords(text) {
   }
   return text;
 }
-  
-  function wordsToNumbersInText(text) {
+
+// تحويل الكلام إلى أرقام
+function wordsToNumbersInText(text) {
   const units = {
-    "صفر":0,"واحد":1,"واحدة":1,"احت":1,"احدع":1,
+    "صفر":0,"واحد":1,"واحدة":1,"احد":1,
     "اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,
-    "ثلاثة":3,"ثلاث":3,"اتلاثه":3,"تلات":3,"تلث":3,
+    "ثلاثة":3,"ثلاث":3,"تلات":3,"تلث":3,
     "أربعة":4,"اربعه":4,"اربع":4,
     "خمسة":5,"خمسه":5,
     "ستة":6,"سته":6,
@@ -423,38 +424,34 @@ function applySmartWords(text) {
   const tokens = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
   let resultWords = [];
   let numberBuffer = [];
-    
+
   function processBuffer(buffer) {
-  let total = 0;
-  let current = 0;
+    let total = 0;
+    let current = 0;
 
-  buffer.forEach(word => {
-    if (teens[word] !== undefined) {
-      current += teens[word];
-    } else if (units[word] !== undefined) {
-      current += units[word];
-    } else if (tens[word] !== undefined) {
-      current += tens[word];
-    } else if (hundreds[word] !== undefined) {
-      if (current > 0) {
-        current = current * 100;
-      } else {
+    buffer.forEach(word => {
+      if (teens[word] !== undefined) {
+        current += teens[word];
+      } else if (units[word] !== undefined) {
+        current += units[word];
+      } else if (tens[word] !== undefined) {
+        current += tens[word];
+      } else if (hundreds[word] !== undefined) {
         current += hundreds[word];
+      } else if (multipliers[word] !== undefined) {
+        if (multipliers[word] >= 1000) {
+          current = (current === 0 ? 1 : current) * multipliers[word];
+          total += current;
+          current = 0;
+        } else {
+          current *= multipliers[word];
+        }
       }
-    } else if (multipliers[word] !== undefined) {
-      if (multipliers[word] >= 1000) {
-        current = (current === 0 ? 1 : current) * multipliers[word];
-        total += current;
-        current = 0;
-      } else {
-        current *= multipliers[word];
-      }
-    }
-  });
+    });
 
-  total += current;
-  return total.toLocaleString("en-US");
-}
+    total += current;
+    return total.toLocaleString("en-US");
+  }
 
   for (let i = 0; i < tokens.length; i++) {
     const word = tokens[i];
@@ -468,20 +465,19 @@ function applySmartWords(text) {
       numberBuffer.push(word);
     } else {
       if (numberBuffer.length > 0) {
-        const num = processBuffer(numberBuffer);
-        resultWords.push('<span class="ltr-num">' + num + '</span>');
+        resultWords.push('<span class="ltr-num">' + processBuffer(numberBuffer) + '</span>');
         numberBuffer = [];
       }
       resultWords.push(" " + word);
     }
   }
-  if (numberBuffer.length > 0) {
-    const num = processBuffer(numberBuffer);
-    resultWords.push('<span class="ltr-num">' + num + '</span>');
 
+  if (numberBuffer.length > 0) {
+    resultWords.push('<span class="ltr-num">' + processBuffer(numberBuffer) + '</span>');
   }
+
   return resultWords.join(" ").trim();
-}  
+}
       
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
