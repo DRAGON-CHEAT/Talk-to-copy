@@ -425,24 +425,24 @@ function wordsToNumbersInText(text) {
   let total = 0;
   let current = 0;
 
-  buffer.forEach(word=>{
-    if(units[word]!==undefined) current+=units[word];
-    else if(teens[word]!==undefined) current+=teens[word];
-    else if(tens[word]!==undefined) current+=tens[word];
-    else if(hundreds[word]!==undefined) current+=hundreds[word];
-    else if(multipliers[word]!==undefined){
-      let mult = multipliers[word];
-      // اذا المضاعف مليون أو ألف
-      if(mult >= 1000){
-        total += (current===0 ? 1 : current) * mult;
-        current=0;
-      } else {
-        current*=mult;
+  buffer.forEach(word => {
+    if (units[word] !== undefined) current += units[word];
+    else if (teens[word] !== undefined) current += teens[word];
+    else if (tens[word] !== undefined) current += tens[word];
+    else if (hundreds[word] !== undefined) current += hundreds[word];
+    else if (multipliers[word] !== undefined){
+      const mult = multipliers[word];
+
+      if(mult >= 1000){  // ألف أو مليون
+        total += (current === 0 ? 1 : current) * mult;
+        current = 0;     // لا تترك الرقم القديم
+      } else {           // أرقام مثل مئة أو مئتين
+        current *= mult;
       }
     }
   });
 
-  total += current;
+  total += current; 
   return total.toLocaleString("en-US");
 }
 
