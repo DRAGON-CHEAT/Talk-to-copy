@@ -363,15 +363,14 @@ function applySmartWords(text) {
   
 function wordsToNumbersInText(text) {
   const units = {
-    "صفر":0,"واحد":1,"واحدة":1,"اثنان":2,"اثنين":2,"اثنتان":2,"ثلاثة":3,"ثلاث":3,
-    "أربعة":4,"اربعه":4,"خمسة":5,"خمسه":5,"ستة":6,"سته":6,"سبعة":7,"سبعه":7,
-    "ثمانية":8,"ثمانيه":8,"تسعة":9,"تسعه":9
+    "صفر":0,"واحد":1,"واحدة":1,"اثنان":2,"اثنين":2,"ثلاثة":3,"ثلاث":3,"أربعة":4,"اربعه":4,
+    "خمسة":5,"خمسه":5,"ستة":6,"سته":6,"سبعة":7,"سبعه":7,"ثمانية":8,"ثمانيه":8,"تسعة":9,"تسعه":9
   };
 
   const teens = {
-    "عشرة":10,"عشر":10,"احد عشر":11,"اثنا عشر":12,"اثنعش":12,
-    "ثلاثة عشر":13,"أربعة عشر":14,"اربعتعش":14,"خمسة عشر":15,"ستة عشر":16,
-    "سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19
+    "عشرة":10,"عشر":10,"احد عشر":11,"أحد عشر":11,"اثنا عشر":12,"اثنعش":12,
+    "ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,
+    "ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19
   };
 
   const tens = {
@@ -386,68 +385,73 @@ function wordsToNumbersInText(text) {
   };
 
   const multipliers = {
-    "ألف":1000,"الف":1000,"ألفين":2000,"مليون":1000000,"ملايين":1000000,"مليونان":2000000
-  };
+  // الألف
+  "ألف": 1000, "الف": 1000, "ألفين": 2000, "الفين": 2000, "آلاف": 1000,
+  "اتلألف": 3000, "ثلاثألف": 3000, "اربعمألف": 4000, "خمسألف": 5000,
+  "ستألف": 6000, "سبعألف": 7000, "ثمانألف": 8000, "تسعألف": 9000,
+  "تلاتألف": 3000, "اربألف": 4000, "خمسألف": 5000, "ستةألف": 6000, "سبعةألف": 7000,
+  "ثمانيةألف": 8000, "تسعةألف": 9000,
+  
+  // الملايين
+  "مليون": 1000000, "مليونان": 2000000, "مليونين": 2000000, "ملايين": 1000000,
+  "اتلملاين": 3000000, "ثلاثملاين": 3000000, "اربعملاين": 4000000, "خمسملين": 5000000,
+  "ستملاين": 6000000, "سبعملاين": 7000000, "ثمانملاين": 8000000, "تسعملاين": 9000000,
+  "تلاتملاين": 3000000, "اربعملاين": 4000000, "خمسملين": 5000000, "ستةملاين": 6000000,
+  "سبعةملاين": 7000000, "ثمانيةملاين": 8000000, "تسعةملاين": 9000000
+};
 
-  const allWords = { ...units, ...teens, ...tens, ...hundreds, ...multipliers };
-  const tokens = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
+  const allWords = {...units, ...teens, ...tens, ...hundreds};
 
-  let resultWords = [];
+  // تنظيف النص وتقسيمه
+  let tokens = text.replace(/،/g," ").replace(/ و /g," ").trim().split(/\s+/);
+  let result = [];
   let buffer = [];
-
-  function processBuffer(buffer){
+  
+  function processBuffer(buffer) {
     let total = 0;
     let current = 0;
 
     buffer.forEach(word => {
-        if (units[word] !== undefined) current += units[word];
-        else if (teens[word] !== undefined) current += teens[word];
-        else if (tens[word] !== undefined) current += tens[word];
-        else if (hundreds[word] !== undefined) current += hundreds[word];
-        else if (multipliers[word] !== undefined){
-            const mult = multipliers[word];
-
-            if(mult >= 1000){  // ألف أو مليون
-                // بدل إضافة total منفصل، ندمج current * mult مباشرة
-                current = (current === 0 ? 1 : current) * mult;
-            } else {           // مئة أو مئتين
-                current *= mult;
-            }
-        }
+      if(allWords[word] !== undefined) current += allWords[word];
+      else if(multipliers[word] !== undefined){
+        const mult = multipliers[word];
+        if(mult >= 1000){
+          total += (current === 0 ? 1 : current) * mult;
+          current = 0;
+        } else current *= mult;
+      }
     });
 
-    total += current; 
-    return total.toLocaleString("en-US");
-}
+    total += current;
+    return total.toLocaleString("en-US"); // صيغة رقمية مع الفواصل
+  }
 
-  for (let i = 0; i < tokens.length; i++) {
-    const word = tokens[i];
-    const twoWords = word + " " + (tokens[i+1] || "");
-    if (teens[twoWords]) {
-      buffer.push(twoWords);
+  for(let i=0;i<tokens.length;i++){
+    let word = tokens[i];
+    // تحقق من صيغة المليون المركبة مثل "ثلاث ملايين"
+    if(i+1<tokens.length && multipliers[word+" "+tokens[i+1]]){
+      buffer.push(word+" "+tokens[i+1]);
       i++;
       continue;
     }
-
-    if (allWords[word] !== undefined) {
+    if(allWords[word] || multipliers[word]){
       buffer.push(word);
     } else {
-      if (buffer.length > 0) {
-        const num = processBuffer(buffer);
-        resultWords.push('<span class="ltr-num">' + num.toLocaleString("en-US") + '</span>');
+      if(buffer.length>0){
+        result.push(processBuffer(buffer));
         buffer = [];
       }
-      resultWords.push(word);
+      result.push(word);
     }
   }
 
-  if (buffer.length > 0) {
-    const num = processBuffer(buffer);
-    resultWords.push('<span class="ltr-num">' + num.toLocaleString("en-US") + '</span>');
+  if(buffer.length>0){
+    result.push(processBuffer(buffer));
   }
 
-  return resultWords.join(" ").trim();
+  return result.join(" ");
 }
+
       
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
