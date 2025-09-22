@@ -612,6 +612,7 @@ function addToHistory(text){
   tempDiv.innerHTML = text;
   const cleanText = tempDiv.textContent || tempDiv.innerText || "";
 
+  // النص
   const spanText = document.createElement("span");
   spanText.innerText = cleanText; // استخدم النص النظيف
   spanText.style.cursor = "pointer";
@@ -620,7 +621,7 @@ function addToHistory(text){
 
   // نسخ عند الضغط
   spanText.addEventListener("click", ()=>{
-    navigator.clipboard.writeText(text).then(()=>{
+    navigator.clipboard.writeText(cleanText).then(()=>{
       const copyIcon = document.createElement("span");
       copyIcon.innerText = "[√]";
       copyIcon.style.marginLeft = "6px";
@@ -641,7 +642,7 @@ function addToHistory(text){
   delBtn.style.padding = "0 3px";
 
   delBtn.addEventListener("click", (e)=>{
-    e.stopPropagation(); // منع تفعيل نسخ النص
+    e.stopPropagation(); // منع نسخ النص عند الضغط على زر الحذف
     lineDiv.remove();
   });
 
