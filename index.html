@@ -394,10 +394,10 @@ function wordsToNumbersInText(text) {
   
   // الملايين
   "واحد مليون": 1000000, "مليونان": 2000000, "مليونين": 2000000, "مليون": 1000000,
-  "اتلملاين": 3000000, "ثلاثملاين": 3000000, "اربع ملاين": 4000000, "خمس ملاين": 5000000,
-  "ستملاين": 6000000, "سبع ملاين": 7000000, "ثمان ملاين": 8000000, "تسع ملاين": 9000000,
-  "تلاتملاين": 3000000, "اربعملاين": 4000000, "خمس ملاين": 5000000, "ست ملاين": 6000000,
-  "سبعةملاين": 7000000, "ثمانيةملاين": 8000000, "تسع ملاين": 9000000
+  "اتلملاين": 3000000, "ثلاثملاين": 3000000, "اربعملاين": 4000000, "خمسملاين": 5000000,
+  "ستملاين": 6000000, "سبعملاين": 7000000, "ثمانملاين": 8000000, "تسعةملاين": 9000000,
+  "تلاتملاين": 3000000, "اربعةملاين": 4000000, "خمسملاين": 5000000, "ستملاين": 6000000,
+  "سبعةملاين": 7000000, "ثمانيةملاين": 8000000, "تسعملاين": 9000000
 };
 
   const allWords = {...units, ...teens, ...tens, ...hundreds};
@@ -407,25 +407,35 @@ function wordsToNumbersInText(text) {
   let result = [];
   let buffer = [];
   
-  function processBuffer(buffer) {
-    let total = 0;
-    let current = 0;
+  function processBuffer(buffer){
+  let total = 0;
+  let current = 0;
 
-    buffer.forEach(word => {
-      if(allWords[word] !== undefined) current += allWords[word];
-      else if(multipliers[word] !== undefined){
-        const mult = multipliers[word];
-        if(mult >= 1000){
-          total += (current === 0 ? 1 : current) * mult;
-          current = 0;
-        } else current *= mult;
+  buffer.forEach(word => {
+    if(units[word] !== undefined) {
+      current += units[word];
+    } else if(teens[word] !== undefined) {
+      current += teens[word];
+    } else if(tens[word] !== undefined) {
+      current += tens[word];
+    } else if(hundreds[word] !== undefined) {
+      current += hundreds[word];
+    } else if(multipliers[word] !== undefined){
+      const mult = multipliers[word];
+
+      if(mult >= 1000){  
+        // إذا كان current = 0، نعتبره 1 (مثل "مليون" = 1,000,000)
+        total += (current || 1) * mult;
+        current = 0; // إعادة تعيين الرقم الحالي
+      } else {
+        current *= mult; // مئة أو مئتين
       }
-    });
+    }
+  });
 
-    total += current;
-    return total.toLocaleString("en-US"); // صيغة رقمية مع الفواصل
-  }
-
+  total += current; 
+  return total.toLocaleString("en-US");
+}
   for(let i=0;i<tokens.length;i++){
     let word = tokens[i];
     // تحقق من صيغة المليون المركبة مثل "ثلاث ملايين"
