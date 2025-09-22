@@ -363,7 +363,15 @@ function applySmartWords(text) {
   
   function wordsToNumbersInText(text) {
   const units = {
-    
+    "صفر":0,"واحد":1,"واحدة":1,"احد":1,"احدى":1,
+    "اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,
+    "ثلاثة":3,"ثلاث":3,"تلاتة":3,"تلات":3,"تلث":3,
+    "أربعة":4,"اربعة":4,"اربع":4,
+    "خمسة":5,"خمس":5,
+    "ستة":6,"ست":6,
+    "سبعة":7,"سبع":7,
+    "ثمانية":8,"ثمان":8,"ثمن":8,"اثمن":8,
+    "تسعة":9,"تسع":9
   };
 
   const teens = {
@@ -437,37 +445,32 @@ function applySmartWords(text) {
     return total.toLocaleString("en-US");
   }
 
-  let lastWord = null;
-
-for (let i = 0; i < tokens.length; i++) {
-  const word = tokens[i];
-  const twoWords = word + " " + (tokens[i+1] || "");
-
-  if (teens[twoWords]) {
-    numberBuffer.push(twoWords);
-    i++;
-    lastWord = twoWords;
-    continue;
-  }
-
-  if (allWords[word]) {
-    if (lastWord === word) {
-      const num = processBuffer(numberBuffer);
-      resultWords.push('<span class="ltr-num">' + num + '</span>');
-      numberBuffer = [];
+  for (let i = 0; i < tokens.length; i++) {
+    const word = tokens[i];
+    const twoWords = word + " " + (tokens[i+1] || "");
+    if (teens[twoWords]) {
+      numberBuffer.push(twoWords);
+      i++;
+      continue;
     }
-    numberBuffer.push(word);
-    lastWord = word;
-  } else {
-    if (numberBuffer.length > 0) {
-      const num = processBuffer(numberBuffer);
-      resultWords.push('<span class="ltr-num">' + num + '</span>');
-      numberBuffer = [];
+    if (allWords[word]) {
+      numberBuffer.push(word);
+    } else {
+      if (numberBuffer.length > 0) {
+        const num = processBuffer(numberBuffer);
+        resultWords.push('<span class="ltr-num">' + num + '</span>');
+        numberBuffer = [];
+      }
+      resultWords.push(" " + word);
     }
-    resultWords.push(" " + word);
-    lastWord = null;
   }
-}
+  if (numberBuffer.length > 0) {
+    const num = processBuffer(numberBuffer);
+    resultWords.push('<span class="ltr-num">' + num + '</span>');
+
+  }
+  return resultWords.join(" ").trim();
+}  
       
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
@@ -507,7 +510,12 @@ function startRecognition(){
     document.getElementById("startBtn").style.display = "none";
     document.getElementById("stopBtn").style.display = "inline-block";
   };
-
+// فلتر لتحديد تكرار الأرقام بحد أقصى 3 مرات
+function limitNumberRepeats(text) {
+  return text.replace(/\b(\d)\b(\s+\1){3,}/g, (match, num) => {
+    return num.repeat(3); // يخلي الرقم يتكرر 3 مرات فقط
+  });
+}  
   recognition.onresult = function(event) {
     try {
       const transcript = event.results[0][0].transcript || "";
@@ -516,18 +524,21 @@ function startRecognition(){
       let converted = wordsToNumbersInText(preApplied || "");
       converted = applySmartWords(converted);
 
-      const dateFormat = extractDateFromText(converted);
-      const outputText = dateFormat ? dateFormat : converted;
+    // ✨ فلتر تحديد التكرار للأرقام ✨
+    converted = limitNumberRepeats(converted);
 
-      document.getElementById("outputText").innerHTML = outputText;
-      addToHistory(outputText);
-      navigator.clipboard.writeText(outputText).catch(()=>{});
-    } catch (err) {
-      console.error("onresult error:", err);
-    }
-  };
+    const dateFormat = extractDateFromText(converted);
+    const outputText = dateFormat ? dateFormat : converted;
 
-  recognition.onend = function(){
+    document.getElementById("outputText").innerHTML = outputText;
+    addToHistory(outputText);
+    navigator.clipboard.writeText(outputText).catch(()=>{});
+  } catch (err) {
+    console.error("onresult error:", err);
+  }
+};
+
+    recognition.onend = function(){
     document.querySelector(".container").classList.remove("recording");
     document.getElementById("recordingIndicator").style.display = "none";
     document.getElementById("startBtn").style.display = "inline-block";
@@ -795,3 +806,4 @@ function renderSmartWords() {
 
 </body>
 </html>
+>
