@@ -607,9 +607,13 @@ function addToHistory(text){
   lineDiv.style.margin = "2px 2px";
   lineDiv.style.width = "auto";
 
-  // النص
+  // عنصر مؤقت لتحويل HTML إلى نص خام
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = text;
+  const cleanText = tempDiv.textContent || tempDiv.innerText || "";
+
   const spanText = document.createElement("span");
-  spanText.innerText = text;
+  spanText.innerText = cleanText; // استخدم النص النظيف
   spanText.style.cursor = "pointer";
   spanText.style.flex = "1";
   spanText.style.textAlign = "center";
