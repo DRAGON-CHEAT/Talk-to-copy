@@ -423,27 +423,38 @@ function applySmartWords(text) {
   const tokens = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
   let resultWords = [];
   let numberBuffer = [];
-
+    
   function processBuffer(buffer) {
-    let total = 0, current = 0;
-    buffer.forEach(word => {
-      if (teens[word] !== undefined) current += teens[word];
-      else if (units[word] !== undefined) current += units[word];
-      else if (tens[word] !== undefined) current += tens[word];
-      else if (hundreds[word] !== undefined) current += hundreds[word];
-      else if (multipliers[word] !== undefined) {
-        if (multipliers[word] >= 1000) {
-          current = (current === 0 ? 1 : current) * multipliers[word];
-          total += current;
-          current = 0;
-        } else {
-          current *= multipliers[word];
-        }
+  let total = 0;
+  let current = 0;
+
+  buffer.forEach(word => {
+    if (teens[word] !== undefined) {
+      current += teens[word];
+    } else if (units[word] !== undefined) {
+      current += units[word];
+    } else if (tens[word] !== undefined) {
+      current += tens[word];
+    } else if (hundreds[word] !== undefined) {
+      if (current > 0) {
+        current = current * 100;
+      } else {
+        current += hundreds[word];
       }
-    });
-    total += current;
-    return total.toLocaleString("en-US");
-  }
+    } else if (multipliers[word] !== undefined) {
+      if (multipliers[word] >= 1000) {
+        current = (current === 0 ? 1 : current) * multipliers[word];
+        total += current;
+        current = 0;
+      } else {
+        current *= multipliers[word];
+      }
+    }
+  });
+
+  total += current;
+  return total.toLocaleString("en-US");
+}
 
   for (let i = 0; i < tokens.length; i++) {
     const word = tokens[i];
