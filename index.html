@@ -527,12 +527,18 @@ function limitNumberRepeats(text) {
     // ✨ فلتر تحديد التكرار للأرقام ✨
     converted = limitNumberRepeats(converted);
 
-    const dateFormat = extractDateFromText(converted);
-    const outputText = dateFormat ? dateFormat : converted;
+      const dateFormat = extractDateFromText(converted);
+      const outputText = dateFormat ? dateFormat : converted;
 
-    document.getElementById("outputText").innerHTML = outputText;
-    addToHistory(outputText);
-    navigator.clipboard.writeText(outputText).catch(()=>{});
+      // عرض النتائج مع HTML لواجهة المستخدم
+      document.getElementById("outputText").innerHTML = outputText;
+      addToHistory(outputText);
+
+      // نسخ النص النظيف فقط بدون أي <span>
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = outputText;
+      const cleanText = tempDiv.textContent || tempDiv.innerText || "";
+      navigator.clipboard.writeText(cleanText).catch(()=>{});
   } catch (err) {
     console.error("onresult error:", err);
   }
