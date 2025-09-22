@@ -395,29 +395,30 @@ function wordsToNumbersInText(text) {
   let resultWords = [];
   let buffer = [];
 
-  function processBuffer(buf) {
+  function processBuffer(buffer){
     let total = 0;
     let current = 0;
 
-    buf.forEach(word => {
-      if (units[word] !== undefined) current += units[word];
-      else if (teens[word] !== undefined) current += teens[word];
-      else if (tens[word] !== undefined) current += tens[word];
-      else if (hundreds[word] !== undefined) current += hundreds[word];
-      else if (multipliers[word] !== undefined) {
-        const mult = multipliers[word];
-        if (mult >= 1000) {
-          total += (current === 0 ? 1 : current) * mult;
-          current = 0;
-        } else {
-          current *= mult;
+    buffer.forEach(word => {
+        if (units[word] !== undefined) current += units[word];
+        else if (teens[word] !== undefined) current += teens[word];
+        else if (tens[word] !== undefined) current += tens[word];
+        else if (hundreds[word] !== undefined) current += hundreds[word];
+        else if (multipliers[word] !== undefined){
+            const mult = multipliers[word];
+
+            if(mult >= 1000){  // ألف أو مليون
+                // بدل إضافة total منفصل، ندمج current * mult مباشرة
+                current = (current === 0 ? 1 : current) * mult;
+            } else {           // مئة أو مئتين
+                current *= mult;
+            }
         }
-      }
     });
 
-    total += current;
-    return total;
-  }
+    total += current; 
+    return total.toLocaleString("en-US");
+}
 
   for (let i = 0; i < tokens.length; i++) {
     const word = tokens[i];
