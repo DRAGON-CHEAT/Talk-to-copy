@@ -361,86 +361,61 @@ function applySmartWords(text) {
   return text;
 }
   
-  function wordsToNumbersInText(text) {
+function wordsToNumbersInText(text) {
   const units = {
-    "صفر":0,"واحد":1,"واحدة":1,"احت":1,"احدع":1,
-    "اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,
-    "ثلاثة":3,"ثلاث":3,"اتلاثه":3,"تلات":3,"تلث":3,
-    "أربعة":4,"اربعه":4,"اربع":4,
-    "خمسة":5,"خمسه":5,
-    "ستة":6,"سته":6,
-    "سبعة":7,"سبعه":7,
-    "ثمانية":8,"ثمانيه":8,"ثمن":8,"اثمن":8,
-    "تسعة":9,"تسعه":9
+    "صفر":0,"واحد":1,"واحدة":1,"اثنان":2,"اثنين":2,"اثنتان":2,"ثلاثة":3,"ثلاث":3,"تلات":3,
+    "أربعة":4,"اربعه":4,"خمسة":5,"خمسه":5,"ستة":6,"سته":6,"سبعة":7,"سبعه":7,
+    "ثمانية":8,"ثمانيه":8,"تسعة":9,"تسعه":9
   };
 
   const teens = {
-    "عشرة":10,"عشر":10,
-    "احد عشر":11,"أحد عشر":11,"احدى عشر":11,"إحدى عشر":11,"احدعش":11,
-    "اثنا عشر":12,"اثني عشر":12,"اثنعش":12,"ثنعش":12,
-    "ثلاثة عشر":13,"ثلاث عشر":13,"تلاتطعش":13,"تلطعش":13,
-    "أربعة عشر":14,"اربعة عشر":14,"اربعتعش":14,
-    "خمسة عشر":15,"خمسطعش":15,
-    "ستة عشر":16,"ستطعش":16,
-    "سبعة عشر":17,"سبعطعش":17,
-    "ثمانية عشر":18,"ثمانطعش":18,"ثمنطعش":18,
-    "تسعة عشر":19,"تسعطعش":19
+    "عشرة":10,"عشر":10,"احد عشر":11,"أحد عشر":11,"اثنا عشر":12,"اثني عشر":12,
+    "ثلاثة عشر":13,"ثلاث عشر":13,"أربعة عشر":14,"اربعة عشر":14,"خمسة عشر":15,
+    "ستة عشر":16,"ستة عشر":16,"سبعة عشر":17,"ثمانية عشر":18,"تسعة عشر":19
   };
 
   const tens = {
-    "عشرون":20,"عشرين":20,
-    "ثلاثون":30,"ثلاثين":30,
-    "أربعون":40,"اربعين":40,
-    "خمسون":50,"خمسين":50,
-    "ستون":60,"ستين":60,
-    "سبعون":70,"سبعين":70,
-    "ثمانون":80,"ثمانين":80,
-    "تسعون":90,"تسعين":90
+    "عشرون":20,"عشرين":20,"ثلاثون":30,"ثلاثين":30,"أربعون":40,"اربعين":40,
+    "خمسون":50,"خمسين":50,"ستون":60,"ستين":60,"سبعون":70,"سبعين":70,
+    "ثمانون":80,"ثمانين":80,"تسعون":90,"تسعين":90
   };
 
   const hundreds = {
-    "مائة":100,"مئة":100,"مية":100,"ميّه":100,
-    "مئتين":200,"ميتين":200,
-    "ثلاثمائة":300,"ثلاثمية":300,"تلثمية":300,
-    "أربعمائة":400,"اربعماية":400,"اربعمية":400,
-    "خمسمائة":500,"خمسماية":500,
-    "ستمائة":600,"ستمية":600,
-    "سبعمائة":700,"سبعمية":700,
-    "ثمانمائة":800,"ثمانمية":800,"ثمنمية":800,
-    "تسعمائة":900,"تسعمية":900,"تسعميه":900
+    "مائة":100,"مئة":100,"مئتين":200,"ثلاثمائة":300,"أربعمائة":400,"خمسمائة":500,
+    "ستمائة":600,"سبعمائة":700,"ثمانمائة":800,"تسعمائة":900
   };
 
   const multipliers = {
-    "ألف":1000,"الف":1000,
-    "ألفين":2000,"الفين":2000,
-    "آلاف":1000,"تالاف":1000,
-    "مليون":1000000,"مليونان":2000000,"مليونين":2000000,
-    "ملايين":1000000
+    "ألف":1000,"ألفين":2000,"آلاف":1000,"مليون":1000000,"مليونان":2000000,"ملايين":1000000
   };
 
   const allWords = { ...units, ...teens, ...tens, ...hundreds, ...multipliers };
-
   const tokens = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
+
   let resultWords = [];
   let numberBuffer = [];
 
   function processBuffer(buffer) {
-    let total = 0, current = 0;
+    let total = 0;
+    let current = 0;
+
     buffer.forEach(word => {
       if (teens[word] !== undefined) current += teens[word];
       else if (units[word] !== undefined) current += units[word];
       else if (tens[word] !== undefined) current += tens[word];
       else if (hundreds[word] !== undefined) current += hundreds[word];
       else if (multipliers[word] !== undefined) {
-        if (multipliers[word] >= 1000) {
-          current = (current === 0 ? 1 : current) * multipliers[word];
+        const mult = multipliers[word];
+        if (mult >= 1000) {
+          current = (current === 0 ? 1 : current) * mult;
           total += current;
           current = 0;
         } else {
-          current *= multipliers[word];
+          current *= mult;
         }
       }
     });
+
     total += current;
     return total.toLocaleString("en-US");
   }
@@ -453,9 +428,9 @@ function applySmartWords(text) {
       i++;
       continue;
     }
-    if (allWords[word]) {
-      numberBuffer.push(word);
-    } else {
+
+    if (allWords[word]) numberBuffer.push(word);
+    else {
       if (numberBuffer.length > 0) {
         const num = processBuffer(numberBuffer);
         resultWords.push('<span class="ltr-num">' + num + '</span>');
@@ -464,13 +439,14 @@ function applySmartWords(text) {
       resultWords.push(" " + word);
     }
   }
+
   if (numberBuffer.length > 0) {
     const num = processBuffer(numberBuffer);
     resultWords.push('<span class="ltr-num">' + num + '</span>');
-
   }
+
   return resultWords.join(" ").trim();
-}  
+}
       
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
