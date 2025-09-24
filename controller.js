@@ -1,17 +1,19 @@
-document.getElementById("startBtn").addEventListener("click", () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tabs[0].id },
-      func: () => window.dispatchEvent(new CustomEvent("startSpeech"))
+function sendSpeechEvent(eventName) {
+  chrome.tabs.query({ currentWindow: true }, (tabs) => {
+    tabs.forEach(tab => {
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: (eventName) => window.dispatchEvent(new CustomEvent(eventName)),
+        args: [eventName]
+      });
     });
   });
+}
+
+document.getElementById("startBtn").addEventListener("click", () => {
+  sendSpeechEvent("startSpeech");
 });
 
 document.getElementById("stopBtn").addEventListener("click", () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tabs[0].id },
-      func: () => window.dispatchEvent(new CustomEvent("stopSpeech"))
-    });
-  });
+  sendSpeechEvent("stopSpeech");
 });
