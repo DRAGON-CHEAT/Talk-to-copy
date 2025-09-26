@@ -14,7 +14,7 @@ body{ overflow: hidden; margin:0;padding:0;background-color:#000;color:#fff;font
 .login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}
 .login-container button:hover{opacity:0.85}
 .container{top:-50px;background-color:#111;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:82%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
-h1{font-family:bodoni,cursive; color:rgba(196, 144, 217, 0.70); margin-bottom:0px;font-size:18px;transition:font-size 0.3s ease}
+h1{font-family:bodoni,cursive; color:rgba(196, 144, 217, 0.70); margin-bottom:0px;font-size:17px;transition:font-size 0.3s ease}
 button{padding:12px 24px;font-size:18px;margin:0px 0px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}
 #startBtn{background-color:#4CAF50;color:white}
 #stopBtn{background-color:#f44336;color:white;display:none}
@@ -43,9 +43,9 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 /* === تعديل زر الكلمات الذكية === */
 #smartWordsBtn {
     position: absolute;
-    top: 5px;
+    top: 2px;
     left: 5px;
-    padding: 4px 8px;
+    padding: 3px 6px;
     font-size: 12px;
     background-color: #564d4d;
     color: #fff;
@@ -195,8 +195,7 @@ const db = firebase.database();
 </div>
  
 </div>
-<br> <br> <br>
-<h1> [ Convert Audio To Text In Iraqi ]</h1>
+<h1> [ Convert Audio To Text In Iraqi ]</h1><br>
 <button id="startBtn" onclick="startRecognition()">[▶︎] أبدء الكلام</button>
 <label style="display:inline-flex;/*margin-right:10px;*/ cursor:pointer; user-select:none; position:relative; flex-direction:column; top:-2%">
   <input type="checkbox" id="autoRestartCheckbox">  مستمر
