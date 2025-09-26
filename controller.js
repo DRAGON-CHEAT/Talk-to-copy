@@ -1,4 +1,4 @@
-function sendSpeechEvent(eventName) {
+functio sendSPeechEVent(eventName) {
   chrome.tabs.query({ currentWindow: true }, (tabs) => {
     tabs.forEach(tab => {
       chrome.scripting.executeScript({
