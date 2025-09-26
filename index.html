@@ -13,7 +13,7 @@ body{ overflow: hidden; margin:0;padding:0;background-color:#000;color:#fff;/*fo
 .login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}
 .login-container button{padding:12px 24px;font-size:18px;margin-top:15px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;transition:0.3s}
 .login-container button:hover{opacity:0.85}
-.container{top:-50px;background-color:#111;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:82%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
+.container{top:-34px;background-color:#111;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:82%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
 h1{font-family:bodoni,cursive; color:rgba(196, 144, 217, 0.70); margin-bottom:0px;font-size:17px;transition:font-size 0.3s ease}
 button{padding:12px 24px;font-size:18px;margin:0px 0px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}
 #startBtn{background-color:#4CAF50;color:white}
@@ -180,7 +180,7 @@ const db = firebase.database();
 <label><input type="checkbox" id="rememberMe">ذكرني</label>
 <button onclick="checkLogin()">دخول</button>
 <p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
-</div><br><br>
+</div><br>
 <div class="container" id="app">
 <div id="userCountContainer">
   <div id="userCount"># الأعضاء: 0</div>
