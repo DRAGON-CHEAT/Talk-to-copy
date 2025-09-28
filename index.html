@@ -255,10 +255,10 @@ function loginUser() {
   <h2>⟱ إنشاء حساب ⟱</h2>
   <!-- نافذة الاشتراك -->
   <!-- اسم المستخدم (أرقام فقط) -->
-  <input type="text" id="signupUsername"أسم المستخدم"><br><br>
+  <input type="text" id="signupUsername"placeholder="أسم المستخدم"><br><br>
   
   <!-- رقم الهاتف -->
-  <input type="text" id="signupPhone" placeholder="رقم الهاتف"placeholder=" oninput="this.value=this.value.replace(/[^0-9]/g,'')"><br><br>
+  <input type="text" id="signupPhone" placeholder="رقم الهاتف" oninput="this.value=this.value.replace(/[^0-9]/g,'')"><br><br>
   
   <!-- زر إرسال الطلب -->
   <button onclick="registerUser()">إرسال الطلب</button>
