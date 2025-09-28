@@ -174,10 +174,95 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 // توليد معرف فريد للجهاز
+// ----------------------
+// Device ID (حافظ على إعلان واحد فقط)
+// ----------------------
 const deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
 localStorage.setItem("deviceId", deviceId);
 
+// العناصر الموجودة في واجهتك
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
 
+// ----------------------
+// حقن كلمة المرور تلقائياً عند إدخال اسم المستخدم
+// ----------------------
+usernameInput.addEventListener("input", function() {
+    const username = this.value.trim();
+    if (!username) {
+        // إذا الحقل فارغ نترك خانة الباسورد كما هي أو نفضيها
+        passwordInput.value = "";
+        return;
+    }
+
+    // جلب المستخدم من Firebase حسب الحقل username
+    db.ref("users").orderByChild("username").equalTo(username).once("value").then(snapshot => {
+        if (!snapshot.exists()) {
+            // لو ماكو مستخدم اترك الباسورد فارغ
+            passwordInput.value = "";
+            return;
+        }
+
+        // لو موجود نأخذ أول نتيجة (في حال كان اسم المستخدم فريد)
+        snapshot.forEach(child => {
+            const userData = child.val();
+
+            // إذا لم يكن هناك جهاز مسجل مسبقاً أو الجهاز الحالي مطابق -> حقن كلمة المرور
+            if (!userData.deviceId || userData.deviceId === deviceId) {
+                passwordInput.value = userData.password || "";
+            } else {
+                // جهاز مختلف -> لا نحقن الباسورد
+                passwordInput.value = "";
+            }
+        });
+    }).catch(err=>{
+        console.error("Firebase read error:", err);
+    });
+});
+
+  
+function registerUser() {
+    const username = document.getElementById("signupUsername").value.trim();
+    const phone = document.getElementById("signupPhone").value.trim();
+
+    if (!username || !phone) {
+        alert("⚠ يرجى إدخال اسم المستخدم ورقم الهاتف");
+        return;
+    }
+
+    // إنشاء معرف فريد لكل مستخدم
+    const userId = firebase.database().ref().child('users').push().key;
+
+    // بيانات المستخدم بدون كلمة مرور
+    const userData = {
+        username: username,
+        phone: phone,
+        password: "",       // فارغة لأنه سيتم كتابتها يدوياً لاحقاً
+        deviceId: ""        // فارغة حتى يسجل الجهاز عند أول دخول
+    };
+
+    // حفظ البيانات في Firebase
+    firebase.database().ref('users/' + userId).set(userData)
+        .then(() => {
+            alert("تم إرسال الطلب، الحساب ينتظر كلمة المرور");
+            document.getElementById("signupUsername").value = "";
+            document.getElementById("signupPhone").value = "";
+        })
+        .catch((error) => {
+            console.error("حدث خطأ أثناء إنشاء الحساب:", error);
+        });
+}
+
+// دالة تسجيل الدخول (استبدل دالتك القديمة بها أو تأكد أنها نفس الاسم)
+// ----------------------
+function loginUser() {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    if (!username || !password) {
+        alert("⚠ الرجاء تعبئة اسم المستخدم وكلمة المرور");
+        return;
+    }
 
     db.ref("users").orderByChild("username").equalTo(username).once("value").then(snapshot => {
         if (!snapshot.exists()) {
@@ -185,42 +270,56 @@ localStorage.setItem("deviceId", deviceId);
             return;
         }
 
-        let correctPassword = false;
         let userKey = null;
+        let userData = null;
 
         snapshot.forEach(child => {
-            const data = child.val();
             userKey = child.key;
-            if(data.password === password) correctPassword = true;
+            userData = child.val();
         });
 
-        if(!correctPassword){
+        // تحقق من كلمة المرور
+        if (userData.password !== password) {
             alert("⚠ كلمة المرور خاطئة!");
             return;
         }
 
         const userStatusRef = db.ref("onlineUsers/" + userKey);
 
+        // تحقق من وجود جهاز آخر متصل الآن
         userStatusRef.once("value").then(snap => {
-            if(snap.exists()){
+            if (snap.exists()) {
                 const currentDevice = snap.val().deviceId;
-                if(currentDevice !== deviceId){
-                    // تسجيل الخروج من الجهاز السابق
-                    userStatusRef.set({ deviceId: deviceId });
-                    alert("⚠ تم تسجيل الدخول من جهاز آخر، تم تسجيل خروجك من الجهاز السابق.");
+                if (currentDevice !== deviceId) {
+                    // إذا جهاز مختلف -> نكتب الجهاز الجديد (وهذا يؤدي إلى "منع" الجهاز السابق عبر استبدال الـ deviceId)
+                    // يمكنك هنا اختيار: إظهار رسالة فقط أو إجبار تسجيل خروج الجهاز القديم (نقوم بالتحديث)
+                    alert("⚠ تم تسجيل الدخول من جهاز آخر، تم تحديث الجهاز الحالي.");
                 }
-            } else {
-                userStatusRef.set({ deviceId: deviceId });
             }
 
-            // تسجيل الخروج تلقائي عند غلق الصفحة
+            // تسجيل الجهاز الجديد كالجهاز المتصل الآن
+            userStatusRef.set({ deviceId: deviceId });
             userStatusRef.onDisconnect().remove();
 
-            // عرض التطبيق
+            // إظهار التطبيق
             document.getElementById("login").style.display = "none";
             document.getElementById("app").style.display = "block";
+
+            // وضع علامة تسجيل الدخول إن رغبت (مثلاً حفظ بجلسة)
+            sessionStorage.setItem("loggedInSession", "true");
+            // لو تبي خيار "ذكرني" احفظ في localStorage عند تفعيل الـ checkbox
+            if (document.getElementById("rememberMe") && document.getElementById("rememberMe").checked){
+                localStorage.setItem("loggedIn", "true");
+            }
+
+        }).catch(err=>{
+            console.error("Firebase onlineUsers read error:", err);
         });
+
+    }).catch(err=>{
+        console.error("Firebase users read error:", err);
     });
+}
 
 // ===== كود الاشتراك وتسجيل الدخول الجديد =====
 function openSignup() {
