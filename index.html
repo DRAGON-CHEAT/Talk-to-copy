@@ -220,8 +220,15 @@ localStorage.setItem("deviceId", deviceId);
 }
 
 // ===== كود الاشتراك وتسجيل الدخول الجديد =====
-function openSignup() { ... }
-function closeSignup() { ... }
+function openSignup() {
+  document.getElementById("signup").style.display = "block";
+  document.getElementById("login").style.display = "none";
+}
+function closeSignup() {
+  document.getElementById("signup").style.display = "none";
+  document.getElementById("login").style.display = "block";
+}
+
 </script>
 </head>
 <body>
