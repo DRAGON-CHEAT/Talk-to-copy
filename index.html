@@ -253,9 +253,17 @@ function loginUser() {
  <!-- نافذة الاشتراك -->
 <div class="login-container" id="signup" style="display:none">
   <h2>⟱ إنشاء حساب ⟱</h2>
-  <input type="text" id="newUser" placeholder="اسم المستخدم الجديد"><br><br>
-  <input type="password" id="newPass" placeholder="كلمة المرور"><br><br>
-  <button onclick="signupUser()">تسجيل</button>
+  <!-- نافذة الاشتراك -->
+  <!-- اسم المستخدم (أرقام فقط) -->
+  <input type="text" id="signupUsername" placeholder="رقم المستخدم" oninput="this.value=this.value.replace(/[^0-9]/g,'')"><br><br>
+  
+  <!-- رقم الهاتف -->
+  <input type="text" id="signupPhone" placeholder="رقم الهاتف"><br><br>
+  
+  <!-- زر إرسال الطلب -->
+  <button onclick="registerUser()">إرسال الطلب</button>
+  
+  <!-- زر إلغاء -->
   <button onclick="backToLogin()">إلغاء</button>
 
   <!-- التلميح -->
