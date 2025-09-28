@@ -252,13 +252,21 @@ function loginUser() {
 
  <!-- نافذة الاشتراك -->
 <div class="login-container" id="signup" style="display:none">
-  <h2>⟱ تسجيل الاشتراك ⟱</h2>
-  <input type="text" id="signupUsername" placeholder="اسم المستخدم">
-  <input type="text" id="signupPhone" placeholder="رقم الهاتف">
-  <button onclick="registerUser()">إرسال الطلب</button>
-  <button onclick="closeSignup()">إلغاء</button>
-  <p id="signupError" style="color:red; display:none;"></p>
-  <p id="signupSuccess" style="color:green; display:none;"></p>
+  <h2>⟱ إنشاء حساب ⟱</h2>
+  <input type="text" id="newUser" placeholder="اسم المستخدم الجديد"><br><br>
+  <input type="password" id="newPass" placeholder="كلمة المرور"><br><br>
+  <button onclick="signupUser()">تسجيل</button>
+  <button onclick="backToLogin()">إلغاء</button>
+
+  <!-- التلميح -->
+  <div style="margin-top:20px; text-align:right; font-size:14px; color:#ccc; line-height:1.8;">
+    <p>🔔 يجب تحويل رصيد للتمكن من الاشتراك:</p>
+    <ul style="margin:0; padding-right:20px;">
+      <li>مشتركي <strong>آسيا</strong></li>
+      <li>مشتركي <strong>كورك</strong></li>
+      <li>مشتركي <strong>زين</strong></li>
+    </ul>
+  </div>
 </div>
 
 <!-- نافذة تسجيل الدخول لازم تظهر أول ما يفتح الموقع -->
@@ -417,7 +425,7 @@ function loginUser() {
     </button>
 </div>
 
-<script>
+
 // === دوال Firebase + تسجيل دخول ===
 function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
 const deviceId = crypto.randomUUID();
