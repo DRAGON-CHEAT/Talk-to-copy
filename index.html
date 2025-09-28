@@ -72,7 +72,7 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 .smartWordItem span{flex:1;text-align:center}
 .smartWordItem button{background:red;color:#fff;border:none;border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
 #smartAddInput{display:flex;gap:4px;margin-bottom:4px}
-#smartAddInput input{flex:1;padding:4px;border-radius:4px;border:1px solid #555;background:#111;color:#fff;width:70px;font-size:14px}
+#smartAddInput input{flex:1;padding:4px;border-radius:4px;border:1px solid #555;background:#111;color:#fff;width:70px;font-size:11px}
 #smartAddInput button{padding:4px 8px;border-radius:4px;border:none;background:#4CAF50;color:#fff;font-size:12px;cursor:pointer}
 
 /* === زر القائمة العلوية === */
@@ -169,18 +169,96 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+// توليد معرف فريد للجهاز
+const deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
+localStorage.setItem("deviceId", deviceId);
+
+// دالة تسجيل الدخول الجديدة
+function checkLogin() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!username || !password) {
+        alert("⚠ يرجى ملء جميع الحقول");
+        return;
+    }
+
+    db.ref("users").orderByChild("username").equalTo(username).once("value").then(snapshot => {
+        if (!snapshot.exists()) {
+            alert("⚠ الحساب غير موجود!");
+            return;
+        }
+
+        let correctPassword = false;
+        let userKey = null;
+
+        snapshot.forEach(child => {
+            const data = child.val();
+            userKey = child.key;
+            if(data.password === password) correctPassword = true;
+        });
+
+        if(!correctPassword){
+            alert("⚠ كلمة المرور خاطئة!");
+            return;
+        }
+
+        const userStatusRef = db.ref("onlineUsers/" + userKey);
+
+        userStatusRef.once("value").then(snap => {
+            if(snap.exists()){
+                const currentDevice = snap.val().deviceId;
+                if(currentDevice !== deviceId){
+                    // تسجيل الخروج من الجهاز السابق
+                    userStatusRef.set({ deviceId: deviceId });
+                    alert("⚠ تم تسجيل الدخول من جهاز آخر، تم تسجيل خروجك من الجهاز السابق.");
+                }
+            } else {
+                userStatusRef.set({ deviceId: deviceId });
+            }
+
+            // تسجيل الخروج تلقائي عند غلق الصفحة
+            userStatusRef.onDisconnect().remove();
+
+            // عرض التطبيق
+            document.getElementById("login").style.display = "none";
+            document.getElementById("app").style.display = "block";
+        });
+    });
+}
+
+// ===== كود الاشتراك وتسجيل الدخول الجديد =====
+function openSignup() { ... }
+function closeSignup() { ... }
+function registerUser() { ... }
+function loginUser() { ... }
 </script>
 </head>
 <body>
 
+<body>
+ <!-- نافذة الاشتراك -->
+<div class="login-container" id="signup" style="display:none">
+  <h2>⟱ تسجيل الاشتراك ⟱</h2>
+  <input type="text" id="signupUsername" placeholder="اسم المستخدم">
+  <input type="text" id="signupPhone" placeholder="رقم الهاتف">
+  <button onclick="registerUser()">إرسال الطلب</button>
+  <button onclick="closeSignup()">إلغاء</button>
+  <p id="signupError" style="color:red; display:none;"></p>
+  <p id="signupSuccess" style="color:green; display:none;"></p>
+</div>
+
+<!-- نافذة تسجيل الدخول الحالية -->
 <div class="login-container" id="login">
-<h2>⟱ تسجيل الدخول ⟱</h2>
-<input type="text" id="username" placeholder="اسم المستخدم">
-<input type="password" id="password" placeholder="كلمة المرور">
-<label><input type="checkbox" id="rememberMe">ذكرني</label>
-<button onclick="checkLogin()">دخول</button>
-<p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
-</div><br>
+  <h2>⟱ تسجيل الدخول ⟱</h2>
+  <input type="text" id="username" placeholder="اسم المستخدم">
+  <input type="password" id="password" placeholder="كلمة المرور">
+  <label><input type="checkbox" id="rememberMe">ذكرني</label>
+  <button onclick="loginUser()">دخول</button>
+  <button onclick="openSignup()" style="margin-left:10px;">اشتراك</button>
+  <p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
+</div>
+<br>
 <div class="container" id="app">
 <div id="userCountContainer">
   <div id="userCount"># الأعضاء: 0</div>
@@ -224,7 +302,7 @@ const db = firebase.database();
 
 <div id="output">
   <div id="outputText"></div>
-  <button id="smartWordsBtn">ادراج تصحيح</button>
+  <button id="smartWordsBtn">تصحيح</button>
   <div id="smartWordsMenu">
     <div id="smartAddInput">
       <input type="text" id="wrongWord" placeholder="أدخل الكلمة الخاطئة">
@@ -331,7 +409,9 @@ function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)))
 const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
 db.ref('onlineUsers').on('value',snapshot=>{document.getElementById("userCount").textContent="# الأعضاء: "+snapshot.numChildren();});
-function checkLogin(){const user=document.getElementById("username").value.trim();const pass=document.getElementById("password").value.trim();const remember=document.getElementById("rememberMe").checked;const encodedUser="2LnZhNin2KE=";const encodedPass="MjI0NA==";if(base64EncodeUnicode(user)===encodedUser && base64EncodeUnicode(pass)===encodedPass){if(remember)localStorage.setItem("loggedIn","true");else sessionStorage.setItem("loggedInSession","true");document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("error").style.display="block";}}
+function checkLogin(){
+    loginUser(); // هذه دالتك الجديدة التي تتحقق من Firebase
+}
 function logout(){const user=document.getElementById("username").value.trim();updateUserOnlineStatus(user,false);localStorage.removeItem("loggedIn");sessionStorage.removeItem("loggedInSession");document.getElementById("app").style.display="none";document.getElementById("login").style.display="block";}
 window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(loggedInPermanent && !loggedInSession){alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");sessionStorage.setItem("loggedInSession","true");location.reload();return;}if(loggedInPermanent||loggedInSession){const user=document.getElementById("username").value.trim();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("login").style.display="block";}}
 </script>
