@@ -185,33 +185,24 @@ const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 
 // ----------------------
-// حقن كلمة المرور تلقائياً عند إدخال اسم المستخدم
-// ----------------------
 usernameInput.addEventListener("input", function() {
     const username = this.value.trim();
     if (!username) {
-        // إذا الحقل فارغ نترك خانة الباسورد كما هي أو نفضيها
         passwordInput.value = "";
         return;
     }
 
-    // جلب المستخدم من Firebase حسب الحقل username
     db.ref("users").orderByChild("username").equalTo(username).once("value").then(snapshot => {
         if (!snapshot.exists()) {
-            // لو ماكو مستخدم اترك الباسورد فارغ
             passwordInput.value = "";
             return;
         }
 
-        // لو موجود نأخذ أول نتيجة (في حال كان اسم المستخدم فريد)
         snapshot.forEach(child => {
             const userData = child.val();
-
-            // إذا لم يكن هناك جهاز مسجل مسبقاً أو الجهاز الحالي مطابق -> حقن كلمة المرور
             if (!userData.deviceId || userData.deviceId === deviceId) {
                 passwordInput.value = userData.password || "";
             } else {
-                // جهاز مختلف -> لا نحقن الباسورد
                 passwordInput.value = "";
             }
         });
@@ -220,7 +211,6 @@ usernameInput.addEventListener("input", function() {
     });
 });
 
-  
 function registerUser() {
     const username = document.getElementById("signupUsername").value.trim();
     const phone = document.getElementById("signupPhone").value.trim();
@@ -330,19 +320,6 @@ function openSignup() {
 function backToLogin() {
   document.getElementById("signup").style.display = "none";
   document.getElementById("login").style.display = "block";
-}
-
-function loginUser() {
-  const user = document.getElementById("username").value;
-  const pass = document.getElementById("password").value;
-
-  // تحقق مؤقت
-  if (user === "admin" && pass === "123") {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("app").style.display = "block";
-  } else {
-    document.getElementById("error").style.display = "block";
-  }
 }
 
 </script>
@@ -535,7 +512,6 @@ function loginUser() {
 
 // === دوال Firebase + تسجيل دخول ===
 function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
-const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
 db.ref('onlineUsers').on('value',snapshot=>{document.getElementById("userCount").textContent="# الأعضاء: "+snapshot.numChildren();});
 
