@@ -185,12 +185,19 @@ const usernameInput = document.getElementById("username");
 const passwordInput = document.getElementById("password");
 
 // ----------------------
-usernameInput.addEventListener("input", function() {
-    const username = this.value.trim();
-    if (!username) {
-        passwordInput.value = "";
-        return;
+window.addEventListener("DOMContentLoaded", () => {
+    const usernameEl = document.getElementById("username");
+    const passwordEl = document.getElementById("password");
+    if(usernameEl && passwordEl){
+        usernameEl.addEventListener("keydown", function(e){
+            if(e.key === "Enter"){
+                e.preventDefault();
+                passwordEl.focus();
+            }
+        });
     }
+});
+
 
     db.ref("users").orderByChild("username").equalTo(username).once("value").then(snapshot => {
         if (!snapshot.exists()) {
@@ -246,8 +253,13 @@ function registerUser() {
 // دالة تسجيل الدخول (استبدل دالتك القديمة بها أو تأكد أنها نفس الاسم)
 // ----------------------
 function loginUser() {
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
+    let usernameInput, passwordInput;
+
+window.addEventListener("DOMContentLoaded", () => {
+    usernameInput = document.getElementById("username");
+    passwordInput = document.getElementById("password");
+});
+
 
     if (!username || !password) {
         alert("⚠ الرجاء تعبئة اسم المستخدم وكلمة المرور");
