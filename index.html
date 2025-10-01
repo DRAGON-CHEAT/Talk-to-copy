@@ -116,6 +116,13 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
     opacity: 1;
 }
 
+#togglePassword {
+  user-select: none;   /* منع التحديد */
+  -webkit-user-select: none; /* منع التحديد في كروم/سفاري */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
 /* كلمة الرجوع الصغيرة في أعلى القائمة */
 #backBtn {
     background: none;
@@ -157,7 +164,77 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+</head>
+<body>
+
+<!-- إضافة زر الاشتراك في نافذة تسجيل الدخول -->
+<div class="login-container" id="login">
+  <h2>⟱ تسجيل الدخول ⟱</h2>
+  <input type="text" id="username" placeholder="اسم المستخدم">
+  
+  <div style="position: relative;">
+  <input type="password" id="password" placeholder="كلمة المرور" required>
+  <span id="togglePassword" 
+        style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;">
+    👁️
+  </span>
+</div>
+
+  <label><input type="checkbox" id="rememberMe"> ذكرني</label>
+  <button id="loginBtn">دخول</button>
+<button id="signupBtn">اشترك</button>
+<p id="loginWarning" style="color:orange; display:none; margin-top:5px; font-size:14px;"></p>
+<p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
+
+</div>
+
+<!-- نافذة إنشاء حساب جديدة -->
+<div class="login-container" id="signupContainer" style="display:none;">
+  <h2>⟱ إنشاء حساب ⟱</h2>
+  <input type="text" id="newUsername" placeholder="اسم المستخدم">
+  <input type="text" id="phone" placeholder="رقم الهاتف" class="ltr-num">
+  
+  <!-- خانة كلمة المرور المسترجعة -->
+<input type="password" id="showPassword" placeholder="كلمة المرور ستظهر هنا" 
+       readonly style="margin-top:10px; cursor:pointer; display:block;">
+
+<!-- عنصر الرسالة يظهر هنا -->
+<span id="copyMessage" style="color:#0f0; font-size:14px; display:none; margin-top:6px;top:-11px;"></span>
+
+  
+  <button id="submitSignup">إرسال طلب</button>
+  <button id="cancelSignup">إلغاء</button>
+<p id="signupWarning" style="color:orange; display:none; margin-top:5px; font-size:14px;"></p>
+  <!-- رسالة حالة -->
+  <p id="signupMsg" style="color:green; display:none;"></p>
+  
+<!-- ملاحظة الاشتراك -->
+<div id="signupNote" style="
+    font-size: 12px;
+    color: #eee;
+    background-color: #222;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 8px;
+    line-height: 1.4;
+    text-align: right;
+">
+طريقة الاشتراك ليصلك رمز التفعيل:
+<ul style="padding-left: 16px; margin: 4px 0;">
+  <li>أولاً: لو عندك أسيا سيل قم بتحويل رصيد 2$ إلى خط تالي xxxxxxxx</li>
+  <li>ثانياً: لو عندك كورك قم بتحويل رصيد 2$ إلى خط تالي xxxxxxx</li>
+</ul>
+* عند الموافقة، قم بإدخال نفس الاسم الذي أدخلته ونفس الرقم الذي كتبته في تسجيل الدخول
+</div>
+
+
+
+</div>
+
 <script>
+// === Firebase ===
 const firebaseConfig = {
   apiKey: "AIzaSyDa1_gisk5GuTvRzACp0lA1TGe3-b2Sz8A",
   authDomain: "dragon-tv-3e8c1.firebaseapp.com",
@@ -169,18 +246,311 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-</script>
-</head>
-<body>
 
-<div class="login-container" id="login">
-<h2>⟱ تسجيل الدخول ⟱</h2>
-<input type="text" id="username" placeholder="اسم المستخدم">
-<input type="password" id="password" placeholder="كلمة المرور">
-<label><input type="checkbox" id="rememberMe">ذكرني</label>
-<button onclick="checkLogin()">دخول</button>
-<p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
-</div><br>
+// عناصر DOM
+const loginBtn = document.getElementById("loginBtn");
+const signupBtn = document.getElementById("signupBtn");
+const signupContainer = document.getElementById("signupContainer");
+const cancelSignup = document.getElementById("cancelSignup");
+const submitSignup = document.getElementById("submitSignup");
+const signupMsg = document.getElementById("signupMsg");
+const loginContainer = document.getElementById("login");
+
+
+
+
+// ===== ميزة تسجيل الدخول + تذكر اسم المستخدم + دعم كلمة المرور JSON =====
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const rememberMeCheckbox = document.getElementById("rememberMe");
+
+
+
+
+// منع التحديد عند الضغط على العين
+togglePassword.addEventListener("mousedown", (e) => {
+    e.preventDefault(); // يمنع تحديد النص
+    passwordInput.type = "text";
+});
+
+togglePassword.addEventListener("mouseup", () => {
+    passwordInput.type = "password";
+});
+togglePassword.addEventListener("mouseleave", () => {
+    passwordInput.type = "password";
+});
+
+// للموبايل
+togglePassword.addEventListener("touchstart", (e) => {
+    e.preventDefault(); // يمنع التحديد/التكبير
+    passwordInput.type = "text";
+});
+togglePassword.addEventListener("touchend", () => {
+    passwordInput.type = "password";
+});
+
+
+
+
+window.addEventListener("load", () => {
+    // تعبئة اسم المستخدم إذا تم تذكره
+    const savedUsername = localStorage.getItem("rememberedUsername");
+    if (savedUsername) {
+        usernameInput.value = savedUsername;
+        rememberMeCheckbox.checked = true;
+    }
+});
+
+loginBtn.addEventListener("click", () => {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    const loginWarning = document.getElementById("loginWarning");
+
+if (!username || !password) {
+    loginWarning.style.display = "block";
+    loginWarning.innerText = "⚠ يرجى ملء اسم المستخدم وكلمة المرور";
+    setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
+    return;
+} else {
+    loginWarning.style.display = "none"; // إخفاء الرسالة عند إدخال القيم
+}
+
+   
+    db.ref("users/" + username).once("value").then(snapshot => {
+        const userData = snapshot.val();
+
+        if (userData) {
+            let storedPassword = userData.password;
+
+// دعم أي نوع: نص عادي أو JSON
+if (storedPassword && typeof storedPassword === "object") {
+    // إذا كان كائن JSON خذ كل القيم وجمعها
+    storedPassword = Object.values(storedPassword).join(",");
+} else if (!storedPassword) {
+    storedPassword = ""; // فارغة إذا لم توجد كلمة مرور
+}
+
+// الآن نقارن النصوص مباشرة
+if (storedPassword.toString() === password) {
+    // تسجيل الدخول ناجح
+    
+    
+    
+    
+    if (storedPassword.toString() === password) {
+    // === هنا ضع كود التحقق من الجهاز الجديد ===
+    let deviceId = localStorage.getItem("deviceId");
+    if (!deviceId) {
+        deviceId = crypto.randomUUID();
+        localStorage.setItem("deviceId", deviceId);
+    }
+
+    db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
+        const currentDevice = snapshot.val();
+
+        if (currentDevice && currentDevice !== deviceId) {
+            // الحساب مفتوح على جهاز آخر → مسح الجهاز القديم
+            db.ref("onlineUsers/" + username + "/" + currentDevice).remove();
+        }
+
+        // تسجيل الجهاز الحالي كجهاز نشط
+        db.ref("users/" + username + "/currentDevice").set(deviceId);
+        updateUserOnlineStatus(username, true); // تابع حالتك الحالية على Firebase
+        window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
+
+        // إظهار التطبيق وإخفاء تسجيل الدخول
+        loginContainer.style.display = "none";
+        document.getElementById("app").style.display = "block";
+
+        // تذكر اسم المستخدم إذا كان مفعل
+        if (rememberMeCheckbox.checked) {
+            localStorage.setItem("rememberedUsername", username);
+        } else {
+            localStorage.removeItem("rememberedUsername");
+        }
+    });
+}
+
+    
+    
+    
+    
+
+                loginContainer.style.display = "none";
+                document.getElementById("app").style.display = "block";
+
+                if (rememberMeCheckbox.checked) {
+                    localStorage.setItem("rememberedUsername", username);
+                } else {
+                    localStorage.removeItem("rememberedUsername");
+                }
+
+                updateUserOnlineStatus(username, true);
+                window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
+            } else {
+                document.getElementById("error").style.display = "block";
+                document.getElementById("error").innerText = "!! كلمة المرور غير صحيحة";
+            }
+        } else {
+            document.getElementById("error").style.display = "block";
+            document.getElementById("error").innerText = "!! اسم المستخدم غير موجود";
+        }
+    }).catch(err => {
+        console.error(err);
+        alert("حدث خطأ في الاتصال بقاعدة البيانات");
+    });
+});
+
+
+
+
+
+
+// فتح نافذة الاشتراك
+signupBtn.addEventListener("click", () => {
+  loginContainer.style.display = "none";
+  signupContainer.style.display = "block";
+  signupMsg.style.display = "none";
+});
+
+// إلغاء الاشتراك
+cancelSignup.addEventListener("click", () => {
+  signupContainer.style.display = "none";
+  loginContainer.style.display = "block";
+  signupMsg.style.display = "none";
+});
+
+// إرسال طلب الاشتراك إلى Firebase
+const signupWarning = document.getElementById("signupWarning");
+
+submitSignup.addEventListener("click", () => {
+  const newUser = document.getElementById("newUsername").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const showPassword = document.getElementById("showPassword");
+
+  if (!newUser || !phone) {
+    signupWarning.style.display = "block";
+    signupWarning.innerText = "⚠ يرجى ملء جميع الحقول";
+    setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
+ 
+    return;
+  }
+
+  if (!/^\d+$/.test(phone)) {
+    signupWarning.style.display = "block";
+    signupWarning.innerText = "⚠ رقم الهاتف يجب أن يحتوي على أرقام فقط";
+    setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
+ 
+    return;
+  }
+
+  // ===== تحقق الرقم يبدأ بـ 077 أو 075 أو 078 =====
+  if (!/^07[578]/.test(phone)) {
+    signupMsg.style.display = "block";
+    signupMsg.style.color = "red";
+    signupMsg.innerText = "❌ الرقم غير صالح";
+    return;
+  }
+
+  // ===== باقي الكود كما هو لإرسال البيانات إلى Firebase =====
+  db.ref("users/" + newUser).once("value").then(snapshot => {
+    const data = snapshot.val();
+    signupMsg.style.display = "block";
+
+    if (data) {
+      // المستخدم موجود
+      if (data.phone === phone) {
+        if (data.password && data.password !== "") {
+          showPassword.style.display = "block";
+          showPassword.value = typeof data.password === "object" 
+              ? JSON.stringify(data.password) 
+              : data.password;
+          signupMsg.style.color = "green";
+          signupMsg.innerText = "تم العثور على الحساب، كلمة المرور ظهرت أدناه.";
+        } else {
+          showPassword.style.display = "block";
+          showPassword.value = "";
+          signupMsg.style.color = "blue";
+          signupMsg.innerText = "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب.";
+        }
+      } else {
+        showPassword.style.display = "block";
+        showPassword.value = "";
+        signupMsg.style.color = "red";
+        signupMsg.innerText = "رقم الهاتف غير صحيح.";
+      }
+    } else {
+      // مستخدم جديد → إضافة إلى قاعدة البيانات
+      db.ref("users/" + newUser).set({
+        username: newUser,
+        phone: phone,
+        password: ""
+      }).then(() => {
+        showPassword.style.display = "none";
+        signupMsg.style.color = "blue";
+        signupMsg.innerText = "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب.";
+      }).catch(err => {
+        console.error(err);
+        alert("فشل إرسال الطلب");
+      });
+    }
+  }).catch(err => {
+    console.error(err);
+    alert("حدث خطأ في الاتصال بقاعدة البيانات");
+  });
+});
+
+
+
+
+const showPassword = document.getElementById("showPassword");
+const copyMessage = document.getElementById("copyMessage"); // عنصر الرسالة
+
+showPassword.addEventListener("click", () => {
+    const value = showPassword.value.trim();
+
+    // إذا الخانة فارغة أو لا تحتوي على كائن → لا تقم بالنسخ
+    if (!value || value === "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب." || value === "رقم الهاتف غير صحيح.") {
+        return; // لا نفعل شيء
+    }
+
+    let numbersToCopy = "";
+
+    try {
+        const obj = JSON.parse(value);
+        numbersToCopy = Object.keys(obj).join(","); // نسخ كل المفاتيح
+    } catch(e) {
+        numbersToCopy = value; // إذا لم يكن كائن JSON نسخ القيمة كما هي
+    }
+
+    // إنشاء عنصر مؤقت للنسخ
+    const tempTextarea = document.createElement("textarea");
+    tempTextarea.value = numbersToCopy;
+    document.body.appendChild(tempTextarea);
+    tempTextarea.select();
+    tempTextarea.setSelectionRange(0, 99999); // للهواتف
+    document.execCommand("copy");
+    document.body.removeChild(tempTextarea);
+
+    // عرض شعار "تم نسخ" أسفل خانة كلمة المرور
+    copyMessage.style.display = "inline";
+    copyMessage.innerText = "تم نسخ";
+
+    // إزالة الشعار بعد ثانية واحدة
+    setTimeout(() => {
+        copyMessage.style.display = "none";
+    }, 1000);
+});
+
+
+
+
+
+
+</script>
+
+<br>
 <div class="container" id="app">
 <div id="userCountContainer">
   <div id="userCount"># الأعضاء: 0</div>
@@ -331,8 +701,8 @@ function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)))
 const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
 db.ref('onlineUsers').on('value',snapshot=>{document.getElementById("userCount").textContent="# الأعضاء: "+snapshot.numChildren();});
-function checkLogin(){const user=document.getElementById("username").value.trim();const pass=document.getElementById("password").value.trim();const remember=document.getElementById("rememberMe").checked;const encodedUser="2LnZhNin2KE=";const encodedPass="MjI0NA==";if(base64EncodeUnicode(user)===encodedUser && base64EncodeUnicode(pass)===encodedPass){if(remember)localStorage.setItem("loggedIn","true");else sessionStorage.setItem("loggedInSession","true");document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("error").style.display="block";}}
-function logout(){const user=document.getElementById("username").value.trim();updateUserOnlineStatus(user,false);localStorage.removeItem("loggedIn");sessionStorage.removeItem("loggedInSession");document.getElementById("app").style.display="none";document.getElementById("login").style.display="block";}
+
+
 window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(loggedInPermanent && !loggedInSession){alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");sessionStorage.setItem("loggedInSession","true");location.reload();return;}if(loggedInPermanent||loggedInSession){const user=document.getElementById("username").value.trim();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("login").style.display="block";}}
 </script>
 <script>
