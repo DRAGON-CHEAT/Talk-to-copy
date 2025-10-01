@@ -526,22 +526,25 @@ showPassword.addEventListener("click", () => {
 
   
 function logout() {
-    const username = localStorage.getItem("currentUser");
+    const username = localStorage.getItem("currentUser"); // المستخدم الحالي
     if (!username) return;
 
-    // مسح معرف الجهاز في Firebase إذا كنت تستخدمه
-    const deviceId = localStorage.getItem("deviceId");
-    if (deviceId) {
-        firebase.database().ref(`users/${username}/currentDevice`).remove();
-    }
+    // حذف currentDevice في Firebase
+    firebase.database().ref(`users/${username}/currentDevice`).remove()
+    .then(() => {
+        // مسح deviceId محليًا
+        localStorage.removeItem("deviceId");
+        localStorage.removeItem("currentUser");
 
-    // مسح البيانات المحلية
-    localStorage.removeItem("deviceId");
-    localStorage.removeItem("currentUser");
-
-    // توجيه المستخدم إلى صفحة تسجيل الدخول
-    window.location.href = "login.html";
+        // عرض نافذة تسجيل الدخول
+        document.getElementById("login").style.display = "block";
+        document.getElementById("app").style.display = "none";
+    })
+    .catch(err => {
+        console.error("خطأ أثناء تسجيل الخروج:", err);
+    });
 }
+
 
 
 
