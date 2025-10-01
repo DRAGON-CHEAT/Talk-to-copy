@@ -524,7 +524,33 @@ showPassword.addEventListener("click", () => {
 
 
 
+function logout() {
+    const username = localStorage.getItem("rememberedUsername");
+    const deviceId = localStorage.getItem("deviceId");
 
+    if (username && deviceId) {
+        // إزالة ربط الجهاز الحالي إذا كان مسجل
+        db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
+            const currentDevice = snapshot.val();
+            if (currentDevice === deviceId) {
+                db.ref("users/" + username + "/currentDevice").remove();
+            }
+        });
+
+        // تحديث الحالة إلى أوفلاين
+        updateUserOnlineStatus(username, false);
+    }
+
+    // إظهار صفحة تسجيل الدخول وإخفاء التطبيق
+    loginContainer.style.display = "block";
+    document.getElementById("app").style.display = "none";
+
+    }
+
+
+
+
+  
 
 
 </script>
