@@ -339,31 +339,33 @@ if (storedPassword.toString() === password) {
     
     
     if (storedPassword.toString() === password) {
-    // === هنا ضع كود التحقق من الجهاز الجديد ===
+    // الحصول على deviceId الحالي
     let deviceId = localStorage.getItem("deviceId");
     if (!deviceId) {
         deviceId = crypto.randomUUID();
         localStorage.setItem("deviceId", deviceId);
     }
 
+    // التحقق من الجهاز المسجل في قاعدة البيانات
     db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
         const currentDevice = snapshot.val();
 
         if (currentDevice && currentDevice !== deviceId) {
-            // الحساب مفتوح على جهاز آخر → مسح الجهاز القديم
-            db.ref("onlineUsers/" + username + "/" + currentDevice).remove();
+            // الحساب مفتوح على جهاز آخر → منع الدخول
+            const loginWarning = document.getElementById("loginWarning");
+            loginWarning.style.display = "block";
+            loginWarning.innerText = "⚠ حسابك مفتوح على جهاز آخر";
+            return; // عدم السماح بالدخول
         }
 
-        // تسجيل الجهاز الحالي كجهاز نشط
+        // إذا لم يكن هناك جهاز آخر، أو نفس الجهاز → تسجيل الدخول
         db.ref("users/" + username + "/currentDevice").set(deviceId);
-        updateUserOnlineStatus(username, true); // تابع حالتك الحالية على Firebase
+        updateUserOnlineStatus(username, true);
         window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
 
-        // إظهار التطبيق وإخفاء تسجيل الدخول
         loginContainer.style.display = "none";
         document.getElementById("app").style.display = "block";
 
-        // تذكر اسم المستخدم إذا كان مفعل
         if (rememberMeCheckbox.checked) {
             localStorage.setItem("rememberedUsername", username);
         } else {
@@ -371,6 +373,7 @@ if (storedPassword.toString() === password) {
         }
     });
 }
+
 
     
     
