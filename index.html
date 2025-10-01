@@ -526,36 +526,24 @@ showPassword.addEventListener("click", () => {
 
   
 function logout() {
-    const username = localStorage.getItem("rememberedUsername");
-    const deviceId = localStorage.getItem("deviceId");
+    const username = localStorage.getItem("rememberedUsername"); // أو أي طريقة لديك لتحديد المستخدم الحالي
+    if (!username) return;
 
-    if (username && deviceId) {
-        // إعادة ضبط currentDevice في Firebase وانتظار اكتمال العملية
-        db.ref("users/" + username + "/currentDevice").set(null)
-        .then(() => {
-            console.log("currentDevice reset successfully");
-
-            // تحديث الحالة إلى أوفلاين
-            updateUserOnlineStatus(username, false);
-
-            // مسح deviceId من localStorage بعد تحديث Firebase
-            localStorage.removeItem("deviceId");
-
-            // إظهار صفحة تسجيل الدخول وإخفاء التطبيق
-            loginContainer.style.display = "block";
-            document.getElementById("app").style.display = "none";
-        })
-        .catch((error) => {
-            console.error("Error resetting currentDevice:", error);
-            alert("حدث خطأ أثناء تسجيل الخروج، حاول مرة أخرى");
-        });
-    } else {
-        // حتى لو لم يكن هناك deviceId أو username
+    // مسح currentDevice أولاً
+    db.ref("users/" + username + "/currentDevice").set(null)
+    .then(() => {
+        // بعد التأكد من المسح، امسح deviceId محليًا
         localStorage.removeItem("deviceId");
+
+        // إعادة توجيه لصفحة تسجيل الدخول
         loginContainer.style.display = "block";
         document.getElementById("app").style.display = "none";
-    }
+    })
+    .catch(err => {
+        console.error("خطأ أثناء تسجيل الخروج:", err);
+    });
 }
+
 
 
 
