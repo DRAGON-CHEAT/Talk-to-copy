@@ -530,26 +530,33 @@ function logout() {
     const deviceId = localStorage.getItem("deviceId");
 
     if (username && deviceId) {
-        // إعادة ضبط currentDevice في Firebase فوراً
+        // إعادة ضبط currentDevice في Firebase وانتظار اكتمال العملية
         db.ref("users/" + username + "/currentDevice").set(null)
         .then(() => {
             console.log("currentDevice reset successfully");
+
+            // تحديث الحالة إلى أوفلاين
+            updateUserOnlineStatus(username, false);
+
+            // مسح deviceId من localStorage بعد تحديث Firebase
+            localStorage.removeItem("deviceId");
+
+            // إظهار صفحة تسجيل الدخول وإخفاء التطبيق
+            loginContainer.style.display = "block";
+            document.getElementById("app").style.display = "none";
         })
         .catch((error) => {
             console.error("Error resetting currentDevice:", error);
+            alert("حدث خطأ أثناء تسجيل الخروج، حاول مرة أخرى");
         });
-
-        // تحديث الحالة إلى أوفلاين
-        updateUserOnlineStatus(username, false);
+    } else {
+        // حتى لو لم يكن هناك deviceId أو username
+        localStorage.removeItem("deviceId");
+        loginContainer.style.display = "block";
+        document.getElementById("app").style.display = "none";
     }
-
-    // مسح deviceId من localStorage
-    localStorage.removeItem("deviceId");
-
-    // إظهار صفحة تسجيل الدخول وإخفاء التطبيق
-    loginContainer.style.display = "block";
-    document.getElementById("app").style.display = "none";
 }
+
 
 
 
