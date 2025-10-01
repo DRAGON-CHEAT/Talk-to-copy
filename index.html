@@ -304,106 +304,65 @@ window.addEventListener("load", () => {
 loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
-
     const loginWarning = document.getElementById("loginWarning");
 
-if (!username || !password) {
-    loginWarning.style.display = "block";
-    loginWarning.innerText = "⚠ يرجى ملء اسم المستخدم وكلمة المرور";
-    setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
-    return;
-} else {
-    loginWarning.style.display = "none"; // إخفاء الرسالة عند إدخال القيم
-}
-
-   
-    db.ref("users/" + username).once("value").then(snapshot => {
-        const userData = snapshot.val();
-
-        if (userData) {
-            let storedPassword = userData.password;
-
-// دعم أي نوع: نص عادي أو JSON
-if (storedPassword && typeof storedPassword === "object") {
-    // إذا كان كائن JSON خذ كل القيم وجمعها
-    storedPassword = Object.values(storedPassword).join(",");
-} else if (!storedPassword) {
-    storedPassword = ""; // فارغة إذا لم توجد كلمة مرور
-}
-
-// الآن نقارن النصوص مباشرة
-if (storedPassword.toString() === password) {
-    // تسجيل الدخول ناجح
-    
-    
-    
-    
-    if (storedPassword.toString() === password) {
-    // الحصول على deviceId الحالي
-    let deviceId = localStorage.getItem("deviceId");
-    if (!deviceId) {
-        deviceId = crypto.randomUUID();
-        localStorage.setItem("deviceId", deviceId);
+    if (!username || !password) {
+        loginWarning.style.display = "block";
+        loginWarning.innerText = "⚠ يرجى ملء اسم المستخدم وكلمة المرور";
+        setTimeout(() => { loginWarning.style.display = "none"; }, 3000);
+        return;
+    } else {
+        loginWarning.style.display = "none";
     }
 
-    // التحقق من الجهاز المسجل في قاعدة البيانات
-    db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
-        const currentDevice = snapshot.val();
+    db.ref("users/" + username).once("value").then(snapshot => {
+        const userData = snapshot.val();
+        if (userData && userData.password === password) {
 
-        if (currentDevice && currentDevice !== deviceId) {
-            // الحساب مفتوح على جهاز آخر → منع الدخول
-            const loginWarning = document.getElementById("loginWarning");
-            loginWarning.style.display = "block";
-            loginWarning.innerText = "⚠ حسابك مفتوح على جهاز آخر";
-            return; // عدم السماح بالدخول
-        }
+            let deviceId = localStorage.getItem("deviceId");
+            if (!deviceId) {
+                deviceId = crypto.randomUUID();
+                localStorage.setItem("deviceId", deviceId);
+            }
 
-        // إذا لم يكن هناك جهاز آخر، أو نفس الجهاز → تسجيل الدخول
-        db.ref("users/" + username + "/currentDevice").set(deviceId);
-        updateUserOnlineStatus(username, true);
-        window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
+            db.ref("users/" + username + "/currentDevice").once("value").then(snap => {
+                const currentDevice = snap.val();
 
-        loginContainer.style.display = "none";
-        document.getElementById("app").style.display = "block";
+                if (currentDevice && currentDevice !== deviceId) {
+                    // جهاز آخر مسجل → منع الدخول
+                    loginWarning.style.display = "block";
+                    loginWarning.innerText = "❌ حسابك مفتوح من جهاز آخر";
+                    return; // الخروج من العملية هنا
+                }
 
-        if (rememberMeCheckbox.checked) {
-            localStorage.setItem("rememberedUsername", username);
-        } else {
-            localStorage.removeItem("rememberedUsername");
-        }
-    });
-}
+                // لا يوجد جهاز آخر → تسجيل الجهاز الحالي
+                db.ref("users/" + username + "/currentDevice").set(deviceId);
 
+                // تحديث الحالة على Firebase
+                updateUserOnlineStatus(username, true);
+                window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
 
-    
-    
-    
-    
-
+                // إظهار التطبيق
                 loginContainer.style.display = "none";
                 document.getElementById("app").style.display = "block";
 
+                // تذكر اسم المستخدم
                 if (rememberMeCheckbox.checked) {
                     localStorage.setItem("rememberedUsername", username);
                 } else {
                     localStorage.removeItem("rememberedUsername");
                 }
-
-                updateUserOnlineStatus(username, true);
-                window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
-            } else {
-                document.getElementById("error").style.display = "block";
-                document.getElementById("error").innerText = "!! كلمة المرور غير صحيحة";
-            }
+            });
         } else {
             document.getElementById("error").style.display = "block";
-            document.getElementById("error").innerText = "!! اسم المستخدم غير موجود";
+            document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
         }
     }).catch(err => {
         console.error(err);
         alert("حدث خطأ في الاتصال بقاعدة البيانات");
     });
 });
+
 
 
 
