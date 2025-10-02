@@ -322,18 +322,17 @@ loginBtn.addEventListener("click", () => {
 
         if (userData) {
             // ✅ تحقق من انتهاء الاشتراك فقط إذا كانت expiryDate موجودة
-            if (userData.expiryDate) {
+            if (userData.expirydate) {
                 const today = new Date();
-                const expiryDate = new Date(userData.expiryDate);
+                const expirydate = new Date(userData.expirydate);
 
-                if (today > expiryDate) {
+                if (today > expirydate) {
                     // انتهاء الاشتراك → حذف كلمة المرور و expiryDate
                     db.ref("users/" + username).update({
                         password: null,
-                        expiryDate: null
                     });
                     document.getElementById("error").style.display = "block";
-                    document.getElementById("error").innerText = "⚠ انتهت صلاحية حسابك";
+                    document.getElementById("error").innerText = "⚠ انتهت صلاحية الاشتراك";
                     return; // منع الدخول
                 }
             }
