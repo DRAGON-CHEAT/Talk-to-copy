@@ -480,7 +480,7 @@ submitSignup.addEventListener("click", () => {
       db.ref("users/" + newUser).set({
         username: newUser,
         phone: phone,
-        expirydate: phone,
+        expirydate: YYYY-MM-DD,
         password: ""
       }).then(() => {
         showPassword.style.display = "none";
