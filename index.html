@@ -356,6 +356,30 @@ loginBtn.addEventListener("click", () => {
 
         // التحقق من كلمة المرور
         if (storedPassword.toString() !== password) {
+
+// ======== التحقق من الاشتراك ========
+const subscriptionStart = userData.subscriptionStart;
+const subscriptionDurationDays = userData.subscriptionDurationDays || 21; // افتراضي 21 يوم
+const now = Date.now();
+const elapsedDays = (now - subscriptionStart) / (1000 * 60 * 60 * 24);
+
+console.log("=== بيانات الاشتراك ===");
+console.log("اسم المستخدم:", username);
+console.log("وقت بدء الاشتراك:", new Date(subscriptionStart).toLocaleString());
+console.log("مدة الاشتراك بالأيام:", subscriptionDurationDays);
+console.log("الأيام المنقضية منذ البداية:", elapsedDays.toFixed(2));
+
+if (elapsedDays >= subscriptionDurationDays) {
+    console.log("⚠ انتهى الاشتراك للمستخدم:", username);
+    loginWarning.style.display = "block";
+    loginWarning.innerText = "⚠ انتهى الاشتراك، يرجى تجديد الاشتراك";
+    return; // يمنع تسجيل الدخول إذا انتهى الاشتراك
+} else {
+    console.log("✅ الاشتراك فعال للمستخدم:", username);
+    }
+// ======== نهاية التحقق من الاشتراك ========
+
+
             errorMsg.style.display = "block";
             errorMsg.innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
             return;
