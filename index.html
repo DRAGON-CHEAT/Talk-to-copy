@@ -324,23 +324,6 @@ loginBtn.addEventListener("click", () => {
         const userData = snapshot.val();
 
         if (userData) {
-            // ✅ تحقق من انتهاء الاشتراك فقط إذا كانت expiryDate موجودة
-            if (userData.expiryDate) {
-                const today = new Date();
-                const expiryDate = new Date(userData.expiryDate);
-
-                if (today > expiryDate) {
-                    // انتهاء الاشتراك → حذف كلمة المرور و expiryDate
-                    db.ref("users/" + username).update({
-                        password: null,
-                        expiryDate: null
-                    });
-                    document.getElementById("error").style.display = "block";
-                    document.getElementById("error").innerText = "⚠ انتهت صلاحية حسابك";
-                    return; // منع الدخول
-                }
-            }
-
             let storedPassword = userData.password;
 
             if (storedPassword && typeof storedPassword === "object") {
@@ -350,6 +333,27 @@ loginBtn.addEventListener("click", () => {
             }
 
             if (storedPassword.toString() === password) {
+
+                // ✅ إنشاء expiryDate إذا لم يكن موجودًا
+                if (!userData.expiryDate) {
+                    db.ref("users/" + username + "/expiryDate").set(null);
+                }
+
+                // التحقق من انتهاء الاشتراك
+                if (userData.expiryDate) {
+                    const today = new Date();
+                    const expiryDate = new Date(userData.expiryDate);
+                    if (today > expiryDate) {
+                        db.ref("users/" + username).update({
+                            password: null,
+                            expiryDate: null
+                        });
+                        document.getElementById("error").style.display = "block";
+                        document.getElementById("error").innerText = "⚠ انتهت صلاحية حسابك";
+                        return;
+                    }
+                }
+
                 let deviceId = localStorage.getItem("deviceId");
                 if (!deviceId) {
                     deviceId = crypto.randomUUID();
@@ -365,11 +369,6 @@ loginBtn.addEventListener("click", () => {
                         return;
                     }
 
-                    // ✅ إذا لم يكن للمستخدم expiryDate → أنشئه بقيمة null (للتعديل لاحقًا)
-                    if (!userData.expiryDate) {
-                        db.ref("users/" + username + "/expiryDate").set(null);
-                    }
-
                     db.ref("users/" + username + "/currentDevice").set(deviceId);
                     updateUserOnlineStatus(username, true);
                     window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
@@ -383,6 +382,7 @@ loginBtn.addEventListener("click", () => {
                         localStorage.removeItem("rememberedUsername");
                     }
                 });
+
             } else {
                 document.getElementById("error").style.display = "block";
                 document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
@@ -396,7 +396,6 @@ loginBtn.addEventListener("click", () => {
         alert("حدث خطأ في الاتصال بقاعدة البيانات");
     });
 });
-
 
 
 
