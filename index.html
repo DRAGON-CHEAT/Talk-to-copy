@@ -506,37 +506,24 @@ const copyMessage = document.getElementById("copyMessage"); // عنصر الرس
 showPassword.addEventListener("click", () => {
     const value = showPassword.value.trim();
 
-    // إذا الخانة فارغة أو لا تحتوي على كائن → لا تقم بالنسخ
-    if (!value || value === "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب." || value === "رقم الهاتف غير صحيح.") {
-        return; // لا نفعل شيء
-    }
+    if (!value) return; // إذا فارغ لا ينسخ شيء
 
-    let numbersToCopy = "";
-
-    try {
-        const obj = JSON.parse(value);
-        numbersToCopy = Object.keys(obj).join(","); // نسخ كل المفاتيح
-    } catch(e) {
-        numbersToCopy = value; // إذا لم يكن كائن JSON نسخ القيمة كما هي
-    }
-
-    // إنشاء عنصر مؤقت للنسخ
-    const tempTextarea = document.createElement("textarea");
-    tempTextarea.value = numbersToCopy;
-    document.body.appendChild(tempTextarea);
-    tempTextarea.select();
-    tempTextarea.setSelectionRange(0, 99999); // للهواتف
-    document.execCommand("copy");
-    document.body.removeChild(tempTextarea);
-
-    // عرض شعار "تم نسخ" أسفل خانة كلمة المرور
-    copyMessage.style.display = "inline";
-    copyMessage.innerText = "تم نسخ";
-
-    // إزالة الشعار بعد ثانية واحدة
-    setTimeout(() => {
-        copyMessage.style.display = "none";
-    }, 1000);
+    navigator.clipboard.writeText(value).then(() => {
+        copyMessage.style.display = "inline";
+        copyMessage.innerText = "تم النسخ ✅";
+        setTimeout(() => { copyMessage.style.display = "none"; }, 1200);
+    }).catch(() => {
+        // fallback لو المتصفح لا يدعم clipboard API
+        const temp = document.createElement("textarea");
+        temp.value = value;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+        copyMessage.style.display = "inline";
+        copyMessage.innerText = "تم النسخ ✅";
+        setTimeout(() => { copyMessage.style.display = "none"; }, 1200);
+    });
 });
 
 
