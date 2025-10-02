@@ -305,8 +305,7 @@ window.addEventListener("load", () => {
   
 
 // عند الضغط على زر الدخول
-
-loginBtn.addEventListener("click", () => {
+   loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
@@ -337,18 +336,6 @@ loginBtn.addEventListener("click", () => {
             // التحقق من كلمة المرور
             if (storedPassword.toString() === password) {
 
-                // ======= التحقق من الاشتراك =======
-                const subscriptionStart = userData.subscriptionStart || Date.now();
-                const subscriptionDurationMs = 1 * 60 * 1000; // دقيقة واحدة للتجربة
-                const now = Date.now();
-
-                if (now - subscriptionStart > subscriptionDurationMs) {
-                    loginWarning.style.display = "block";
-                    loginWarning.innerText = "⚠ انتهى اشتراكك، يرجى تجديد الاشتراك";
-                    return; // إيقاف تسجيل الدخول إذا انتهى الاشتراك
-                }
-                // ======= نهاية التحقق من الاشتراك =======
-
                 // الحصول على deviceId الحالي
                 let deviceId = localStorage.getItem("deviceId");
                 if (!deviceId) {
@@ -366,11 +353,19 @@ loginBtn.addEventListener("click", () => {
                         return;
                     }
 
-                    // تسجيل الدخول
+                    // ✅ تسجيل الدخول
                     db.ref("users/" + username + "/currentDevice").set(deviceId);
                     updateUserOnlineStatus(username, true);
                     window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
 
+                    // ===== إضافة أو تحديث expiryDate =====
+                    const today = new Date();
+                    const expiry = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 يوم
+                    const expiryDateStr = expiry.toISOString().split("T")[0];
+
+                    db.ref("users/" + username + "/expiryDate").set(expiryDateStr);
+
+                    // إظهار التطبيق بعد تسجيل الدخول
                     loginContainer.style.display = "none";
                     document.getElementById("app").style.display = "block";
 
