@@ -303,9 +303,11 @@ window.addEventListener("load", () => {
 
   
   
+
 loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
+
     const loginWarning = document.getElementById("loginWarning");
 
     if (!username || !password) {
@@ -317,29 +319,45 @@ loginBtn.addEventListener("click", () => {
         loginWarning.style.display = "none";
     }
 
-    const userRef = db.ref("users/" + username);
-
-    userRef.once("value").then(snapshot => {
+    db.ref("users/" + username).once("value").then(snapshot => {
         const userData = snapshot.val();
 
         if (userData) {
-            // مستخدم موجود → تحقق كلمة المرور
             let storedPassword = userData.password;
+
             if (storedPassword && typeof storedPassword === "object") {
                 storedPassword = Object.values(storedPassword).join(",");
             } else if (!storedPassword) {
                 storedPassword = "";
             }
 
+            // التحقق من كلمة المرور
             if (storedPassword.toString() === password) {
+
+                // ====== إضافة التحقق من انتهاء الاشتراك ======
+                const now = Date.now();
+                const subscriptionStart = userData.subscriptionStart || 0;
+                const subscriptionDurationDays = userData.subscriptionDurationDays || 21;
+                const subscriptionDurationMs = subscriptionDurationDays * 24 * 60 * 60 * 1000;
+
+                if (now > subscriptionStart + subscriptionDurationMs) {
+                    loginWarning.style.display = "block";
+                    loginWarning.innerText = "⚠ انتهت مدة الاشتراك، يرجى تجديد الاشتراك";
+                    return; // يمنع الدخول حتى تجديد الاشتراك
+                }
+                // ====== نهاية الإضافة ======
+
+                // الحصول على deviceId الحالي
                 let deviceId = localStorage.getItem("deviceId");
                 if (!deviceId) {
                     deviceId = crypto.randomUUID();
                     localStorage.setItem("deviceId", deviceId);
                 }
 
+                // التحقق من الجهاز المسجل في قاعدة البيانات
                 db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
                     const currentDevice = snapshot.val();
+
                     if (currentDevice && currentDevice !== deviceId) {
                         loginWarning.style.display = "block";
                         loginWarning.innerText = "⚠ حسابك مفتوح على جهاز آخر";
@@ -359,40 +377,19 @@ loginBtn.addEventListener("click", () => {
                         localStorage.removeItem("rememberedUsername");
                     }
                 });
-
             } else {
                 document.getElementById("error").style.display = "block";
                 document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
             }
-
         } else {
-            // مستخدم جديد → إنشاء بياناته مع مدة الاشتراك تلقائيًا
-            db.ref("settings/subscriptionDurationDays").once("value").then(settingsSnap => {
-                const subscriptionDays = settingsSnap.val() || 21; // قيمة افتراضية إذا لم توجد
-                userRef.set({
-                    password: password,
-                    subscriptionStart: Date.now(),
-                    subscriptionDurationDays: subscriptionDays,
-                    currentDevice: crypto.randomUUID()
-                }).then(() => {
-                    localStorage.setItem("deviceId", userRef.currentDevice);
-                    loginContainer.style.display = "none";
-                    document.getElementById("app").style.display = "block";
-                });
-            });
+            document.getElementById("error").style.display = "block";
+            document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
         }
     }).catch(err => {
         console.error(err);
         alert("حدث خطأ في الاتصال بقاعدة البيانات");
     });
 });
-
-
-
-
-
-
-
 
 
 
