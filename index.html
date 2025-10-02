@@ -305,6 +305,7 @@ window.addEventListener("load", () => {
   
 
 // عند الضغط على زر الدخول
+
 loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
@@ -326,32 +327,36 @@ loginBtn.addEventListener("click", () => {
         if (userData) {
             let storedPassword = userData.password;
 
+            // دعم أي نوع: نص عادي أو JSON
             if (storedPassword && typeof storedPassword === "object") {
                 storedPassword = Object.values(storedPassword).join(",");
             } else if (!storedPassword) {
                 storedPassword = "";
             }
 
+            // التحقق من كلمة المرور
             if (storedPassword.toString() === password) {
 
-                // ===== تحقق الاشتراك قبل تسجيل الدخول =====
+                // ======= التحقق من الاشتراك =======
                 const subscriptionStart = userData.subscriptionStart || Date.now();
-                const subscriptionDurationMs = (userData.subscriptionDurationDays || (1/1440)) * 24 * 60 * 60 * 1000; // دقيقة = 1/1440 يوم
+                const subscriptionDurationMs = 1 * 60 * 1000; // دقيقة واحدة للتجربة
                 const now = Date.now();
 
                 if (now - subscriptionStart > subscriptionDurationMs) {
                     loginWarning.style.display = "block";
                     loginWarning.innerText = "⚠ انتهى اشتراكك، يرجى تجديد الاشتراك";
-                    return; // منع الدخول
+                    return; // إيقاف تسجيل الدخول إذا انتهى الاشتراك
                 }
-                // ============================================
+                // ======= نهاية التحقق من الاشتراك =======
 
+                // الحصول على deviceId الحالي
                 let deviceId = localStorage.getItem("deviceId");
                 if (!deviceId) {
                     deviceId = crypto.randomUUID();
                     localStorage.setItem("deviceId", deviceId);
                 }
 
+                // التحقق من الجهاز المسجل في قاعدة البيانات
                 db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
                     const currentDevice = snapshot.val();
 
@@ -361,6 +366,7 @@ loginBtn.addEventListener("click", () => {
                         return;
                     }
 
+                    // تسجيل الدخول
                     db.ref("users/" + username + "/currentDevice").set(deviceId);
                     updateUserOnlineStatus(username, true);
                     window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
@@ -387,6 +393,7 @@ loginBtn.addEventListener("click", () => {
         alert("حدث خطأ في الاتصال بقاعدة البيانات");
     });
 });
+
 
 
 
