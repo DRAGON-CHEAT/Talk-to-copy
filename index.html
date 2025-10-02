@@ -480,8 +480,8 @@ submitSignup.addEventListener("click", () => {
       db.ref("users/" + newUser).set({
         username: newUser,
         phone: phone,
-        expirydate: "",
-        password: ""
+        password: "",
+        expirydate: ""
       }).then(() => {
         showPassword.style.display = "none";
         signupMsg.style.color = "blue";
