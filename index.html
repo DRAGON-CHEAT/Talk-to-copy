@@ -333,6 +333,25 @@ loginBtn.addEventListener("click", () => {
             // التحقق من كلمة المرور
             if (storedPassword.toString() === password) {
 
+
+            db.ref("settings/subscriptionDurationDays").once("value").then(durationSnapshot => {
+    const durationDays = durationSnapshot.val() || 21; // إذا ما موجودة ترجع 21 يوم افتراضياً
+    const subscriptionDuration = durationDays * 24 * 60 * 60 * 1000; // تحويل الأيام إلى ميلي ثانية
+
+    const now = Date.now();
+    const subscriptionStart = userData.subscriptionStart || now;
+
+    if (!userData.subscriptionStart) {
+        db.ref("users/" + username + "/subscriptionStart").set(now);
+    }
+
+    if (now - subscriptionStart > subscriptionDuration) {
+        loginWarning.style.display = "block";
+        loginWarning.innerText = "⚠ انتهت صلاحية الاشتراك لديك. يرجى التجديد.";
+        return; 
+       }
+
+        
                 // الحصول على deviceId الحالي
                 let deviceId = localStorage.getItem("deviceId");
                 if (!deviceId) {
