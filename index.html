@@ -304,8 +304,7 @@ window.addEventListener("load", () => {
   
   
 
-// عند الضغط على زر الدخول
-   loginBtn.addEventListener("click", () => {
+// عند الضغط على زر الدخول       loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
@@ -314,10 +313,10 @@ window.addEventListener("load", () => {
     if (!username || !password) {
         loginWarning.style.display = "block";
         loginWarning.innerText = "⚠ يرجى ملء اسم المستخدم وكلمة المرور";
-        setTimeout(() => { loginWarning.style.display = "none"; }, 3000);
+        setTimeout(() => { loginWarning.style.display = "none"; }, 3000); 
         return;
     } else {
-        loginWarning.style.display = "none";
+        loginWarning.style.display = "none"; 
     }
 
     db.ref("users/" + username).once("value").then(snapshot => {
@@ -330,7 +329,24 @@ window.addEventListener("load", () => {
             if (storedPassword && typeof storedPassword === "object") {
                 storedPassword = Object.values(storedPassword).join(",");
             } else if (!storedPassword) {
-                storedPassword = "";
+                storedPassword = ""; 
+            }
+
+            // **التحقق من انتهاء الصلاحية قبل أي شيء**
+            const expiryDate = userData.expiryDate;
+            if (expiryDate) {
+                const now = new Date();
+                const expiry = new Date(expiryDate);
+                if (now > expiry) {
+                    // انتهت الصلاحية → حذف كلمة المرور و expiryDate
+                    db.ref("users/" + username).update({
+                        password: null,
+                        expiryDate: null
+                    });
+                    loginWarning.style.display = "block";
+                    loginWarning.innerText = "⚠ انتهت صلاحية الاشتراك، تم تعطيل الحساب";
+                    return; // منع الدخول
+                }
             }
 
             // التحقق من كلمة المرور
@@ -350,22 +366,14 @@ window.addEventListener("load", () => {
                     if (currentDevice && currentDevice !== deviceId) {
                         loginWarning.style.display = "block";
                         loginWarning.innerText = "⚠ حسابك مفتوح على جهاز آخر";
-                        return;
+                        return; 
                     }
 
-                    // ✅ تسجيل الدخول
+                    // تسجيل الدخول وتحديث الجهاز
                     db.ref("users/" + username + "/currentDevice").set(deviceId);
                     updateUserOnlineStatus(username, true);
                     window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
 
-                    // ===== إضافة أو تحديث expiryDate =====
-                    const today = new Date();
-                    const expiry = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 يوم
-                    const expiryDateStr = expiry.toISOString().split("T")[0];
-
-                    db.ref("users/" + username + "/expiryDate").set(expiryDateStr);
-
-                    // إظهار التطبيق بعد تسجيل الدخول
                     loginContainer.style.display = "none";
                     document.getElementById("app").style.display = "block";
 
@@ -389,105 +397,6 @@ window.addEventListener("load", () => {
     });
 });
 
-
-
-
-
-
-
-// فتح نافذة الاشتراك
-signupBtn.addEventListener("click", () => {
-  loginContainer.style.display = "none";
-  signupContainer.style.display = "block";
-  signupMsg.style.display = "none";
-});
-
-// إلغاء الاشتراك
-cancelSignup.addEventListener("click", () => {
-  signupContainer.style.display = "none";
-  loginContainer.style.display = "block";
-  signupMsg.style.display = "none";
-});
-
-// إرسال طلب الاشتراك إلى Firebase
-const signupWarning = document.getElementById("signupWarning");
-
-submitSignup.addEventListener("click", () => {
-  const newUser = document.getElementById("newUsername").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const showPassword = document.getElementById("showPassword");
-
-  if (!newUser || !phone) {
-    signupWarning.style.display = "block";
-    signupWarning.innerText = "⚠ يرجى ملء جميع الحقول";
-    setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
- 
-    return;
-  }
-
-  if (!/^\d+$/.test(phone)) {
-    signupWarning.style.display = "block";
-    signupWarning.innerText = "⚠ رقم الهاتف يجب أن يحتوي على أرقام فقط";
-    setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
- 
-    return;
-  }
-
-  // ===== تحقق الرقم يبدأ بـ 077 أو 075 أو 078 =====
-  if (!/^07[578]/.test(phone)) {
-    signupMsg.style.display = "block";
-    signupMsg.style.color = "red";
-    signupMsg.innerText = "❌ الرقم غير صالح";
-    return;
-  }
-
-  // ===== باقي الكود كما هو لإرسال البيانات إلى Firebase =====
-  db.ref("users/" + newUser).once("value").then(snapshot => {
-    const data = snapshot.val();
-    signupMsg.style.display = "block";
-
-    if (data) {
-      // المستخدم موجود
-      if (data.phone === phone) {
-        if (data.password && data.password !== "") {
-          showPassword.style.display = "block";
-          showPassword.value = typeof data.password === "object" 
-              ? JSON.stringify(data.password) 
-              : data.password;
-          signupMsg.style.color = "green";
-          signupMsg.innerText = "تم العثور على الحساب، كلمة المرور ظهرت أدناه.";
-        } else {
-          showPassword.style.display = "block";
-          showPassword.value = "";
-          signupMsg.style.color = "blue";
-          signupMsg.innerText = "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب.";
-        }
-      } else {
-        showPassword.style.display = "block";
-        showPassword.value = "";
-        signupMsg.style.color = "red";
-        signupMsg.innerText = "رقم الهاتف غير صحيح.";
-      }
-    } else {
-      // مستخدم جديد → إضافة إلى قاعدة البيانات
-      db.ref("users/" + newUser).set({
-        username: newUser,
-        phone: phone,
-        password: ""
-      }).then(() => {
-        showPassword.style.display = "none";
-        signupMsg.style.color = "blue";
-        signupMsg.innerText = "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب.";
-      }).catch(err => {
-        console.error(err);
-        alert("فشل إرسال الطلب");
-      });
-    }
-  }).catch(err => {
-    console.error(err);
-    alert("حدث خطأ في الاتصال بقاعدة البيانات");
-  });
-});
 
 
 
