@@ -302,7 +302,7 @@ window.addEventListener("load", () => {
 });
 
   
-loginBtn.addEventListener("click", async () => {
+loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
@@ -317,81 +317,83 @@ loginBtn.addEventListener("click", async () => {
         loginWarning.style.display = "none";
     }
 
-    try {
-        const snapshot = await db.ref("users/" + username).once("value");
+    db.ref("users/" + username).once("value").then(snapshot => {
         const userData = snapshot.val();
 
-        if (!userData) {
-            document.getElementById("error").style.display = "block";
-            document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
-            return;
-        }
+        if (userData) {
+            let storedPassword = userData.password;
 
-        let storedPassword = userData.password;
-        if (storedPassword && typeof storedPassword === "object") {
-            storedPassword = Object.values(storedPassword).join(",");
-        } else if (!storedPassword) {
-            storedPassword = "";
-        }
+            if (storedPassword && typeof storedPassword === "object") {
+                storedPassword = Object.values(storedPassword).join(",");
+            } else if (!storedPassword) {
+                storedPassword = "";
+            }
 
-        if (storedPassword.toString() !== password) {
-            document.getElementById("error").style.display = "block";
-            document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
-            return;
-        }
+            if (storedPassword.toString() === password) {
 
-        // ===== جلب مدة الاشتراك =====
-        const durationSnapshot = await db.ref("settings/subscriptionDurationDays").once("value");
-        const durationDays = durationSnapshot.val() || 21;
-        const subscriptionDuration = durationDays * 24 * 60 * 60 * 1000;
+                // ✅ نجيب مدة الاشتراك من settings
+                db.ref("settings/subscriptionDurationDays").once("value").then(durationSnapshot => {
+                    const durationDays = durationSnapshot.val() || 21;
+                    const subscriptionDuration = durationDays * 24 * 60 * 60 * 1000;
 
-        const now = Date.now();
-        const subscriptionStart = userData.subscriptionStart || now;
+                    const now = Date.now();
+                    const subscriptionStart = userData.subscriptionStart || now;
 
-        if (!userData.subscriptionStart) {
-            await db.ref("users/" + username + "/subscriptionStart").set(now);
-        }
+                    if (!userData.subscriptionStart) {
+                        db.ref("users/" + username + "/subscriptionStart").set(now);
+                    }
 
-        if (now - subscriptionStart > subscriptionDuration) {
-            loginWarning.style.display = "block";
-            loginWarning.innerText = "⚠ انتهت صلاحية الاشتراك لديك. يرجى التجديد.";
-            return;
-        }
+                    if (now - subscriptionStart > subscriptionDuration) {
+                        loginWarning.style.display = "block";
+                        loginWarning.innerText = "⚠ انتهت صلاحية الاشتراك لديك. يرجى التجديد.";
+                        return;
+                    }
 
-        // ===== التحقق من الجهاز =====
-        let deviceId = localStorage.getItem("deviceId");
-        if (!deviceId) {
-            deviceId = crypto.randomUUID();
-            localStorage.setItem("deviceId", deviceId);
-        }
+                    // ✅ متابعة تسجيل الدخول (كودك الأصلي)
+                    let deviceId = localStorage.getItem("deviceId");
+                    if (!deviceId) {
+                        deviceId = crypto.randomUUID();
+                        localStorage.setItem("deviceId", deviceId);
+                    }
 
-        const deviceSnapshot = await db.ref("users/" + username + "/currentDevice").once("value");
-        const currentDevice = deviceSnapshot.val();
+                    db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
+                        const currentDevice = snapshot.val();
 
-        if (currentDevice && currentDevice !== deviceId) {
-            loginWarning.style.display = "block";
-            loginWarning.innerText = "⚠ حسابك مفتوح على جهاز آخر";
-            return;
-        }
+                        if (currentDevice && currentDevice !== deviceId) {
+                            loginWarning.style.display = "block";
+                            loginWarning.innerText = "⚠ حسابك مفتوح على جهاز آخر";
+                            return;
+                        }
 
-        await db.ref("users/" + username + "/currentDevice").set(deviceId);
-        updateUserOnlineStatus(username, true);
-        window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
+                        db.ref("users/" + username + "/currentDevice").set(deviceId);
+                        updateUserOnlineStatus(username, true);
+                        window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
 
-        loginContainer.style.display = "none";
-        document.getElementById("app").style.display = "block";
+                        loginContainer.style.display = "none";
+                        document.getElementById("app").style.display = "block";
 
-        if (rememberMeCheckbox.checked) {
-            localStorage.setItem("rememberedUsername", username);
+                        if (rememberMeCheckbox.checked) {
+                            localStorage.setItem("rememberedUsername", username);
+                        } else {
+                            localStorage.removeItem("rememberedUsername");
+                        }
+                    });
+                });
+
+            } else {
+                document.getElementById("error").style.display = "block";
+                document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
+            }
         } else {
-            localStorage.removeItem("rememberedUsername");
+            document.getElementById("error").style.display = "block";
+            document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
         }
-
-    } catch (err) {
-        console.error(err);
+    }).catch(err => {
+        console.error("Firebase error:", err);
         alert("حدث خطأ في الاتصال بقاعدة البيانات");
-    }
+    });
 });
+
 
 
 
