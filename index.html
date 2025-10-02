@@ -304,11 +304,12 @@ window.addEventListener("load", () => {
   
   
 
+// عند الضغط على زر الدخول
 loginBtn.addEventListener("click", () => {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
-
     const loginWarning = document.getElementById("loginWarning");
+    const errorMsg = document.getElementById("error");
 
     if (!username || !password) {
         loginWarning.style.display = "block";
@@ -320,76 +321,102 @@ loginBtn.addEventListener("click", () => {
     }
 
     db.ref("users/" + username).once("value").then(snapshot => {
-        const userData = snapshot.val();
+        let userData = snapshot.val();
 
-        if (userData) {
-            let storedPassword = userData.password;
+        // إذا لم يكن المستخدم موجود → إنشاء مستخدم جديد
+        if (!userData) {
+            db.ref("settings/subscriptionDurationDays").once("value").then(settingsSnap => {
+                const subscriptionDays = settingsSnap.val() || 21; // افتراضي 21 يوم
+                const deviceId = crypto.randomUUID();
 
-            if (storedPassword && typeof storedPassword === "object") {
-                storedPassword = Object.values(storedPassword).join(",");
-            } else if (!storedPassword) {
-                storedPassword = "";
-            }
-
-            // التحقق من كلمة المرور
-            if (storedPassword.toString() === password) {
-
-                // ====== إضافة التحقق من انتهاء الاشتراك ======
-                const now = Date.now();
-                const subscriptionStart = userData.subscriptionStart || 0;
-                const subscriptionDurationDays = userData.subscriptionDurationDays || 21;
-                const subscriptionDurationMs = subscriptionDurationDays * 24 * 60 * 60 * 1000;
-
-                if (now > subscriptionStart + subscriptionDurationMs) {
-                    loginWarning.style.display = "block";
-                    loginWarning.innerText = "⚠ انتهت مدة الاشتراك، يرجى تجديد الاشتراك";
-                    return; // يمنع الدخول حتى تجديد الاشتراك
-                }
-                // ====== نهاية الإضافة ======
-
-                // الحصول على deviceId الحالي
-                let deviceId = localStorage.getItem("deviceId");
-                if (!deviceId) {
-                    deviceId = crypto.randomUUID();
+                db.ref("users/" + username).set({
+                    password: password,
+                    subscriptionStart: Date.now(),
+                    subscriptionDurationDays: subscriptionDays,
+                    currentDevice: deviceId
+                }).then(() => {
                     localStorage.setItem("deviceId", deviceId);
-                }
-
-                // التحقق من الجهاز المسجل في قاعدة البيانات
-                db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
-                    const currentDevice = snapshot.val();
-
-                    if (currentDevice && currentDevice !== deviceId) {
-                        loginWarning.style.display = "block";
-                        loginWarning.innerText = "⚠ حسابك مفتوح على جهاز آخر";
-                        return;
-                    }
-
-                    db.ref("users/" + username + "/currentDevice").set(deviceId);
-                    updateUserOnlineStatus(username, true);
-                    window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
-
-                    loginContainer.style.display = "none";
-                    document.getElementById("app").style.display = "block";
-
-                    if (rememberMeCheckbox.checked) {
-                        localStorage.setItem("rememberedUsername", username);
-                    } else {
-                        localStorage.removeItem("rememberedUsername");
-                    }
+                    // تسجيل الدخول مباشرة بعد إنشاء الحساب
+                    loginUser(username);
+                }).catch(err => {
+                    console.error("حدث خطأ أثناء إنشاء المستخدم:", err);
+                    alert("حدث خطأ أثناء إنشاء الحساب");
                 });
-            } else {
-                document.getElementById("error").style.display = "block";
-                document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
-            }
-        } else {
-            document.getElementById("error").style.display = "block";
-            document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
+            });
+            return;
         }
+
+        let storedPassword = userData.password;
+
+        if (storedPassword && typeof storedPassword === "object") {
+            storedPassword = Object.values(storedPassword).join(",");
+        } else if (!storedPassword) {
+            storedPassword = "";
+        }
+
+        // التحقق من كلمة المرور
+        if (storedPassword.toString() !== password) {
+            errorMsg.style.display = "block";
+            errorMsg.innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
+            return;
+        }
+
+        // تحقق من انتهاء الاشتراك
+        const subscriptionStart = userData.subscriptionStart;
+        const subscriptionDurationDays = userData.subscriptionDurationDays || 21; // افتراضي 21 يوم
+        const now = Date.now();
+        const elapsedDays = (now - subscriptionStart) / (1000 * 60 * 60 * 24);
+
+        if (elapsedDays > subscriptionDurationDays) {
+            errorMsg.style.display = "block";
+            errorMsg.innerText = "⚠ انتهى الاشتراك، يرجى تجديد طلبك";
+            return;
+        }
+
+        // إذا كانت كلمة المرور صحيحة ولم ينته الاشتراك → تسجيل الدخول
+        loginUser(username);
     }).catch(err => {
         console.error(err);
         alert("حدث خطأ في الاتصال بقاعدة البيانات");
     });
 });
+
+// دالة لتسجيل الدخول (تفصل كل المهام المتعلقة بالجهاز والواجهة)
+function loginUser(username) {
+    const loginWarning = document.getElementById("loginWarning");
+
+    // الحصول على deviceId الحالي
+    let deviceId = localStorage.getItem("deviceId");
+    if (!deviceId) {
+        deviceId = crypto.randomUUID();
+        localStorage.setItem("deviceId", deviceId);
+    }
+
+    // التحقق من الجهاز المسجل في قاعدة البيانات
+    db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
+        const currentDevice = snapshot.val();
+
+        if (currentDevice && currentDevice !== deviceId) {
+            loginWarning.style.display = "block";
+            loginWarning.innerText = "⚠ حسابك مفتوح على جهاز آخر";
+            return;
+        }
+
+        // تسجيل الدخول
+        db.ref("users/" + username + "/currentDevice").set(deviceId);
+        updateUserOnlineStatus(username, true);
+        window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
+
+        loginContainer.style.display = "none";
+        document.getElementById("app").style.display = "block";
+
+        if (rememberMeCheckbox.checked) {
+            localStorage.setItem("rememberedUsername", username);
+        } else {
+            localStorage.removeItem("rememberedUsername");
+        }
+    });
+}
 
 
 
