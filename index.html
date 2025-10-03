@@ -210,23 +210,191 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
   <p id="signupMsg" style="color:green; display:none;"></p>
   
 <!-- ملاحظة الاشتراك -->
-<div id="signupNote" style="
-    font-size: 12px;
-    color: #eee;
-    background-color: #222;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 8px 10px;
-    margin-top: 8px;
-    line-height: 1.4;
-    text-align: right;
-">
-طريقة الاشتراك ليصلك رمز التفعيل:
-<ul style="padding-left: 16px; margin: 4px 0;">
-  <li>أولاً: لو عندك أسيا سيل قم بتحويل رصيد 2$ إلى خط تالي xxxxxxxx</li>
-  <li>ثانياً: لو عندك كورك قم بتحويل رصيد 2$ إلى خط تالي xxxxxxx</li>
-</ul>
-* عند الموافقة، قم بإدخال نفس الاسم الذي أدخلته ونفس الرقم الذي كتبته في تسجيل الدخول
+<!-- طرق الاشتراك مع الشركات -->
+<div id="signupNote" style="font-size:12px;color:#eee;background:#222;border:1px solid #444;border-radius:6px;padding:8px 10px;margin-top:8px;line-height:1.4;text-align:right; position:relative;">
+  <strong style="display:block; text-align:right;">طريقة الاشتراك ليصلك رمز التفعيل:</strong>
+
+  <div style="display:flex; gap:6px; justify-content:center; margin-top:6px; position:relative;">
+
+    <!-- زر شركات الاتصالات: سماوي + مهامه كما كانت -->
+    <div style="position:relative;">
+      <button id="telecomBtn" class="slanted-btn btn1">
+        شركة الاتصال 📱
+      </button>
+
+      <!-- Dropdown الشركات (مهام كما كانت) -->
+      <div id="telecomDropdown" style="display:none; position:absolute; top:30px; right:0; background:#111; border:1px solid #555; border-radius:6px; padding:6px; width:200px; z-index:10;">
+        <div style="padding:4px 6px; cursor:pointer; border-bottom:1px solid #555;">
+          💰 أسيا - تحويل رصيد 2$ إلى الخط التالي: xxxxxxxx
+        </div>
+        <div style="padding:4px 6px; cursor:pointer;">
+          💰 زين العراق - يمكنك الدفع عن طريق المحفظة أو الماستر كارد
+        </div>
+      </div>
+    </div>
+
+    <!-- زر ماستر كارد -->
+    <div style="position:relative;">
+      <button class="slanted-btn btn2">
+        ماستر كارد 💳
+      </button>
+      <div style="display:none; position:absolute; top:30px; right:0; background:#111; border:1px solid #555; border-radius:6px; padding:6px; width:180px; z-index:10;">
+        💰 تفاصيل الدفع بالماستر كارد (يمكنك تخصيصها لاحقاً)
+      </div>
+    </div>
+
+    <!-- زر محفظة زين -->
+    <div style="position:relative;">
+      <button class="slanted-btn btn3">
+        محفظة زين 🏦
+      </button>
+      <div style="display:none; position:absolute; top:30px; right:0; background:#111; border:1px solid #555; border-radius:6px; padding:6px; width:180px; z-index:10;">
+        💰 تفاصيل الدفع عن طريق المحفظة (يمكنك تخصيصها لاحقاً)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CSS المعدل -->
+<style>
+.slanted-btn {
+  position: relative;
+  display: inline-block;
+  padding: 3px 10px;       /* تقليل الطول والعرض لكل الأزرار */
+  font-size: 12px;         /* حجم الخط */
+  color: #fff;
+  border: 1px solid #111;  /* بولدر أصغر */
+  cursor: pointer;
+  transform: skewX(-12deg); /* ميلان المستطيل */
+  overflow: hidden;
+  border-radius: 4px;       /* خفف الانحناء قليلاً */
+}
+
+/* الزوايا الخاصة */
+.slanted-btn::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: -9px;
+  width: 16px;
+  height: 16px;
+  transform: rotate(20deg);
+  border-radius: 2px;
+}
+
+.slanted-btn::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  right: -7px;
+  width: 14px;
+  height: 14px;
+  transform: rotate(45deg);
+}
+
+/* زر 1: سماوي */
+.slanted-btn.btn1 {
+  background: linear-gradient(135deg, #0077b6, #00bfff);
+  border: 1px solid #005f87;
+}
+.slanted-btn.btn1::before { background: rgba(255,255,255,0.15); }
+.slanted-btn.btn1::after { background: rgba(0,0,0,0.3); }
+
+/* زر 2: أصفر */
+.slanted-btn.btn2 {
+  background: linear-gradient(135deg, #b58900, #fff176);
+  border: 1px solid #a57c00;
+}
+.slanted-btn.btn2::before { background: rgba(255,255,255,0.2); }
+.slanted-btn.btn2::after { background: rgba(0,0,0,0.25); }
+
+/* زر 3: بنفسجي */
+.slanted-btn.btn3 {
+  background: linear-gradient(135deg, #6a0dad, #b19cd9);
+  border: 1px solid #4e0080;
+}
+.slanted-btn.btn3::before { background: rgba(255,255,255,0.15); }
+.slanted-btn.btn3::after { background: rgba(0,0,0,0.3); }
+
+</style>
+
+
+
+
+
+  </div>
+</div>
+
+<script>
+const telecomBtn = document.getElementById('telecomBtn');
+const telecomDropdown = document.getElementById('telecomDropdown');
+
+// Toggle شركات الاتصالات
+telecomBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  telecomDropdown.style.display = telecomDropdown.style.display==='block' ? 'none' : 'block';
+});
+
+// إغلاق عند الضغط خارج القائمة
+document.addEventListener('click', ()=> {
+  telecomDropdown.style.display = 'none';
+});
+</script>
+
+
+
+
+
+
+  </div>
+</div>
+
+<script>
+  const modal = document.getElementById('paymentModal');
+  const content = document.getElementById('paymentContent');
+  const telecomBtn = document.getElementById('telecomBtn');
+  const dropdown = document.getElementById('telecomDropdown');
+
+  // إظهار/إخفاء قائمة شركات الاتصالات عند الضغط على الزر
+  telecomBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // إغلاق النافذة عند الضغط خارجها
+  modal.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  // منع إغلاق عند الضغط داخل المحتوى
+  content.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+  </div>
+</div>
+
+<script>
+function toggleCompany(id){
+  const elem = document.getElementById(id);
+  if(!elem) return;
+  
+  // إغلاق أي عناصر أخرى مفتوحة ضمن نفس القسم
+  ['asiaDetails','korekDetails','zainDetails'].forEach(eid=>{
+    if(eid !== id){
+      const el = document.getElementById(eid);
+      if(el) el.style.display='none';
+    }
+  });
+
+  // عرض / إخفاء العنصر الحالي
+  elem.style.display = (elem.style.display==='block') ? 'none' : 'block';
+}
+</script>
+
 </div>
 
 
@@ -424,11 +592,11 @@ submitSignup.addEventListener("click", () => {
   const phone = document.getElementById("phone").value.trim();
   const showPassword = document.getElementById("showPassword");
 
+  // ===== التحقق من الحقول =====
   if (!newUser || !phone) {
     signupWarning.style.display = "block";
     signupWarning.innerText = "⚠ يرجى ملء جميع الحقول";
     setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
- 
     return;
   }
 
@@ -436,11 +604,9 @@ submitSignup.addEventListener("click", () => {
     signupWarning.style.display = "block";
     signupWarning.innerText = "⚠ رقم الهاتف يجب أن يحتوي على أرقام فقط";
     setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
- 
     return;
   }
 
-  // ===== تحقق الرقم يبدأ بـ 077 أو 075 أو 078 =====
   if (!/^07[578]/.test(phone)) {
     signupMsg.style.display = "block";
     signupMsg.style.color = "red";
@@ -448,40 +614,61 @@ submitSignup.addEventListener("click", () => {
     return;
   }
 
-  // ===== باقي الكود كما هو لإرسال البيانات إلى Firebase =====
+  // ===== التعامل مع Firebase =====
   db.ref("users/" + newUser).once("value").then(snapshot => {
     const data = snapshot.val();
     signupMsg.style.display = "block";
 
     if (data) {
-      // المستخدم موجود
+      // ===== المستخدم موجود =====
       if (data.phone === phone) {
-        if (data.password && data.password !== "") {
-          showPassword.style.display = "block";
-          showPassword.value = typeof data.password === "object" 
-              ? JSON.stringify(data.password) 
-              : data.password;
-          signupMsg.style.color = "green";
-          signupMsg.innerText = "تم العثور على الحساب، كلمة المرور ظهرت أدناه.";
+
+        // ===== تحقق إذا انتهت صلاحية الاشتراك =====
+        if (data.expirydate && new Date(data.expirydate) < new Date()) {
+          signupMsg.style.color = "orange";
+          signupMsg.innerText = "⚠ انتهى الاشتراك";
+
+          // زيادة عداد طلب التجديد
+          const renewals = data.renewalRequests ? data.renewalRequests + 1 : 1;
+          db.ref("users/" + newUser).update({ renewalRequests: renewals })
+            .then(() => {
+              signupMsg.innerText += ` | عدد الطلبات: ${renewals}`;
+            });
+
+          // إخفاء كلمة المرور لأنه انتهى الاشتراك
+          showPassword.style.display = "none";
+
         } else {
-          showPassword.style.display = "block";
-          showPassword.value = "";
-          signupMsg.style.color = "blue";
-          signupMsg.innerText = "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب.";
+          // ===== الاشتراك صالح، اترك كل شيء كما هو =====
+          if (data.password && data.password !== "") {
+            showPassword.style.display = "block";
+            showPassword.value = typeof data.password === "object" ? JSON.stringify(data.password) : data.password;
+            signupMsg.style.color = "green";
+            signupMsg.innerText = "تم العثور على الحساب، قم بنسخ كلمة المرور.";
+          } else {
+            showPassword.style.display = "block";
+            showPassword.value = "";
+            signupMsg.style.color = "blue";
+            signupMsg.innerText = "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب.";
+          }
         }
+
       } else {
+        // رقم الهاتف غير صحيح
         showPassword.style.display = "block";
         showPassword.value = "";
         signupMsg.style.color = "red";
         signupMsg.innerText = "رقم الهاتف غير صحيح.";
       }
+
     } else {
-      // مستخدم جديد → إضافة إلى قاعدة البيانات
+      // ===== مستخدم جديد → إنشاء الحساب =====
       db.ref("users/" + newUser).set({
         username: newUser,
         phone: phone,
         expirydate: "",
-        password: ""
+        password: "",
+        renewalRequests: 0
       }).then(() => {
         showPassword.style.display = "none";
         signupMsg.style.color = "blue";
@@ -491,11 +678,14 @@ submitSignup.addEventListener("click", () => {
         alert("فشل إرسال الطلب");
       });
     }
+
   }).catch(err => {
     console.error(err);
     alert("حدث خطأ في الاتصال بقاعدة البيانات");
   });
 });
+
+
 
 
 
@@ -728,6 +918,17 @@ document.getElementById("username").addEventListener("keydown", function(e){
   if(e.key === "Enter"){
     e.preventDefault();
     document.getElementById("password").focus();
+  }
+});
+document.getElementById("password").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    e.preventDefault();
+    document.getElementById("loginBtn").focus();
+  }
+});
+  document.getElementById("phone").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        document.getElementById("submitSignup").click();
   }
 });
 </script>
