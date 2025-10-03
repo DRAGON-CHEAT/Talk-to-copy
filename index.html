@@ -7,7 +7,7 @@
 <style>
 /* === التنسيقات الأصلية مع تعديل زر الكلمات الذكية === */
 body{ overflow: hidden; margin:0;padding:0;background-color:#000;color:#fff;/*font-family:Tahoma,sans-serif*/;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
-.login-container{background-color:#111;padding:30px;top:30px;position:relative;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}
+.login-container{background-color:#111;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}
 .login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}
 .login-container input{width:90%;padding:12px;margin-top:0px;margin:10px 0;border-radius:8px;border:1px solid #444;background-color:#1a1a1a;color:#fff;font-size:16px;text-align:center;direction:ltr;unicode-bidi:embed}
 .login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}
@@ -28,7 +28,7 @@ textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px
 #userCountContainer{top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:13px;opacity:0.8;justify-content:space-between}
 #userCount{color:#0f0}
 #logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}
-footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
+footer{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
 .container.recording{animation:rgbGlow 10s infinite linear}
 .ltr-num {
@@ -170,7 +170,7 @@ footer{margin-top:15px;font-size:14px;color:#b17215;text-align:center}
 
 <!-- إضافة زر الاشتراك في نافذة تسجيل الدخول -->
 <div class="login-container" id="login">
-  <h2>⟱ تسجيل الدخول ⟱</h2>
+  <br><br><h2>⟱ تسجيل الدخول ⟱</h2>
   <input type="text" id="username" placeholder="اسم المستخدم">
   
   <div style="position: relative;">
