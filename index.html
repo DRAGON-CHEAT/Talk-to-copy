@@ -930,29 +930,35 @@ const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
 
 
+// افترض أن هذه هي الطريقة للحصول على معرف الجهاز الحالي
+// استبدلها بالطريقة الفعلية للحصول على currentDevice للجهاز الحالي
+const currentDeviceId = "20c279a0-32ea-4770-b3ac-0c1e652e5b85";
 
-
-db.ref('users').once('value').then(snapshot => {
+db.ref('users').on('value', snapshot => {
     const users = snapshot.val();
     let remainingText = [];
 
-    // نعرض بيانات أول مستخدم فقط إذا لا يوجد currentDevice معرف
-    const firstUserKey = Object.keys(users)[0]; 
-    const user = users[firstUserKey];
+    for (const username in users) {
+        if (users.hasOwnProperty(username)) {
+            const user = users[username];
 
-    if (user && user.expirydate) {
-        const today = new Date();
-        const expiry = new Date(user.expirydate);
-        let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-        diffDays = diffDays < 0 ? 0 : diffDays;
-        remainingText.push(`${firstUserKey}: ${diffDays} Ex`);
+            // تحقق إذا كان هذا المستخدم هو صاحب الجهاز الحالي
+            if (user.currentDevice === currentDeviceId && user.expirydate) {
+                const today = new Date();
+                const expiry = new Date(user.expirydate);
+                let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                diffDays = diffDays < 0 ? 0 : diffDays; // لا تعرض أرقام سالبة
+
+                // نفس التنسيق القديم
+                remainingText.push(`${username}: ${diffDays} Ex`);
+            }
+        }
     }
 
-    if (remainingText.length === 0) {
-        document.getElementById("userCount").textContent = "لا توجد معلومات لهذا الجهاز";
-    } else {
-        document.getElementById("userCount").textContent = remainingText.join(" | ");
-    }
+    // إذا لم يوجد مستخدم مطابق للجهاز الحالي، يظل # الأعضاء: 0
+    document.getElementById("userCount").textContent = remainingText.length > 0 
+        ? remainingText.join(" | ") 
+        : "# الأعضاء: 0";
 });
 
 
