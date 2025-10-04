@@ -935,18 +935,41 @@ function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'
 
   
 const currentUser = "محمد"; // اسم المستخدم الحالي
-db.ref('users/' + currentUser).once('value').then(snapshot => {
-    const user = snapshot.val();
-    if(user && user.expirydate){
-        const today = new Date();
-        const expiry = new Date(user.expirydate.replace(/-/g, '/')); 
-        let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-        diffDays = diffDays < 0 ? 0 : diffDays;
-        document.getElementById("userCount").textContent = `${currentUser}: ${diffDays} يوم متبقي`;
-    } else {
-        document.getElementById("userCount").textContent = `${currentUser}: لم يتم تحديد تاريخ انتهاء`;
-    }
-});
+// الحصول على اسم المستخدم الحالي بعد تسجيل الدخول
+const currentUser = usernameInput.value.trim(); // أو استخدم اسم المستخدم المسجل حالياً من متغيرك
+
+// التحقق أن الاسم ليس فارغ
+if (currentUser) {
+    const userRef = db.ref('users/' + currentUser);
+
+    // استرجاع بيانات المستخدم الحالي فقط
+    userRef.once('value').then(snapshot => {
+        const user = snapshot.val();
+
+        if (user && user.expirydate) {
+            const today = new Date();
+            const expiry = new Date(user.expirydate.replace(/-/g, '/'));
+
+            // حساب الأيام المتبقية
+            let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+            diffDays = diffDays < 0 ? 0 : diffDays;
+
+            // عرض النتيجة في الصفحة
+            document.getElementById("userCount").textContent =
+                `${user.username || currentUser}: ${diffDays} يوم متبقي`;
+        } else {
+            document.getElementById("userCount").textContent =
+                `${currentUser}: لم يتم تحديد تاريخ انتهاء`;
+        }
+    }).catch(error => {
+        console.error("خطأ في قراءة بيانات المستخدم:", error);
+        document.getElementById("userCount").textContent =
+            "حدث خطأ أثناء تحميل البيانات.";
+    });
+} else {
+    console.warn("اسم المستخدم غير محدد!");
+    document.getElementById("userCount").textContent = "لم يتم تحديد المستخدم.";
+}
 
 
 
