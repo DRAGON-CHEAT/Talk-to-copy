@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convert audio</title>
+<style>
+/* === التنسيقات الأصلية مع تعديل زر الكلمات الذكية === */
+body{ overflow: hidden; margin:0;padding:0;background-color:#000;color:#fff;/*font-family:Tahoma,sans-serif*/;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
+.login-container{background-color:#111;padding:15px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.15);text-align:center;width:90%;max-width:400px;display:none}
+.login-container h2{margin-bottom:20px;font-size:22px;color:#ffcc00}
+.login-container input{width:90%;padding:12px;margin-top:0px;margin:10px 0;border-radius:8px;border:1px solid #444;background-color:#1a1a1a;color:#fff;font-size:16px;text-align:center;direction:ltr;unicode-bidi:embed}
+.login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}
+.login-container button{/*padding:12px 24px;*/font-size:18px;/*margin-top:15px;*/border:none;border-radius:8px;background-color:#6aab30d9;color:white;cursor:pointer;transition:0.3s}
+.login-container button:hover{opacity:0.85}
+.container{top:-34px;background-color:#111;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:82%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
+h1{font-family:bodoni,cursive; color:rgba(196, 144, 217, 0.70); margin-bottom:0px;font-size:17px;transition:font-size 0.3s ease}
+button{padding:12px 24px;font-size:18px;margin:0px 0px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}
+#startBtn{background-color:#4CAF50;color:white}
+#stopBtn{background-color:#f44336;color:white;display:none}
+button:hover{opacity:0.85}
+#recordingIndicator{display:none;color:#ff5252;font-weight:bold;font-size:11px;margin-top:0px}
+#recordingDot{display:inline-block;width:12px;height:12px;background-color:red;border-radius:50%;margin-left:8px;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+#output{background:#222;border:1px solid #444;padding:15px; width:93%; border-radius:8px;margin-top:5px;font-size:18px;min-height:5px; /*white-space:pre-wrap;*/color:#ddd;transition:font-size 0.3s ease,padding 0.3s ease;direction:rtl;unicode-bidi:embed;text-align:center;position:relative;user-select:none}
+#outputText{pointer-events:none} 
+textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px;border:1px solid #555;background-color:#1a1a1a;color:#fff;resize:vertical;transition:font-size 0.3s ease,padding 0.3s ease}
+#userCountContainer{top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:13px;opacity:0.8;justify-content:space-between}
+#userCount{color:#0f0}
+#logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}
+footer{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
+@keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
+.container.recording{animation:rgbGlow 10s infinite linear}
+.ltr-num {
+  direction: ltr;
+  unicode-bidi: embed;
+}
+  
+#autoRestartCheckbox:hover + #autoRestartTooltip {
+    visibility: visible;
+    opacity: 1;
+}
+/* === تعديل زر الكلمات الذكية === */
+#smartWordsBtn {
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    padding: 3px 6px;
+    font-size: 12px;
+    background-color: #564d4d;
+    color: #fff;
+    border: none;
+    /*border-radius: 4px;*/
+    cursor: pointer;
+    z-index: 50;
+}
+#smartWordsMenu {
+    position: absolute;
+    top: 25px;
+    left: 5px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 6px;
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 51;
+    width:80%;
+}
+.smartWordItem{display:flex;justify-content:space-between;align-items:center;background:#333;padding:2px 6px;border-radius:4px;cursor:pointer}
+.smartWordItem span{flex:1;text-align:center}
+.smartWordItem button{background:red;color:#fff;border:none;border-radius:4px;padding:0 4px;margin-left:4px;cursor:pointer}
+#smartAddInput{display:flex;gap:4px;margin-bottom:4px}
+#smartAddInput input{flex:1;padding:4px;border-radius:4px;border:1px solid #555;background:#111;color:#fff;width:70px;font-size:11px}
+#smartAddInput button{padding:4px 8px;border-radius:4px;border:none;background:#4CAF50;color:#fff;font-size:12px;cursor:pointer}
+
+/* === زر القائمة العلوية === */
+#menuBtn{
+    position: absolute;
+    /*top: 0px;*/
+    left: 17px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    background-color: #444;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1000;
+}
+/* === القائمة الجانبية المصغرة والمنسقة === */
+#sideMenu {
+    position: absolute;
+    top: 17px;
+    left: 17px;
+    width: 111px; /* جعلها أقل عرضًا */
+    background-color: #0a0909;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 12px 8px 12px 12px; /* تقليل البادينج من اليمين */
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+    box-shadow: 3px 3px 12px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateX(-220px);
+    opacity: 0;
+}
+
+/* ظهور القائمة */
+#sideMenu.show {
+    display: flex;
+    transform: translateX(0);
+    opacity: 1;
+}
+
+#togglePassword {
+  user-select: none;   /* منع التحديد */
+  -webkit-user-select: none; /* منع التحديد في كروم/سفاري */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* كلمة الرجوع الصغيرة في أعلى القائمة */
+#backBtn {
+    background: none;
+    border: none;
+    color: #ffcc00;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: left;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 8px;
+    transition: color 0.2s ease;
+}
+#backBtn:hover {
+    color: #ffff66;
+}
+
+/* أزرار القائمة الأخرى */
+#sideMenu .menuItem {
+    padding: 8px 10px; /* تقليل البادينج قليلاً */
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+#sideMenu .menuItem:hover {
+    background-color: #444;
+    transform: translateX(3px);
+}
+
+/* === استجابة الشاشة === */
+@media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
+@media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+</head>
+<body>
+
+<!-- إضافة زر الاشتراك في نافذة تسجيل الدخول -->
+<div class="login-container" id="login">
+  <br><br><h2>⟱ تسجيل الدخول ⟱</h2>
+  <input type="text" id="username" placeholder="اسم المستخدم">
+  
+  <div style="position: relative;">
+  <input type="password" id="password" placeholder="كلمة المرور" required>
+  <span id="togglePassword" 
+        style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;">
+     «»
+  </span>
+</div>
+
+  <label><input type="checkbox" id="rememberMe"> ذكرني</label>
+  <button id="loginBtn">دخول</button>
+<button id="signupBtn">اشترك</button>
+<p id="loginWarning" style="color:orange; display:none; margin-top:5px; font-size:14px;"></p>
+<p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
+
+<br><br><a href="https://wa.me/9647731200180" target="_blank" 
+   style="
+      position: fixed;
+      bottom: 20px;
+      left: 10px;
+      background-color: rgba(37, 211, 102, 12%); /* أخضر شفاف */
+      color: white;
+      padding: 4px 6px; /* أصغر من قبل */
+      border-radius: 50px;
+      font-size: 11px; /* أصغر */
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 9999;
+      transition: transform 0.2s, opacity 0.2s; /* تأثير عند المرور */
+   "
+   onmouseover="this.style.transform='scale(1.1)'; this.style.opacity='1';"
+   onmouseout="this.style.transform='scale(1)'; this.style.opacity='0.8';"
+>
+   ✆ واتساب
+</a>
+
+
+</div>
+
+<!-- نافذة إنشاء حساب جديدة -->
+<div class="login-container" id="signupContainer" style="display:none;">
+  <h2>⟱ إنشاء حساب ⟱</h2>
+  <input type="text" id="newUsername" placeholder="اسم المستخدم">
+  <input type="text" id="phone" placeholder="رقم الهاتف" class="ltr-num">
+  
+  <!-- خانة كلمة المرور المسترجعة -->
+<input type="password" id="showPassword" placeholder="كلمة المرور ستظهر هنا" 
+       readonly style="margin-top:10px; cursor:pointer; display:block;">
+
+<!-- عنصر الرسالة يظهر هنا -->
+<span id="copyMessage" style="color:#0f0; font-size:14px; display:none; margin-top:6px;top:-11px;"></span>
+
+  
+  <button id="submitSignup">إرسال طلب</button>
+  <button id="cancelSignup">إلغاء</button>
+<p id="signupWarning" style="color:orange; display:none; margin-top:5px; font-size:14px;"></p>
+  <!-- رسالة حالة -->
+  <p id="signupMsg" style="color:green; display:none;"></p>
+  
+<!-- ملاحظة الاشتراك -->
+<!-- طرق الاشتراك مع الشركات -->
+<div id="signupNote" style="font-size:12px;color:#2be3c9;/*background:#222;border:1px solid #444;*/border-radius:6px;padding:8px 10px;margin-top:8px;line-height:1.4;text-align:right; position:relative;">
+  <strong style="display:block;text-align:right;">طرق الاشتراك لتفعيل الحساب:</strong>
+
+  <div style="display:flex; gap:9px; justify-content:center; margin-top:6px; position:relative;">
+
+    <!-- زر شركات الاتصالات: سماوي + مهامه كما كانت -->
+    <div style="position:relative;">
+      <button id="telecomBtn" class="slanted-btn btn1">
+        شركة الاتصال 
+      </button>
+
+      <!-- Dropdown الشركات (مهام كما كانت) -->
+      <div id="telecomDropdown" style="display:none; position:absolute; top:0px; right:0; background:#111; border:1px solid #555; border-radius:6px; padding:6px; width:200px; z-index:10;">
+        <div style="padding:4px 6px; cursor:pointer; border-bottom:1px solid #555;">
+          💰 أسيا - تحويل رصيد 2$ إلى الخط التالي: xxxxxxxx
+        </div>
+        <div style="padding:4px 6px; cursor:pointer;">
+          💰 زين العراق - يمكنك الدفع عن طريق المحفظة أو الماستر كارد
+        </div>
+      </div>
+    </div>
+
+    <!-- زر ماستر كارد -->
+    <div style="position:relative;">
+      <button class="slanted-btn btn2">
+        ماستر كارد
+      </button>
+      <div style="display:none; position:absolute; top:30px; right:0; background:#111; border:1px solid #555; border-radius:6px; padding:6px; width:180px; z-index:10;">
+        💰 تفاصيل الدفع بالماستر كارد (يمكنك تخصيصها لاحقاً)
+      </div>
+    </div>
+
+    <!-- زر محفظة زين -->
+    <div style="position:relative;">
+      <button class="slanted-btn btn3">
+        محفظة زين
+      </button>
+      <div style="display:none; position:absolute; top:30px; right:0; background:#111; border:1px solid #555; border-radius:6px; padding:6px; width:180px; z-index:10;">
+        💰 تفاصيل الدفع عن طريق المحفظة (يمكنك تخصيصها لاحقاً)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CSS المعدل -->
+<style>
+.slanted-btn {
+  position: relative;
+  display: inline-block;
+  padding: 3px 10px;       /* تقليل الطول والعرض لكل الأزرار */
+  font-size: 12px;         /* حجم الخط */
+  color: #fff;
+  border: 1px solid #111;  /* بولدر أصغر */
+  cursor: pointer;
+  transform: skewX(-12deg); /* ميلان المستطيل */
+  overflow: hidden;
+  border-radius: 4px;       /* خفف الانحناء قليلاً */
+}
+
+/* الزوايا الخاصة */
+.slanted-btn::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  right: -9px;
+  width: 16px;
+  height: 16px;
+  transform: rotate(20deg);
+  border-radius: 2px;
+}
+
+.slanted-btn::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  right: -7px;
+  width: 14px;
+  height: 14px;
+  transform: rotate(45deg);
+}
+
+/* زر 1: سماوي */
+.slanted-btn.btn1 {
+  background: linear-gradient(135deg, #0077b6, #00bfff);
+  border: 1px solid #005f87;
+}
+.slanted-btn.btn1::before { background: rgba(255,255,255,0.15); }
+.slanted-btn.btn1::after { background: rgba(0,0,0,0.3); }
+
+/* زر 2: أصفر */
+.slanted-btn.btn2 {
+  background: linear-gradient(135deg, #b58900, #fff176);
+  border: 1px solid #a57c00;
+}
+.slanted-btn.btn2::before { background: rgba(255,255,255,0.2); }
+.slanted-btn.btn2::after { background: rgba(0,0,0,0.25); }
+
+/* زر 3: بنفسجي */
+.slanted-btn.btn3 {
+  background: linear-gradient(135deg, #6a0dad, #b19cd9);
+  border: 1px solid #4e0080;
+}
+.slanted-btn.btn3::before { background: rgba(255,255,255,0.15); }
+.slanted-btn.btn3::after { background: rgba(0,0,0,0.3); }
+
+</style>
+
+
+
+
+
+  </div>
+</div>
+
+<script>
+const telecomBtn = document.getElementById('telecomBtn');
+const telecomDropdown = document.getElementById('telecomDropdown');
+
+// Toggle شركات الاتصالات
+telecomBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  telecomDropdown.style.display = telecomDropdown.style.display==='block' ? 'none' : 'block';
+});
+
+// إغلاق عند الضغط خارج القائمة
+document.addEventListener('click', ()=> {
+  telecomDropdown.style.display = 'none';
+});
+</script>
+
+
+
+
+
+
+  </div>
+</div>
+<script>
+  const modal = document.getElementById('paymentModal');
+  const content = document.getElementById('paymentContent');
+  const telecomBtn = document.getElementById('telecomBtn');
+  const dropdown = document.getElementById('telecomDropdown');
+
+  // إظهار/إخفاء قائمة شركات الاتصالات عند الضغط على الزر
+  telecomBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // إغلاق النافذة عند الضغط خارجها
+  modal.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+
+  // منع إغلاق عند الضغط داخل المحتوى
+  content.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+</script>
+
+
+  </div>
+</div>
+
+<script>
+function toggleCompany(id){
+  const elem = document.getElementById(id);
+  if(!elem) return;
+  
+  // إغلاق أي عناصر أخرى مفتوحة ضمن نفس القسم
+  ['asiaDetails','korekDetails','zainDetails'].forEach(eid=>{
+    if(eid !== id){
+      const el = document.getElementById(eid);
+      if(el) el.style.display='none';
+    }
+  });
+
+  // عرض / إخفاء العنصر الحالي
+  elem.style.display = (elem.style.display==='block') ? 'none' : 'block';
+}
+</script>
+
+</div>
+
+
+
+</div>
+
+<script>
+// === Firebase ===
+const firebaseConfig = {
+  apiKey: "AIzaSyDa1_gisk5GuTvRzACp0lA1TGe3-b2Sz8A",
+  authDomain: "dragon-tv-3e8c1.firebaseapp.com",
+  databaseURL: "https://dragon-tv-3e8c1-default-rtdb.firebaseio.com",
+  projectId: "dragon-tv-3e8c1",
+  storageBucket: "dragon-tv-3e8c1.firebasestorage.app",
+  messagingSenderId: "909817368695",
+  appId: "1:909817368695:web:b5e9ffccafefcbc41a7672"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// عناصر DOM
+const loginBtn = document.getElementById("loginBtn");
+const signupBtn = document.getElementById("signupBtn");
+const signupContainer = document.getElementById("signupContainer");
+const cancelSignup = document.getElementById("cancelSignup");
+const submitSignup = document.getElementById("submitSignup");
+const signupMsg = document.getElementById("signupMsg");
+const loginContainer = document.getElementById("login");
+
+
+
+
+// ===== ميزة تسجيل الدخول + تذكر اسم المستخدم + دعم كلمة المرور JSON =====
+const usernameInput = document.getElementById("username");
+const passwordInput = document.getElementById("password");
+const rememberMeCheckbox = document.getElementById("rememberMe");
+
+
+
+
+// منع التحديد عند الضغط على العين
+togglePassword.addEventListener("mousedown", (e) => {
+    e.preventDefault(); // يمنع تحديد النص
+    passwordInput.type = "text";
+});
+
+togglePassword.addEventListener("mouseup", () => {
+    passwordInput.type = "password";
+});
+togglePassword.addEventListener("mouseleave", () => {
+    passwordInput.type = "password";
+});
+
+// للموبايل
+togglePassword.addEventListener("touchstart", (e) => {
+    e.preventDefault(); // يمنع التحديد/التكبير
+    passwordInput.type = "text";
+});
+togglePassword.addEventListener("touchend", () => {
+    passwordInput.type = "password";
+});
+
+
+
+
+window.addEventListener("load", () => {
+    // تعبئة اسم المستخدم إذا تم تذكره
+    const savedUsername = localStorage.getItem("rememberedUsername");
+    if (savedUsername) {
+        usernameInput.value = savedUsername;
+        rememberMeCheckbox.checked = true;
+    }
+});
+
+  
+loginBtn.addEventListener("click", () => {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    const loginWarning = document.getElementById("loginWarning");
+
+    if (!username || !password) {
+        loginWarning.style.display = "block";
+        loginWarning.innerText = "⚠ يرجى ملء اسم المستخدم وكلمة المرور";
+        setTimeout(() => { loginWarning.style.display = "none"; }, 3000);
+        return;
+    } else {
+        loginWarning.style.display = "none";
+    }
+
+    db.ref("users/" + username).once("value").then(snapshot => {
+        const userData = snapshot.val();
+
+        if (userData) {
+            // ✅ تحقق من انتهاء الاشتراك فقط إذا كانت expiryDate موجودة
+            if (userData.expirydate) {
+                const today = new Date();
+                const expirydate = new Date(userData.expirydate);
+
+                if (today > expirydate) {
+                    // انتهاء الاشتراك → حذف كلمة المرور و expiryDate
+                    db.ref("users/" + username).update({
+                        password: null,
+                    });
+                    document.getElementById("error").style.display = "block";
+                    document.getElementById("error").innerText = "⚠ انتهت صلاحية الاشتراك";
+                    return; // منع الدخول
+                }
+            }
+
+            let storedPassword = userData.password;
+
+            // دعم أي نوع: نص عادي أو JSON
+            if (storedPassword && typeof storedPassword === "object") {
+                storedPassword = Object.values(storedPassword).join(",");
+            } else if (!storedPassword) {
+                storedPassword = "";
+            }
+
+            // التحقق من كلمة المرور
+            if (storedPassword.toString() === password) {
+
+                // الحصول على deviceId الحالي
+                let deviceId = localStorage.getItem("deviceId");
+                if (!deviceId) {
+                    deviceId = crypto.randomUUID();
+                    localStorage.setItem("deviceId", deviceId);
+                }
+
+                // التحقق من الجهاز المسجل في قاعدة البيانات
+                db.ref("users/" + username + "/currentDevice").once("value").then(snapshot => {
+                    const currentDevice = snapshot.val();
+
+                    if (currentDevice && currentDevice !== deviceId) {
+                        loginWarning.style.display = "block";
+                        loginWarning.innerText = "⚠ حسابك مفتوح على جهاز آخر";
+                        return;
+                    }
+
+                    // إذا لم يكن هناك جهاز آخر، أو نفس الجهاز → تسجيل الدخول
+                    db.ref("users/" + username + "/currentDevice").set(deviceId);
+                    updateUserOnlineStatus(username, true);
+                    window.addEventListener("beforeunload", () => updateUserOnlineStatus(username, false));
+
+                    loginContainer.style.display = "none";
+                    document.getElementById("app").style.display = "block";
+
+                    if (rememberMeCheckbox.checked) {
+                        localStorage.setItem("rememberedUsername", username);
+                    } else {
+                        localStorage.removeItem("rememberedUsername");
+                    }
+                });
+            } else {
+                document.getElementById("error").style.display = "block";
+                document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
+            }
+        } else {
+            document.getElementById("error").style.display = "block";
+            document.getElementById("error").innerText = "!! اسم المستخدم أو كلمة المرور غير صحيحة";
+        }
+    }).catch(err => {
+        console.error(err);
+        alert("حدث خطأ في الاتصال بقاعدة البيانات");
+    });
+});
+
+
+
+
+
+
+
+
+
+// فتح نافذة الاشتراك
+signupBtn.addEventListener("click", () => {
+  loginContainer.style.display = "none";
+  signupContainer.style.display = "block";
+  signupMsg.style.display = "none";
+});
+
+// إلغاء الاشتراك
+cancelSignup.addEventListener("click", () => {
+  signupContainer.style.display = "none";
+  loginContainer.style.display = "block";
+  signupMsg.style.display = "none";
+});
+
+// إرسال طلب الاشتراك إلى Firebase
+const signupWarning = document.getElementById("signupWarning");
+
+submitSignup.addEventListener("click", () => {
+  const newUser = document.getElementById("newUsername").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const showPassword = document.getElementById("showPassword");
+
+  // ===== التحقق من الحقول =====
+  if (!newUser || !phone) {
+    signupWarning.style.display = "block";
+    signupWarning.innerText = "⚠ يرجى ملء جميع الحقول";
+    setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
+    return;
+  }
+
+  if (!/^\d+$/.test(phone)) {
+    signupWarning.style.display = "block";
+    signupWarning.innerText = "⚠ رقم الهاتف يجب أن يحتوي على أرقام فقط";
+    setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
+    return;
+  }
+
+  if (!/^07[578]/.test(phone)) {
+    signupMsg.style.display = "block";
+    signupMsg.style.color = "red";
+    signupMsg.innerText = "❌ الرقم غير صالح";
+    return;
+  }
+
+  // ===== التعامل مع Firebase =====
+  db.ref("users/" + newUser).once("value").then(snapshot => {
+    const data = snapshot.val();
+    signupMsg.style.display = "block";
+
+    if (data) {
+      // ===== المستخدم موجود =====
+      if (data.phone === phone) {
+
+        // ===== تحقق إذا انتهت صلاحية الاشتراك =====
+        if (data.expirydate && new Date(data.expirydate) < new Date()) {
+          signupMsg.style.color = "orange";
+          signupMsg.innerText = "⚠ انتهى الاشتراك";
+
+          // زيادة عداد طلب التجديد
+          const renewals = data.renewalRequests ? data.renewalRequests + 1 : 1;
+          db.ref("users/" + newUser).update({ renewalRequests: renewals })
+            .then(() => {
+              signupMsg.innerText += ` | طلب اعادة تفعيل: ${renewals}`;
+            });
+
+          // إخفاء كلمة المرور لأنه انتهى الاشتراك
+          showPassword.style.display = "none";
+
+        } else {
+          // ===== الاشتراك صالح، اترك كل شيء كما هو =====
+          if (data.password && data.password !== "") {
+            showPassword.style.display = "block";
+            showPassword.value = typeof data.password === "object" ? JSON.stringify(data.password) : data.password;
+            signupMsg.style.color = "green";
+            signupMsg.innerText = "تم العثور على الحساب، قم بنسخ كلمة المرور.";
+          } else {
+            showPassword.style.display = "block";
+            showPassword.value = "";
+            signupMsg.style.color = "Pink";
+            signupMsg.innerText = "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب.";
+          }
+        }
+
+      } else {
+        // رقم الهاتف غير صحيح
+        showPassword.style.display = "block";
+        showPassword.value = "";
+        signupMsg.style.color = "red";
+        signupMsg.innerText = "رقم الهاتف غير صحيح.";
+      }
+
+    } else {
+      // ===== مستخدم جديد → إنشاء الحساب =====
+      db.ref("users/" + newUser).set({
+        username: newUser,
+        phone: phone,
+        expirydate: "",
+        password: "",
+        renewalRequests: 0
+      }).then(() => {
+        showPassword.style.display = "none";
+        signupMsg.style.color = "blue";
+        signupMsg.innerText = "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب.";
+      }).catch(err => {
+        console.error(err);
+        alert("فشل إرسال الطلب");
+      });
+    }
+
+  }).catch(err => {
+    console.error(err);
+    alert("حدث خطأ في الاتصال بقاعدة البيانات");
+  });
+});
+
+
+
+
+
+
+const showPassword = document.getElementById("showPassword");
+const copyMessage = document.getElementById("copyMessage"); // عنصر الرسالة
+
+showPassword.addEventListener("click", () => {
+    const value = showPassword.value.trim();
+
+    if (!value) return; // إذا فارغ لا ينسخ شيء
+
+    navigator.clipboard.writeText(value).then(() => {
+        copyMessage.style.display = "inline";
+        copyMessage.innerText = "تم النسخ ✅";
+        setTimeout(() => { copyMessage.style.display = "none"; }, 1200);
+    }).catch(() => {
+        // fallback لو المتصفح لا يدعم clipboard API
+        const temp = document.createElement("textarea");
+        temp.value = value;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+        copyMessage.style.display = "inline";
+        copyMessage.innerText = "تم النسخ ✅";
+        setTimeout(() => { copyMessage.style.display = "none"; }, 1200);
+    });
+});
+
+
+
+  
+function logout() {
+    const username = localStorage.getItem("rememberedUsername");
+
+    if (!username) {
+        alert("لم يتم العثور على اسم المستخدم!");
+        return;
+    }
+
+    // حذف currentDevice من Firebase
+    firebase.database().ref(`users/${username}/currentDevice`).remove()
+        .then(() => {
+            console.log("تم حذف currentDevice بنجاح!");
+
+            // مسح بيانات تسجيل الدخول من localStorage
+            localStorage.removeItem("rememberedUsername");
+            localStorage.removeItem("rememberedPassword");
+
+            // إعادة تحميل الصفحة لتظهر نافذة تسجيل الدخول
+            window.location.reload();
+        })
+        .catch((error) => {
+            console.error("حدث خطأ أثناء تسجيل الخروج:", error);
+            alert("حدث خطأ، حاول مرة أخرى.");
+        });
+}
+
+
+
+
+
+
+
+
+  
+
+
+</script>
+
+<br><br>
+<div class="container" id="app">
+<div id="userCountContainer">
+  <div id="userCount"># الأعضاء: 0</div>
+ <!-- الزر الأصلي للقائمة -->
+<button id="menuBtn">☰ قائمة</button>
+
+<!-- القائمة الجانبية -->
+<div id="sideMenu">
+    <button id="backBtn">رجوع</button>
+    <button class="menuItem" onclick="logout()">تسجيل خروج</button>
+    <button class="menuItem" onclick="helpModal.style.display='block'">التعليمات</button>
+</div>
+ 
+</div>
+<h1> [ Convert Audio To Text In Iraqi ]</h1><br>
+<button id="startBtn" onclick="startRecognition()">[▶︎] أبدء الكلام</button>
+<label style="display:inline-flex;/*margin-right:10px;*/ cursor:pointer; user-select:none; position:relative; flex-direction:column; top:-2%">
+  <input type="checkbox" id="autoRestartCheckbox">  مستمر
+  <span id="autoRestartTooltip" style="
+        visibility:hidden;
+        background-color:#333;
+        color:#fff;
+        text-align:center;
+        border-radius:6px;
+        padding:5px;
+        position:absolute;
+        z-index:100;
+        font-size:12px;
+        top:-30px;
+        right:0;
+        opacity:0;
+        transition: opacity 0.3s;">
+    عند تفعيل هذا الخيار سيعمل التسجيل تلقائيًا بدون توقف
+  </span>
+</label>
+<button id="stopBtn" onclick="stopRecognition()">[X] إيقاف الكلام</button>
+
+<div id="recordingIndicator">
+  <span id="recordingDot"></span> ▶︎ جاري التحويل...
+</div>
+
+<div id="output">
+  <div id="outputText"></div>
+  <button id="smartWordsBtn">تصحيح</button>
+  <div id="smartWordsMenu">
+    <div id="smartAddInput">
+      <input type="text" id="wrongWord" placeholder="أدخل الكلمة الخاطئة">
+      <input type="text" id="correctWord" placeholder="أدخل التصحيح">
+      <button onclick="addSmartWord()">إضافة</button>
+    </div>
+    <div id="smartWordsList"></div>
+
+    <!-- أزرار التصدير والاستيراد (صغيرتان ومتناسقتان) -->
+    <div style="display:flex; gap:4px; margin-top:-6px; justify-content:right;">
+      <button onclick="exportSmartWords()" 
+              style="padding:2px 6px;background:#4CAF50;color:#fff;border:none;border-radius:4px;font-size:12px;">تصدير</button>
+      
+      <button onclick="document.getElementById('importFile').click()" 
+              style="padding:2px 6px;background:#2196F3;color:#fff;border:none;border-radius:4px;font-size:12px;">استيراد</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importSmartWords(event)">
+    </div>
+  </div>
+</div>
+
+<div id="historyContainer" style="
+    width:100%; min-height:110px; max-height:120px;
+    border:1px solid #555; border-radius:6px;
+    background:#1a1a1a; margin-top:11px;
+    display:flex; flex-direction:column; gap:6px;
+">
+
+  <!-- الشريط العلوي للأزرار -->
+  <div style="display:flex; justify-content:space-between; padding:3px;">
+    <button id="toggleHistoryBtn" title="تبديل العرض"
+      style="background-color:#564d4d; color:#c5b4b4; padding:3px 8px; font-size:12px;">
+      ⇄
+    </button>
+
+    <button id="copyAllHistoryBtn" title="نسخ الكل"
+      style="background-color:#353d48; color:#c5b4b4; padding:3px 8px; font-size:12px;">
+      نسخ الكل
+    </button>
+  </div>
+
+  <!-- قائمة السجل -->
+  <div id="history" style="
+      flex:1; overflow-y:auto; padding:5px;
+      display:flex; flex-direction:column; gap:4px;
+      align-items:center; text-align:center;
+  ">
+  </div>
+
+  <!-- الشريط السفلي -->
+  <div style="display:flex; justify-content:right; padding:3px;">
+    <button id="clearHistoryBtn" title="حذف الكل"
+      style=" background-color:#8f2424; color:#c5b4b4;
+             border:none; border-radius:6px;
+             font-size:12px; padding:4px 8px; cursor:pointer;">
+      حذف الكل
+    </button>
+  </div>
+</div>
+
+<br>
+<footer>
+  &copy; DRAGON&CHEAT 2025 
+</footer>
+
+<div id="helpModal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 400px;
+    background-color: #111;
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+    text-align: center;
+    z-index: 10000;
+">
+    <h3>تعليمات الاستخدام</h3>
+    <p>
+
+       
+        0. لتسجيل الدخول أدخل اسم المستخدم وكلمة المرور. <br>
+        1. اضغط على زر ▶︎ لبدء التسجيل الصوتي للكلام.<br>
+        2. اضغط على زر X لإيقاف التسجيل صوتي كلام.<br>
+        3. يدعم الغة العربية فصحى-عراقية وارقام لاتينية.<br>
+        4. يمكنك نسخ النتائج وحذفها من صندوق التاريخ.<br>
+        5. يمكنك كتابة تصحيح وحفظ لايفهمه محرك<br>
+        6.دعم للسنوات واشهر والايام عند نطق بها عند كلام <br>
+        7.يجب ان يتوفر لديك مكرفون وأنترنت مستقر  <br><br>
+      ®جميع حقوق محفوظة™
+    </p>
+    <button onclick="helpModal.style.display='none'" 
+        style="margin-top:15px;padding:8px 16px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;">
+        إغلاق
+    </button>
+</div>
+
+<script>
+// === دوال Firebase + تسجيل دخول ===
+function base64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
+const deviceId = crypto.randomUUID();
+function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
+
+
+// افترض أن هذه هي الطريقة للحصول على معرف الجهاز الحالي
+// استبدلها بالطريقة الفعلية للحصول على currentDevice للجهاز الحالي
+const currentDeviceId = "20c279a0-32ea-4770-b3ac-0c1e652e5b85";
+
+try {
+    // معرف الجهاز الحالي يجب أن يكون محفوظ مسبقاً عند تسجيل الدخول
+    const currentDeviceId = localStorage.getItem('deviceId') || ''; 
+
+    db.ref('users').on('value', snapshot => {
+        const users = snapshot.val();
+        let remainingText = '';
+
+        if (users) {
+            for (const username in users) {
+                if (users.hasOwnProperty(username)) {
+                    const user = users[username];
+
+                    if (user.currentDevice && user.expirydate) {
+                        if (user.currentDevice === currentDeviceId) {
+                            const today = new Date();
+                            const expiry = new Date(user.expirydate);
+
+                            if (!isNaN(expiry.getTime())) {
+                                let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                                diffDays = diffDays < 0 ? 0 : diffDays;
+                                remainingText = `${username}: ${diffDays} Ex`;
+                            }
+                            break; // وجد المستخدم الحالي
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!remainingText) remainingText = "لا توجد معلومات لهذا الجهاز";
+
+        const userCountElement = document.getElementById("userCount");
+        if (userCountElement) {
+            userCountElement.textContent = remainingText;
+        }
+    });
+} catch (e) {
+    console.error("حدث خطأ: ", e);
+    document.body.innerHTML = "<h1>حدث خطأ يرجى إعادة تحميل الصفحة</h1>";
+}
+
+
+
+
+
+window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(loggedInPermanent && !loggedInSession){alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");sessionStorage.setItem("loggedInSession","true");location.reload();return;}if(loggedInPermanent||loggedInSession){const user=document.getElementById("username").value.trim();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("login").style.display="block";}}
+</script>
+<script>
+// انتقال بالإنتر من اسم المستخدم إلى كلمة المرور
+document.getElementById("username").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    e.preventDefault();
+    document.getElementById("password").focus();
+  }
+});
+document.getElementById("password").addEventListener("keydown", function(e){
+  if(e.key === "Enter"){
+    e.preventDefault();
+    document.getElementById("loginBtn").focus();
+  }
+});
+
+  document.getElementById("phone").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+        document.getElementById("submitSignup").click();
+  }
+});
+</script>
+<script>
+// === التعرف الصوتي + تحويل الكلمات إلى أرقام + الكلمات الذكية ===
+let recognition;
+let smartWords = {};
+const autoRestartCheckbox = document.getElementById("autoRestartCheckbox");
+
+function applySmartWords(text) {
+  for (const wrong in smartWords) {
+    if (smartWords.hasOwnProperty(wrong)) {
+      const correct = smartWords[wrong];
+      // استبدال كل كلمة خاطئة بالتصحيح
+      text = text.split(wrong).join(correct);
+    }
+  }
+  return text;
+}
+  
+  function wordsToNumbersInText(text) {
+  const units = {
+    "صفر":0,"واحد":1,"واحدة":1,"احت":1,"احدع":1,
+    "اثنان":2,"اثنين":2,"اثنتان":2,"اثنتين":2,"ثنين":2,
+    "ثلاثة":3,"ثلاث":3,"اتلاثه":3,"تلات":3,"تلث":3,
+    "أربعة":4,"اربعه":4,"اربع":4,
+    "خمسة":5,"خمسه":5,
+    "ستة":6,"سته":6,
+    "سبعة":7,"سبعه":7,
+    "ثمانية":8,"ثمانيه":8,"ثمن":8,"اثمن":8,
+    "تسعة":9,"تسعه":9
+  };
+
+  const teens = {
+    "عشرة":10,"عشر":10,
+    "احد عشر":11,"أحد عشر":11,"احدى عشر":11,"إحدى عشر":11,"احدعش":11,
+    "اثنا عشر":12,"اثني عشر":12,"اثنعش":12,"ثنعش":12,
+    "ثلاثة عشر":13,"ثلاث عشر":13,"تلاتطعش":13,"تلطعش":13,
+    "أربعة عشر":14,"اربعة عشر":14,"اربعتعش":14,
+    "خمسة عشر":15,"خمسطعش":15,
+    "ستة عشر":16,"ستطعش":16,
+    "سبعة عشر":17,"سبعطعش":17,
+    "ثمانية عشر":18,"ثمانطعش":18,"ثمنطعش":18,
+    "تسعة عشر":19,"تسعطعش":19
+  };
+
+  const tens = {
+    "عشرون":20,"عشرين":20,
+    "ثلاثون":30,"ثلاثين":30,
+    "أربعون":40,"اربعين":40,
+    "خمسون":50,"خمسين":50,
+    "ستون":60,"ستين":60,
+    "سبعون":70,"سبعين":70,
+    "ثمانون":80,"ثمانين":80,
+    "تسعون":90,"تسعين":90
+  };
+
+  const hundreds = {
+    "مائة":100,"مئة":100,"مية":100,"ميّه":100,
+    "مئتين":200,"ميتين":200,
+    "ثلاثمائة":300,"ثلاثمية":300,"تلثمية":300,
+    "أربعمائة":400,"اربعماية":400,"اربعمية":400,
+    "خمسمائة":500,"خمسماية":500,
+    "ستمائة":600,"ستمية":600,
+    "سبعمائة":700,"سبعمية":700,
+    "ثمانمائة":800,"ثمانمية":800,"ثمنمية":800,
+    "تسعمائة":900,"تسعمية":900,"تسعميه":900
+  };
+
+  const multipliers = {
+    "ألف":1000,"الف":1000,
+    "ألفين":2000,"الفين":2000,
+    "آلاف":1000,"تالاف":1000,
+    "مليون":1000000,"مليونان":2000000,"مليونين":2000000,
+    "ملايين":1000000
+  };
+
+  const allWords = { ...units, ...teens, ...tens, ...hundreds, ...multipliers };
+
+  const tokens = text.replace(/،/g, " ").replace(/ و /g, " ").trim().split(/\s+/);
+  let resultWords = [];
+  let numberBuffer = [];
+
+  function processBuffer(buffer) {
+    let total = 0, current = 0;
+    buffer.forEach(word => {
+      if (teens[word] !== undefined) current += teens[word];
+      else if (units[word] !== undefined) current += units[word];
+      else if (tens[word] !== undefined) current += tens[word];
+      else if (hundreds[word] !== undefined) current += hundreds[word];
+      else if (multipliers[word] !== undefined) {
+        if (multipliers[word] >= 1000) {
+          current = (current === 0 ? 1 : current) * multipliers[word];
+          total += current;
+          current = 0;
+        } else {
+          current *= multipliers[word];
+        }
+      }
+    });
+    total += current;
+    return total.toLocaleString("en-US");
+  }
+
+  for (let i = 0; i < tokens.length; i++) {
+    const word = tokens[i];
+    const twoWords = word + " " + (tokens[i+1] || "");
+    if (teens[twoWords]) {
+      numberBuffer.push(twoWords);
+      i++;
+      continue;
+    }
+    if (allWords[word]) {
+      numberBuffer.push(word);
+    } else {
+      if (numberBuffer.length > 0) {
+        const num = processBuffer(numberBuffer);
+        resultWords.push('<span class="ltr-num">' + num + '</span>');
+        numberBuffer = [];
+      }
+      resultWords.push(" " + word);
+    }
+  }
+  if (numberBuffer.length > 0) {
+    const num = processBuffer(numberBuffer);
+    resultWords.push('<span class="ltr-num">' + num + '</span>');
+
+  }
+  return resultWords.join(" ").trim();
+}  
+      
+function extractDateFromText(text){
+  const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
+  const match=text.match(regex);
+  if(match){
+    let [_,year,month,day]=match.map(Number);
+    if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){
+      return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
+    }
+  }
+  if(/سنة|شهر|يوم/.test(text)){
+    const parts=text.split(/\s+/).map(p=>parseInt(p)).filter(n=>!isNaN(n));
+    if(parts.length>=3){
+      const [year,month,day]=parts;
+      if(year>=1000 && year<=2999 && month>=1 && month<=12 && day>=1 && day<=31){
+        return `${year}/${String(month).padStart(2,"0")}/${String(day).padStart(2,"0")}`;
+      }
+    }
+  }
+  return null;
+}
+
+function startRecognition(){
+  const SpeechRecognition = window.webkitSpeechRecognition;
+  if(!SpeechRecognition){
+    alert("❌ هذه الميزة تعمل فقط على متصفح Chrome.");
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'ar-IQ';
+  recognition.interimResults = false;
+
+  recognition.onstart = function(){
+    document.querySelector(".container").classList.add("recording");
+    document.getElementById("recordingIndicator").style.display = "block";
+    document.getElementById("startBtn").style.display = "none";
+    document.getElementById("stopBtn").style.display = "inline-block";
+  };
+// فلتر لتحديد تكرار الأرقام بحد أقصى 3 مرات
+function limitNumberRepeats(text) {
+  return text.replace(/\b(\d)\b(\s+\1){3,}/g, (match, num) => {
+    return num.repeat(3); // يخلي الرقم يتكرر 3 مرات فقط
+  });
+}  
+  recognition.onresult = function(event) {
+    try {
+      const transcript = event.results[0][0].transcript || "";
+
+      let preApplied = applySmartWords(transcript);
+      let converted = wordsToNumbersInText(preApplied || "");
+      converted = applySmartWords(converted);
+
+    // ✨ فلتر تحديد التكرار للأرقام ✨
+    converted = limitNumberRepeats(converted);
+
+      const dateFormat = extractDateFromText(converted);
+      const outputText = dateFormat ? dateFormat : converted;
+
+      // عرض النتائج مع HTML لواجهة المستخدم
+      document.getElementById("outputText").innerHTML = outputText;
+      addToHistory(outputText);
+
+      // نسخ النص النظيف فقط بدون أي <span>
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = outputText;
+      const cleanText = tempDiv.textContent || tempDiv.innerText || "";
+      navigator.clipboard.writeText(cleanText).catch(()=>{});
+  } catch (err) {
+    console.error("onresult error:", err);
+  }
+};
+
+    recognition.onend = function(){
+    document.querySelector(".container").classList.remove("recording");
+    document.getElementById("recordingIndicator").style.display = "none";
+    document.getElementById("startBtn").style.display = "inline-block";
+    document.getElementById("stopBtn").style.display = "none";
+
+    // إعادة تشغيل التسجيل تلقائيًا إذا تم التفعيل
+    if(autoRestartCheckbox.checked) {
+      startRecognition();
+    }
+  };
+
+  recognition.start();
+}
+
+function stopRecognition(){ 
+  if(recognition){ recognition.stop(); }
+}
+document.getElementById("startBtn").onclick = startRecognition;
+document.getElementById("stopBtn").onclick = stopRecognition;
+
+// === سجل التاريخ ===
+const historyEl = document.getElementById("history");
+const toggleBtn = document.getElementById("toggleHistoryBtn");
+const copyAllBtn = document.getElementById("copyAllHistoryBtn");
+let isHorizontal = false;
+const clearAllBtn = document.getElementById("clearHistoryBtn");
+clearAllBtn.addEventListener("click", ()=>{
+  historyEl.innerHTML = ""; // يمسح كل السجل مباشرة
+});
+
+toggleBtn.addEventListener("click", ()=>{
+  if(isHorizontal){
+    historyEl.style.flexDirection = "column";
+    historyEl.style.flexWrap = "nowrap";
+  } else {
+    historyEl.style.flexDirection = "row";
+    historyEl.style.flexWrap = "wrap";
+  }
+  isHorizontal = !isHorizontal;
+});
+
+copyAllBtn.addEventListener("click", ()=>{
+  let allText = Array.from(historyEl.children)
+    .map(d => d.childNodes[0].textContent.trim()) // استبعاد زر الحذف (X)
+    .join(isHorizontal ? " " : "\n"); // أفقي = مسافة / عمودي = سطر جديد
+
+  navigator.clipboard.writeText(allText).then(()=>{
+    const existingIcon = copyAllBtn.querySelector("span");
+    if(existingIcon) existingIcon.remove();
+    const icon = document.createElement("span");
+    icon.innerText = "[√]";
+    icon.style.marginLeft = "6px";
+    copyAllBtn.appendChild(icon);
+    setTimeout(()=>{icon.remove();},1000);
+  });
+});
+
+function addToHistory(text){
+  const lineDiv = document.createElement("div");
+  lineDiv.style.display = "flex";
+  lineDiv.style.alignItems = "center";
+  lineDiv.style.gap = "6px";
+  lineDiv.style.padding = "2px 6px";
+  lineDiv.style.background = "#1a1a1a";
+  lineDiv.style.borderRadius = "4px";
+  lineDiv.style.margin = "2px 2px";
+  lineDiv.style.width = "auto";
+
+  // عنصر مؤقت لتحويل HTML إلى نص خام
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = text;
+  const cleanText = tempDiv.textContent || tempDiv.innerText || "";
+
+  // النص
+  const spanText = document.createElement("span");
+  spanText.innerText = cleanText; // استخدم النص النظيف
+  spanText.style.cursor = "pointer";
+  spanText.style.flex = "1";
+  spanText.style.textAlign = "center";
+
+  // نسخ عند الضغط
+  spanText.addEventListener("click", ()=>{
+    navigator.clipboard.writeText(cleanText).then(()=>{
+      const copyIcon = document.createElement("span");
+      copyIcon.innerText = "[√]";
+      copyIcon.style.marginLeft = "6px";
+      spanText.appendChild(copyIcon);
+      setTimeout(()=>{copyIcon.remove();},1000);
+    });
+  });
+
+  // زر الحذف ❌
+  const delBtn = document.createElement("button");
+  delBtn.innerText = "X";
+  delBtn.style.background = "red";
+  delBtn.style.color = "white";
+  delBtn.style.border = "none";
+  delBtn.style.borderRadius = "3px";
+  delBtn.style.cursor = "pointer";
+  delBtn.style.fontSize = "12px";
+  delBtn.style.padding = "0 3px";
+
+  delBtn.addEventListener("click", (e)=>{
+    e.stopPropagation(); // منع نسخ النص عند الضغط على زر الحذف
+    lineDiv.remove();
+  });
+
+  lineDiv.appendChild(spanText);
+  lineDiv.appendChild(delBtn);
+
+  if (historyEl.firstChild) {
+    historyEl.insertBefore(lineDiv, historyEl.firstChild); 
+  } else {
+    historyEl.appendChild(lineDiv);
+  }
+
+  historyEl.scrollTop = 0;
+}
+
+function toggleSmartMenu(){smartMenu.style.display="none";}
+
+// === زر القائمة العلوية ===
+const menuBtn = document.getElementById('menuBtn');
+const sideMenu = document.getElementById('sideMenu');
+const backBtn = document.getElementById('backBtn');
+
+menuBtn.addEventListener('click', () => {
+    sideMenu.classList.add('show');
+    menuBtn.style.display = 'none';
+});
+
+backBtn.addEventListener('click', () => {
+    sideMenu.classList.remove('show');
+    setTimeout(() => menuBtn.style.display = 'inline-block', 300); 
+});
+
+window.addEventListener('click', (e) => {
+    if (!menuBtn.contains(e.target) && !sideMenu.contains(e.target)) {
+        sideMenu.classList.remove('show');
+        setTimeout(() => menuBtn.style.display = 'inline-block', 300);
+    }
+});
+
+// === زر الاستعلام الدائري أسفل الفوتر ===
+//هناك عنصر مع id="helpBtn" لذا نتحقق من وجوده قبل إضافة مستمعي الأحداث حتى لا يسبب خطأ.
+const helpBtn = document.getElementById('helpBtn');
+const helpModal = document.getElementById('helpModal');
+if(helpBtn){
+  helpBtn.addEventListener('mouseenter', ()=>{
+      helpBtn.style.backgroundColor = 'rgba(255, 204, 0, 1)';
+      helpBtn.style.boxShadow = '0 0 20px rgba(255,255,0,0.8)';
+  });
+
+  helpBtn.addEventListener('mouseleave', ()=>{
+      helpBtn.style.backgroundColor = 'rgba(255, 204, 0, 0.4)';
+      helpBtn.style.boxShadow = '0 0 10px rgba(255,255,0,0.3)';
+  });
+
+  helpBtn.addEventListener('click', ()=>{
+      helpModal.style.display = 'block';
+  });
+}
+
+window.addEventListener('click', (e)=>{
+    if(e.target === helpModal){
+        helpModal.style.display = 'none';
+    }
+});
+
+// === تصدير الكلمات الذكية كملف JSON ===
+function exportSmartWords() {
+  try {
+    const dataStr = JSON.stringify(smartWords, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    // اسم الملف قابل للتغيير لو أردت
+    a.download = "recovery_txt.json";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  } catch (err) {
+    alert("فشل التصدير");
+  }
+}
+
+// === استيراد الكلمات الذكية من ملف JSON ===
+function importSmartWords(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (typeof imported === "object" && imported !== null) {
+        // دمج المحتوى المستورد مع smartWords الحالي
+        smartWords = { ...smartWords, ...imported };
+        renderSmartWords();
+        alert("√ تم استيراد الكلمات بنجاح");
+      } else {
+        alert("X تنسيق الملف غير صحيح");
+      }
+    } catch (err) {
+      alert("X ملف غير صالح");
+    }
+    // إعادة تعيين قيمة input حتى تسمح بتحميل نفس الملف مرة ثانية إذا رغب المستخدم
+    event.target.value = "";
+  };
+  reader.readAsText(file);
+}
+
+// === زر "إدراج تصحيح" ===
+// === زر "إدراج تصحيح" مع تغيير النص وإغلاق عند الضغط خارج ===
+const smartBtn = document.getElementById("smartWordsBtn");
+const smartMenu = document.getElementById("smartWordsMenu");
+let menuOpen = false;
+
+smartBtn.addEventListener("click", (e) => {
+  e.stopPropagation(); // منع حدث الإغلاق عند الضغط على الزر نفسه
+  menuOpen = !menuOpen;
+  smartMenu.style.display = menuOpen ? "flex" : "none";
+  smartBtn.innerText = menuOpen ? "إغلاق" : "ادراج تصحيح";
+  smartMenu.style.flexDirection = "column";
+});
+
+// إغلاق القائمة عند الضغط في أي مكان آخر
+window.addEventListener("click", (e) => {
+  if(menuOpen && !smartMenu.contains(e.target) && e.target !== smartBtn) {
+    smartMenu.style.display = "none";
+    smartBtn.innerText = "ادراج تصحيح";
+    menuOpen = false;
+  }
+});
+
+// دالة لإضافة الكلمة الخاطئة + التصحيح
+function addSmartWord() {
+  const wrong = document.getElementById("wrongWord").value.trim();
+  const correct = document.getElementById("correctWord").value.trim();
+
+  if (wrong && correct) {
+    smartWords[wrong] = correct;
+    renderSmartWords();
+    document.getElementById("wrongWord").value = "";
+    document.getElementById("correctWord").value = "";
+  }
+}
+
+// دالة عرض الكلمات المضافة
+function renderSmartWords() {
+  const list = document.getElementById("smartWordsList");
+  list.innerHTML = "";
+  for (const wrong in smartWords) {
+    const div = document.createElement("div");
+    div.className = "smartWordItem";
+    div.innerHTML = `<span>${wrong} → ${smartWords[wrong]}</span>`;
+    const delBtn = document.createElement("button");
+    delBtn.innerText = "X";
+    delBtn.onclick = () => {
+      delete smartWords[wrong];
+      renderSmartWords();
+    };
+    div.appendChild(delBtn);
+    list.appendChild(div);
+  }
+}
+</script>
+</body>
+</html>
+>
