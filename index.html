@@ -933,20 +933,34 @@ const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
 
 
+  
 // عند تسجيل الدخول ناجحاً، احصل على اسم المستخدم الحالي
-const currentUser = usernameInput.value.trim(); // أو username من تسجيل الدخول
-db.ref('users/' + currentUser).once('value').then(snapshot => {
-    const user = snapshot.val();
-    if(user && user.expirydate){
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+
+const db = getFirestore();
+
+async function getRemainingDays(userId) {
+    const userRef = doc(db, "users", userId); // افترض أن مجموعة المستخدمين اسمها "users"
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+        const data = userSnap.data();
+        const expiryDate = new Date(data.expirydate);
         const today = new Date();
-        const expiry = new Date(user.expirydate);
-        let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-        diffDays = diffDays < 0 ? 0 : diffDays;
-        document.getElementById("userCount").textContent = `${currentUser}: ${diffDays} Ex`;
+
+        const diffTime = expiryDate - today; // الفرق بالميلي ثانية
+        const remainingDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // الأيام المتبقية
+
+        return remainingDays > 0 ? remainingDays : 0; // إذا انتهت الصلاحية، يرجع 0
     } else {
-        document.getElementById("userCount").textContent = `${currentUser}: 0 Ex`;
+        console.log("المستخدم غير موجود");
+        return null;
     }
-});
+}
+
+// مثال للاستخدام
+getRemainingDays("userId_here").then(days => console.log("الأيام المتبقية:", days));
+
 
 
 
