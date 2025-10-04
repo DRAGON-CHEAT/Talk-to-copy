@@ -653,7 +653,7 @@ submitSignup.addEventListener("click", () => {
           const renewals = data.renewalRequests ? data.renewalRequests + 1 : 1;
           db.ref("users/" + newUser).update({ renewalRequests: renewals })
             .then(() => {
-              signupMsg.innerText += ` | عدد الطلبات: ${renewals}`;
+              signupMsg.innerText += ` | طلب اعادة تفعيل: ${renewals}`;
             });
 
           // إخفاء كلمة المرور لأنه انتهى الاشتراك
@@ -669,7 +669,7 @@ submitSignup.addEventListener("click", () => {
           } else {
             showPassword.style.display = "block";
             showPassword.value = "";
-            signupMsg.style.color = "blue";
+            signupMsg.style.color = "Pink";
             signupMsg.innerText = "تم إرسال الطلب، يرجى الانتظار حتى تفعيل الحساب.";
           }
         }
@@ -955,7 +955,7 @@ try {
                             if (!isNaN(expiry.getTime())) {
                                 let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
                                 diffDays = diffDays < 0 ? 0 : diffDays;
-                                remainingText = `${username}: ${diffDays} day`;
+                                remainingText = `${username}: ${diffDays} Ex`;
                             }
                             break; // وجد المستخدم الحالي
                         }
