@@ -930,26 +930,31 @@ const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
 
 
-db.ref('users').on('value', snapshot => {
+
+
+db.ref('users').once('value').then(snapshot => {
     const users = snapshot.val();
     let remainingText = [];
 
-    // هنا نفترض أن لديك معرف المستخدم الحالي، مثلاً currentUser
-    const currentUser = "محمد"; // ضع هنا اسم المستخدم الحالي
+    // نعرض بيانات أول مستخدم فقط إذا لا يوجد currentDevice معرف
+    const firstUserKey = Object.keys(users)[0]; 
+    const user = users[firstUserKey];
 
-    if (users.hasOwnProperty(currentUser)) {
-        const user = users[currentUser];
-        if (user.expirydate) {
-            const today = new Date();
-            const expiry = new Date(user.expirydate);
-            let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-            diffDays = diffDays < 0 ? 0 : diffDays; // لا تعرض أرقام سالبة
-            remainingText.push(`${currentUser}: ${diffDays} Ex`);
-        }
+    if (user && user.expirydate) {
+        const today = new Date();
+        const expiry = new Date(user.expirydate);
+        let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+        diffDays = diffDays < 0 ? 0 : diffDays;
+        remainingText.push(`${firstUserKey}: ${diffDays} Ex`);
     }
 
-    document.getElementById("userCount").textContent = remainingText.join(" | ");
+    if (remainingText.length === 0) {
+        document.getElementById("userCount").textContent = "لا توجد معلومات لهذا الجهاز";
+    } else {
+        document.getElementById("userCount").textContent = remainingText.join(" | ");
+    }
 });
+
 
 
 
