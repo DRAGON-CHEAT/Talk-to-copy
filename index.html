@@ -933,6 +933,8 @@ const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
 
 
+
+  
 db.ref('users').on('value', snapshot => {
     const users = snapshot.val();
     let remainingText = [];
@@ -940,7 +942,8 @@ db.ref('users').on('value', snapshot => {
     for (const username in users) {
         if (users.hasOwnProperty(username)) {
             const user = users[username];
-            if (user.expirydate) {
+            // تحقق من أن هذا هو المستخدم الحالي فقط
+            if (user.currentDevice === currentDevice && user.expirydate) {
                 const today = new Date();
                 const expiry = new Date(user.expirydate);
                 let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
@@ -952,6 +955,9 @@ db.ref('users').on('value', snapshot => {
 
     document.getElementById("userCount").textContent = remainingText.join(" | ");
 });
+
+
+  
 
 
 window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(loggedInPermanent && !loggedInSession){alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");sessionStorage.setItem("loggedInSession","true");location.reload();return;}if(loggedInPermanent||loggedInSession){const user=document.getElementById("username").value.trim();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("login").style.display="block";}}
