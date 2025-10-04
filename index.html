@@ -933,25 +933,21 @@ const deviceId = crypto.randomUUID();
 function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'+username+'/'+deviceId);if(online){ref.set(true);ref.onDisconnect().remove();}else{ref.remove();db.ref('onlineUsers/'+username).once('value',snap=>{if(!snap.exists()){db.ref('onlineUsers/'+username).remove();}});}}
 
 
-db.ref('users').on('value', snapshot => {
-    const users = snapshot.val();
-    let remainingText = [];
-
-    for (const username in users) {
-        if (users.hasOwnProperty(username)) {
-            const user = users[username];
-            if (user.expirydate) {
-                const today = new Date();
-                const expiry = new Date(user.expirydate);
-                let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-                diffDays = diffDays < 0 ? 0 : diffDays; // لا تعرض أرقام سالبة
-                remainingText.push(`${username}: ${diffDays} Ex`);
-            }
-        }
+// عند تسجيل الدخول ناجحاً، احصل على اسم المستخدم الحالي
+const currentUser = usernameInput.value.trim(); // أو username من تسجيل الدخول
+db.ref('users/' + currentUser).once('value').then(snapshot => {
+    const user = snapshot.val();
+    if(user && user.expirydate){
+        const today = new Date();
+        const expiry = new Date(user.expirydate);
+        let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+        diffDays = diffDays < 0 ? 0 : diffDays;
+        document.getElementById("userCount").textContent = `${currentUser}: ${diffDays} Ex`;
+    } else {
+        document.getElementById("userCount").textContent = `${currentUser}: 0 Ex`;
     }
-
-    document.getElementById("userCount").textContent = remainingText.join(" | ");
 });
+
 
 
 window.onload=function(){const loggedInPermanent=localStorage.getItem("loggedIn")==="true";const loggedInSession=sessionStorage.getItem("loggedInSession")==="true";if(loggedInPermanent && !loggedInSession){alert("√ سيتم تسجيل الدخول تلقائيًا الآن...");sessionStorage.setItem("loggedInSession","true");location.reload();return;}if(loggedInPermanent||loggedInSession){const user=document.getElementById("username").value.trim();document.getElementById("login").style.display="none";document.getElementById("app").style.display="block";updateUserOnlineStatus(user,true);window.addEventListener("beforeunload",()=>updateUserOnlineStatus(user,false));}else{document.getElementById("login").style.display="block";}}
