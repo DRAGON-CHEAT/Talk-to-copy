@@ -934,32 +934,48 @@ function updateUserOnlineStatus(username,online){const ref=db.ref('onlineUsers/'
 // استبدلها بالطريقة الفعلية للحصول على currentDevice للجهاز الحالي
 const currentDeviceId = "20c279a0-32ea-4770-b3ac-0c1e652e5b85";
 
-db.ref('users').on('value', snapshot => {
-    const users = snapshot.val();
-    let remainingText = [];
+try {
+    // معرف الجهاز الحالي يجب أن يكون محفوظ مسبقاً عند تسجيل الدخول
+    const currentDeviceId = localStorage.getItem('deviceId') || ''; 
 
-    for (const username in users) {
-        if (users.hasOwnProperty(username)) {
-            const user = users[username];
+    db.ref('users').on('value', snapshot => {
+        const users = snapshot.val();
+        let remainingText = '';
 
-            // تحقق إذا كان هذا المستخدم هو صاحب الجهاز الحالي
-            if (user.currentDevice === currentDeviceId && user.expirydate) {
-                const today = new Date();
-                const expiry = new Date(user.expirydate);
-                let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-                diffDays = diffDays < 0 ? 0 : diffDays; // لا تعرض أرقام سالبة
+        if (users) {
+            for (const username in users) {
+                if (users.hasOwnProperty(username)) {
+                    const user = users[username];
 
-                // نفس التنسيق القديم
-                remainingText.push(`${username}: ${diffDays} Ex`);
+                    if (user.currentDevice && user.expirydate) {
+                        if (user.currentDevice === currentDeviceId) {
+                            const today = new Date();
+                            const expiry = new Date(user.expirydate);
+
+                            if (!isNaN(expiry.getTime())) {
+                                let diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                                diffDays = diffDays < 0 ? 0 : diffDays;
+                                remainingText = `${username}: ${diffDays} Ex`;
+                            }
+                            break; // وجد المستخدم الحالي
+                        }
+                    }
+                }
             }
         }
-    }
 
-    // إذا لم يوجد مستخدم مطابق للجهاز الحالي، يظل # الأعضاء: 0
-    document.getElementById("userCount").textContent = remainingText.length > 0 
-        ? remainingText.join(" | ") 
-        : "# الأعضاء: 0";
-});
+        if (!remainingText) remainingText = "لا توجد معلومات لهذا الجهاز";
+
+        const userCountElement = document.getElementById("userCount");
+        if (userCountElement) {
+            userCountElement.textContent = remainingText;
+        }
+    });
+} catch (e) {
+    console.error("حدث خطأ: ", e);
+    document.body.innerHTML = "<h1>حدث خطأ يرجى إعادة تحميل الصفحة</h1>";
+}
+
 
 
 
