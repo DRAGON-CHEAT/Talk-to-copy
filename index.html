@@ -366,17 +366,13 @@ document.addEventListener('click', ()=> {
 });
 </script>
 
-
-
-
-
-
   </div>
 </div>
 <script>
   const modal = document.getElementById('paymentModal');
   const content = document.getElementById('paymentContent');
-  const dropdown = document.getElementById('telecomDropdown');
+  var telecomBtn = telecomBtn || document.getElementById('telecomBtn');
+var telecomDropdown = telecomDropdown || document.getElementById('telecomDropdown');
 
   // إظهار/إخفاء قائمة شركات الاتصالات عند الضغط على الزر
   telecomBtn.addEventListener('click', (e) => {
