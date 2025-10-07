@@ -1203,6 +1203,27 @@ function limitNumberRepeats(text) {
   }
 };
 
+
+// اختر العنصر الذي يحتوي على النص
+const outputDiv = document.getElementById("outputText");
+
+if (outputDiv) {
+  const observer = new MutationObserver(() => {
+    const text = outputDiv.innerText.trim();
+    if (text) {
+      // إرسال النص مباشرة إلى background.js في الإضافة
+      chrome.runtime.sendMessage({ action: "inject_text", text });
+    }
+  });
+
+  // مراقبة التغييرات في النص داخل العنصر
+  observer.observe(outputDiv, { childList: true, subtree: true, characterData: true });
+}
+
+
+
+  
+
     recognition.onend = function(){
     document.querySelector(".container").classList.remove("recording");
     document.getElementById("recordingIndicator").style.display = "none";
