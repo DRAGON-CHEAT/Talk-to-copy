@@ -592,6 +592,14 @@ submitSignup.addEventListener("click", () => {
     return;
   }
 
+  // ===== تحقق من طول اسم المستخدم =====
+  if (newUser.length < 8) {
+    signupWarning.style.display = "block";
+    signupWarning.innerText = "⚠ يجب أن يكون اسم المستخدم ثنائي على الأقل";
+    setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
+    return;
+  }
+  
   if (!/^\d+$/.test(phone)) {
     signupWarning.style.display = "block";
     signupWarning.innerText = "⚠ رقم الهاتف يجب أن يحتوي على أرقام فقط";
@@ -602,7 +610,7 @@ submitSignup.addEventListener("click", () => {
   if (!/^07[578]/.test(phone)) {
     signupMsg.style.display = "block";
     signupMsg.style.color = "red";
-    signupMsg.innerText = "❌ الرقم غير صالح";
+    signupMsg.innerText = "⚠ الرقم غير صالح";
     return;
   }
 
