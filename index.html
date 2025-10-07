@@ -353,20 +353,16 @@ footer{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
   const dropdown = document.getElementById('telecomDropdown');
 
   // إظهار/إخفاء قائمة شركات الاتصالات عند الضغط على الزر
-  telecomBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-  });
+  // Toggle شركات الاتصالات
+telecomBtn.addEventListener('click', e=>{
+  e.stopPropagation();
+  telecomDropdown.style.display = telecomDropdown.style.display==='block' ? 'none' : 'block';
+});
 
-  // إغلاق النافذة عند الضغط خارجها
-  modal.addEventListener('click', () => {
-    modal.style.display = 'none';
-  });
-
-  // منع إغلاق عند الضغط داخل المحتوى
-  content.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
+// إغلاق عند الضغط خارج القائمة
+document.addEventListener('click', ()=> {
+  telecomDropdown.style.display = 'none';
+});
 </script>
 
 
