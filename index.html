@@ -342,39 +342,15 @@ footer{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 .slanted-btn.btn3::after { background: rgba(0,0,0,0.3); }
 
 </style>
-
-
-
-
-
   </div>
 </div>
-
-<script>
-const telecomBtn = document.getElementById('telecomBtn');
-const telecomDropdown = document.getElementById('telecomDropdown');
-
-// Toggle شركات الاتصالات
-telecomBtn.addEventListener('click', e=>{
-  e.stopPropagation();
-  telecomDropdown.style.display = telecomDropdown.style.display==='block' ? 'none' : 'block';
-});
-
-// إغلاق عند الضغط خارج القائمة
-document.addEventListener('click', ()=> {
-  telecomDropdown.style.display = 'none';
-});
-</script>
 
   </div>
 </div>
 <script>
   const modal = document.getElementById('paymentModal');
   const content = document.getElementById('paymentContent');
-  var telecomBtn = window.telecomBtn || document.getElementById('telecomBtn');
-var telecomDropdown = window.telecomDropdown || document.getElementById('telecomDropdown');
-window.telecomBtn = telecomBtn;
-window.telecomDropdown = telecomDropdown;
+  const dropdown = document.getElementById('telecomDropdown');
 
   // إظهار/إخفاء قائمة شركات الاتصالات عند الضغط على الزر
   telecomBtn.addEventListener('click', (e) => {
