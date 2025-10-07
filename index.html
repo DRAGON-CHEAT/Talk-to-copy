@@ -1205,22 +1205,6 @@ function limitNumberRepeats(text) {
   }
 };
 
-
-const outputDiv = document.getElementById("outputText");
-
-if (outputDiv) {
-  const observer = new MutationObserver(() => {
-    const text = outputDiv.innerText.trim();
-    if (text) {
-      chrome.runtime.sendMessage({ action: "inject_text", text });
-    }
-  });
-
-  observer.observe(outputDiv, { childList: true, subtree: true, characterData: true });
-}
-
-
-
     recognition.onend = function(){
     document.querySelector(".container").classList.remove("recording");
     document.getElementById("recordingIndicator").style.display = "none";
