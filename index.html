@@ -371,8 +371,10 @@ document.addEventListener('click', ()=> {
 <script>
   const modal = document.getElementById('paymentModal');
   const content = document.getElementById('paymentContent');
-  var telecomBtn = telecomBtn || document.getElementById('telecomBtn');
-var telecomDropdown = telecomDropdown || document.getElementById('telecomDropdown');
+  var telecomBtn = window.telecomBtn || document.getElementById('telecomBtn');
+var telecomDropdown = window.telecomDropdown || document.getElementById('telecomDropdown');
+window.telecomBtn = telecomBtn;
+window.telecomDropdown = telecomDropdown;
 
   // إظهار/إخفاء قائمة شركات الاتصالات عند الضغط على الزر
   telecomBtn.addEventListener('click', (e) => {
