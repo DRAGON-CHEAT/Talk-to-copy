@@ -218,7 +218,7 @@ footer{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
   <input type="text" id="phone" placeholder="رقم الهاتف" class="ltr-num">
   
   <!-- خانة كلمة المرور المسترجعة -->
-<input type="password" id="showPassword" placeholder="Password verification" 
+<input type="password" id="showPassword" placeholder="كلمة المرور ستظهر هنا" 
        readonly style="margin-top:10px; cursor:pointer; display:block;">
 
 <!-- عنصر الرسالة يظهر هنا -->
@@ -458,23 +458,6 @@ window.addEventListener("load", () => {
     if (savedUsername) {
         usernameInput.value = savedUsername;
         rememberMeCheckbox.checked = true;
-
-        // 🔽 هنا نجلب كلمة المرور من Firebase تلقائياً
-        db.ref("users/" + savedUsername).once("value").then(snapshot => {
-            const userData = snapshot.val();
-            if (userData && userData.password) {
-                let storedPassword = userData.password;
-
-                // دعم كلمات مرور ككائن (JSON)
-                if (typeof storedPassword === "object") {
-                    storedPassword = Object.values(storedPassword).join(",");
-                }
-
-                passwordInput.value = storedPassword; // ✅ تعبئة كلمة المرور التلقائية
-            } else {
-                passwordInput.value = "";
-            }
-        }).catch(err => console.error("Firebase error:", err));
     }
 });
 
@@ -575,37 +558,6 @@ loginBtn.addEventListener("click", () => {
 
 
 
-// === تعبئة كلمة المرور تلقائياً عند إدخال اسم المستخدم ===
-usernameInput.addEventListener("input", () => {
-  const username = usernameInput.value.trim();
-  const passwordField = document.getElementById("password");
-
-  if (username.length === 0) {
-    passwordField.value = ""; // مسح كلمة المرور إن لم يُكتب اسم مستخدم
-    return;
-  }
-
-  // البحث عن المستخدم في قاعدة البيانات
-  db.ref("users/" + username).once("value").then(snapshot => {
-    const userData = snapshot.val();
-
-    if (userData && userData.password) {
-      let storedPassword = userData.password;
-
-      // دعم كلمات مرور على شكل كائن JSON
-      if (typeof storedPassword === "object") {
-        storedPassword = Object.values(storedPassword).join(",");
-      }
-
-      passwordField.value = storedPassword; // ✅ تعبئة كلمة المرور تلقائياً
-    } else {
-      passwordField.value = ""; // لا يوجد مستخدم بهذا الاسم
-    }
-  }).catch(err => {
-    console.error("Firebase error:", err);
-  });
-});
-
 
 
 
@@ -635,7 +587,7 @@ submitSignup.addEventListener("click", () => {
   // ===== التحقق من الحقول =====
   if (!newUser || !phone) {
     signupWarning.style.display = "block";
-    signupWarning.innerText = "⚠ يرجى ملء حقل أسم المستخدم ورقم هاتف";
+    signupWarning.innerText = "⚠ يرجى ملء جميع الحقول";
     setTimeout(() => { signupWarning.style.display = "none"; }, 3000);
     return;
   }
@@ -692,7 +644,7 @@ submitSignup.addEventListener("click", () => {
             showPassword.style.display = "block";
             showPassword.value = typeof data.password === "object" ? JSON.stringify(data.password) : data.password;
             signupMsg.style.color = "green";
-            signupMsg.innerText = "تم العثور على الحساب، توجه الى تسجل دخول .";
+            signupMsg.innerText = "تم العثور على الحساب، قم بنسخ كلمة المرور.";
           } else {
             showPassword.style.display = "block";
             showPassword.value = "";
@@ -741,10 +693,28 @@ submitSignup.addEventListener("click", () => {
 const showPassword = document.getElementById("showPassword");
 const copyMessage = document.getElementById("copyMessage"); // عنصر الرسالة
 
-showPassword.addEventListener("click", (e) => {
-    e.preventDefault(); 
-});
+showPassword.addEventListener("click", () => {
+    const value = showPassword.value.trim();
 
+    if (!value) return; // إذا فارغ لا ينسخ شيء
+
+    navigator.clipboard.writeText(value).then(() => {
+        copyMessage.style.display = "inline";
+        copyMessage.innerText = "تم النسخ ✅";
+        setTimeout(() => { copyMessage.style.display = "none"; }, 1200);
+    }).catch(() => {
+        // fallback لو المتصفح لا يدعم clipboard API
+        const temp = document.createElement("textarea");
+        temp.value = value;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand("copy");
+        document.body.removeChild(temp);
+        copyMessage.style.display = "inline";
+        copyMessage.innerText = "تم النسخ ✅";
+        setTimeout(() => { copyMessage.style.display = "none"; }, 1200);
+    });
+});
 
 
 
