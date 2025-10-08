@@ -783,7 +783,7 @@ function logout() {
 <div id="sideMenu">
     <button id="backBtn">رجوع</button>
     <button class="menuItem" onclick="logout()">تسجيل خروج</button>
-    <button class="menuItem" onclick="helpModal.style.display='block'">التعليمات</button>
+    <button class="menuItem" id="helpBtn">التعليمات</button>
 <button class="menuItem" onclick="window.open('https://wa.me/9647731200180', '_blank')">تواصل</button>
 </div>
  
@@ -882,6 +882,10 @@ function logout() {
   &copy; DRAGON&CHEAT 2025 
 </footer2>
 
+<!-- زر التعليمات -->
+
+
+<!-- نافذة التعليمات -->
 <div id="helpModal" style="
     display: none;
     position: fixed;
@@ -897,26 +901,47 @@ function logout() {
     box-shadow: 0 0 20px rgba(255,255,255,0.3);
     text-align: center;
     z-index: 10000;
+    max-height: 70vh;
+    overflow-y: auto;
 ">
     <h3>تعليمات الاستخدام</h3>
     <p>
-
-       
         0. لتسجيل الدخول أدخل اسم المستخدم وكلمة المرور. <br>
         1. اضغط على زر ▶︎ لبدء التسجيل الصوتي للكلام.<br>
         2. اضغط على زر X لإيقاف التسجيل صوتي كلام.<br>
-        3. يدعم الغة العربية فصحى-عراقية وارقام لاتينية.<br>
+        3. يدعم اللغة العربية فصحى-عراقية وأرقام لاتينية.<br>
         4. يمكنك نسخ النتائج وحذفها من صندوق التاريخ.<br>
-        5. يمكنك كتابة تصحيح وحفظ لايفهمه محرك<br>
-        6.دعم للسنوات واشهر والايام عند نطق بها عند كلام <br>
-        7.يجب ان يتوفر لديك مكرفون وأنترنت مستقر  <br><br>
-      ®جميع حقوق محفوظة™
+        5. يمكنك كتابة تصحيح وحفظ لا يفهمه المحرك.<br>
+        6. دعم للسنوات والأشهر والأيام عند النطق بها.<br>
+        7. يجب أن يتوفر لديك ميكروفون وأنترنت مستقر.<br><br>
+        ® جميع الحقوق محفوظة™
     </p>
-    <button onclick="helpModal.style.display='none'" 
-        style="margin-top:15px;padding:8px 16px;border:none;border-radius:8px;background-color:#4CAF50;color:white;cursor:pointer;">
+    <button id="helpCloseBtn" style="
+        margin-top:15px;padding:8px 16px;border:none;border-radius:8px;
+        background-color:#4CAF50;color:white;cursor:pointer;">
         إغلاق
     </button>
 </div>
+
+<script>
+// بعد تحميل الصفحة
+document.addEventListener('DOMContentLoaded', () => {
+    const helpBtn = document.getElementById('helpBtn');
+    const helpModal = document.getElementById('helpModal');
+    const helpCloseBtn = document.getElementById('helpCloseBtn');
+
+    // فتح النافذة
+    helpBtn.addEventListener('click', () => {
+        helpModal.style.display = 'block';
+    });
+
+    // إغلاق النافذة
+    helpCloseBtn.addEventListener('click', () => {
+        helpModal.style.display = 'none';
+    });
+});
+</script>
+
 
 <script>
 // === دوال Firebase + تسجيل دخول ===
