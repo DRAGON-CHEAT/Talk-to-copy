@@ -28,7 +28,9 @@ textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px
 #userCountContainer{top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:13px;opacity:0.8;justify-content:space-between}
 #userCount{color:#0f0}
 #logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}
-footer{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
+footer{margin-top:-33px;font-size:14px;color:#b17215;text-align:center}
+@keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
+footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
 .container.recording{animation:rgbGlow 10s infinite linear}
 .ltr-num {
@@ -186,6 +188,9 @@ footer{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 <button id="signupBtn">اشترك</button>
 <p id="loginWarning" style="color:orange; display:none; margin-top:5px; font-size:14px;"></p>
 <p id="error" style="color:red; display:none;">!! خطأ في اسم المستخدم أو كلمة المرور</p>
+<footer>
+  &copy; DEV:DRAGON&CHEAT 2025 
+</footer>
 
 <br><br><a href="https://wa.me/9647731200180" target="_blank" 
    style="
@@ -207,9 +212,7 @@ footer{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 >
    ✆ واتساب
 </a>
-<footer>
-  &copy; DEV:DRAGON&CHEAT 2025 
-</footer>
+
 
 </div>
 
@@ -835,7 +838,7 @@ function logout() {
 </div>
 
 <div id="historyContainer" style="
-    width:100%; min-height:110px; max-height:120px;
+    width:100%; min-height:120px; max-height:120px;
     border:1px solid #555; border-radius:6px;
     background:#1a1a1a; margin-top:11px;
     display:flex; flex-direction:column; gap:6px;
@@ -874,9 +877,9 @@ function logout() {
 </div>
 
 <br>
-<footer>
+<footer2>
   &copy; DRAGON&CHEAT 2025 
-</footer>
+</footer2>
 
 <div id="helpModal" style="
     display: none;
