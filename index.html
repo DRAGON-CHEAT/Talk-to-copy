@@ -94,7 +94,7 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 /* === القائمة الجانبية المصغرة والمنسقة === */
 #sideMenu {
     position: absolute;
-    top: 17px;
+    top: 11px;
     left: 17px;
     width: 111px; /* جعلها أقل عرضًا */
     background-color: #0a0909;
@@ -103,7 +103,7 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
     padding: 12px 8px 12px 12px; /* تقليل البادينج من اليمين */
     display: none;
     flex-direction: column;
-    gap: 10px;
+    gap: 7px;
     z-index: 1000;
     box-shadow: 3px 3px 12px rgba(0,0,0,0.5);
     transition: transform 0.3s ease, opacity 0.3s ease;
@@ -784,13 +784,13 @@ function logout() {
     <button id="backBtn">رجوع</button>
     <button class="menuItem" onclick="logout()">تسجيل خروج</button>
     <button class="menuItem" onclick="helpModal.style.display='block'">التعليمات</button>
-<button class="menuItem" onclick="supportModal.style.display='block'">تواصل</button> 
+<button class="menuItem" onclick="window.open('https://wa.me/9647731200180', '_blank')">تواصل</button>
 </div>
  
 </div>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
 <button id="startBtn" onclick="startRecognition()">[▶︎] أبدء الكلام</button>
-<label style="display:inline-flex;/*margin-right:10px;*/ cursor:pointer; user-select:none; flex-direction:column; top:-2%">
+<label style="font-size:15px;display:inline-flex;/*margin-right:10px;*/ cursor:pointer; user-select:none; flex-direction:column; top:-2%">
   <input type="checkbox" id="autoRestartCheckbox">  مستمر
   <span id="autoRestartTooltip" style="
         visibility:hidden;
