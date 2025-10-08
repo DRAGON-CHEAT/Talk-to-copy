@@ -28,7 +28,7 @@ textarea{width:96%;margin-top:15px;padding:12px;font-size:16px;border-radius:6px
 #userCountContainer{top:-22px;left:15px;right:15px;display:flex;align-items:center;font-size:13px;opacity:0.8;justify-content:space-between}
 #userCount{color:#0f0}
 #logoutBtn{font-size:12px;padding:4px 8px;border-radius:6px;border:none;background-color:#f44336;color:white;cursor:pointer;opacity:0.9}
-footer{margin-top:-33px;font-size:14px;color:#b17215;text-align:center}
+footer{margin-top:33px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
 footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 @keyframes rgbGlow{0%{box-shadow:0 0 40px 15px rgba(255,0,0,0.25)}20%{box-shadow:0 0 40px 15px rgba(255,165,0,0.25)}40%{box-shadow:0 0 40px 15px rgba(0,255,0,0.25)}60%{box-shadow:0 0 40px 15px rgba(0,255,255,0.25)}80%{box-shadow:0 0 40px 15px rgba(0,0,255,0.25)}100%{box-shadow:0 0 40px 15px rgba(255,0,255,0.25)}}
@@ -192,10 +192,9 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
   &copy; DEV:DRAGON&CHEAT 2025 
 </footer>
 
-<br><br><a href="https://wa.me/9647731200180" target="_blank" 
+<br><a href="https://wa.me/9647731200180" target="_blank" 
    style="
       position: fixed;
-      bottom: 20px;
       left: 10px;
       background-color: rgba(37, 211, 102, 12%); /* أخضر شفاف */
       color: white;
@@ -203,6 +202,7 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
       border-radius: 50px;
       font-size: 11px; /* أصغر */
       text-decoration: none;
+      top:8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
       z-index: 9999;
       transition: transform 0.2s, opacity 0.2s; /* تأثير عند المرور */
@@ -784,12 +784,13 @@ function logout() {
     <button id="backBtn">رجوع</button>
     <button class="menuItem" onclick="logout()">تسجيل خروج</button>
     <button class="menuItem" onclick="helpModal.style.display='block'">التعليمات</button>
+<button class="menuItem" onclick="supportModal.style.display='block'">تواصل</button> 
 </div>
  
 </div>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
 <button id="startBtn" onclick="startRecognition()">[▶︎] أبدء الكلام</button>
-<label style="display:inline-flex;/*margin-right:10px;*/ cursor:pointer; user-select:none; position:relative; flex-direction:column; top:-2%">
+<label style="display:inline-flex;/*margin-right:10px;*/ cursor:pointer; user-select:none; flex-direction:column; top:-2%">
   <input type="checkbox" id="autoRestartCheckbox">  مستمر
   <span id="autoRestartTooltip" style="
         visibility:hidden;
