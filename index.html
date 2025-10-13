@@ -91,32 +91,58 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
     cursor: pointer;
     z-index: 1000;
 }
-/* === القائمة الجانبية المصغرة والمنسقة === */
+/* القائمة الأفقية داخل #app */
 #sideMenu {
-    position: absolute;
-    top: 11px;
-    left: 17px;
-    width: 111px; /* جعلها أقل عرضًا */
+    position: absolute;       /* بالنسبة للـ container #app */
+    top: 7px;                /* مسافة من الأعلى داخل #app */
+    left: 0;
+    right: 5px;
+    max-width: 90%;          /* لا تتعدى عرض #app */
     background-color: #0a0909;
     border: 1px solid #444;
     border-radius: 8px;
-    padding: 12px 8px 12px 12px; /* تقليل البادينج من اليمين */
+    padding: 10px;
     display: none;
-    flex-direction: column;
-    gap: 7px;
+    flex-direction: row;      /* أفقية */
+    flex-wrap: wrap;          /* الالتفاف إذا زاد العدد */
+    gap: 8px;
     z-index: 1000;
-    box-shadow: 3px 3px 12px rgba(0,0,0,0.5);
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    transform: translateX(-220px);
-    opacity: 0;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+    overflow: hidden;         /* منع تجاوز الحدود */
 }
 
 /* ظهور القائمة */
 #sideMenu.show {
     display: flex;
-    transform: translateX(0);
-    opacity: 1;
 }
+
+/* أزرار القائمة */
+#sideMenu .menuItem {
+    flex: 0 0 auto;           /* حجم ثابت حسب المحتوى */
+    padding: 8px 12px;
+    border-radius: 6px;
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+#sideMenu .menuItem:hover {
+    background-color: #444;
+    transform: translateY(-2px);
+}
+
+/* زر تسجيل الخروج أحمر فقط */
+#sideMenu .menuItem[onclick*="logout()"] {
+    background-color: #f44336; /* أحمر */
+    color: #fff;
+}
+
+#sideMenu .menuItem[onclick*="logout()"]:hover {
+    background-color: #d32f2f; /* أحمر أغمق */
+}
+
 
 #togglePassword {
   user-select: none;   /* منع التحديد */
@@ -781,10 +807,12 @@ function logout() {
 
 <!-- القائمة الجانبية -->
 <div id="sideMenu">
-    <button id="backBtn">رجوع</button>
     <button class="menuItem" onclick="logout()">تسجيل خروج</button>
     <button class="menuItem" id="helpBtn">التعليمات</button>
 <button class="menuItem" onclick="window.open('https://wa.me/9647731200180', '_blank')">تواصل</button>
+<button class="agreement-btn-small" onclick="document.getElementById('userAgreementModal').style.display='block'">
+  بنود اتفاقية
+</button>
 </div>
  
 </div>
@@ -974,6 +1002,118 @@ function logout() {
         إغلاق
     </button>
 </div>
+
+
+
+
+
+<!-- CSS للزر المصغر -->
+<style>
+.agreement-btn-small {
+  background-color: #4CAF50; /* لون الزر */
+  color: white; /* لون النص */
+  padding: 6px 12px; /* حجم صغير */
+  font-size: 12px; /* خط أصغر */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.agreement-btn-small:hover {
+  background-color: #45a049; /* تأثير عند التمرير */
+}
+</style>
+
+<!-- نافذة اتفاقية المستخدم -->
+<div id="userAgreementModal" style="
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 500px;
+    background-color: #111;
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+    text-align: right;
+    z-index: 10000;
+    max-height: 70vh;
+    overflow-y: auto;
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+">
+
+<h2 style="text-align:center;">اتفاقية المستخدم لخدمة Dragon&Cheat – مساعد الصوتي الذكي</h2>
+
+<p><strong>تاريخ النفاذ:</strong> [أدخل التاريخ]</p>
+<p>يرجى قراءة هذه الاتفاقية بعناية قبل استخدام تطبيق <strong>Dragon&Cheat – مساعد الصوتي الذكي</strong> ("الخدمة") المقدم من [اسمك أو شركتك]. باستخدامك للخدمة، فإنك توافق على الالتزام بالشروط التالية:</p>
+
+<h3>1. تعريفات</h3>
+<p><strong>الخدمة:</strong> تطبيق Dragon&Cheat الذي يتيح للمستخدمين تحويل الكلام الصوتي إلى نصوص تفاعلية، مساعدة الموظفين على إنجاز أعمالهم بسرعة وكفاءة، ودعم ذوي الاحتياجات الخاصة.</p>
+<p><strong>المستخدم:</strong> أي شخص يستخدم الخدمة لأي غرض، سواء كان تسجيل حساب أو استخدام الخدمة بدون حساب.</p>
+<p><strong>البيانات الصوتية:</strong> التسجيلات الصوتية التي يقوم المستخدم بإدخالها وتحويلها إلى نصوص.</p>
+
+<h3>2. أهداف الخدمة</h3>
+<p>1. تحويل الكلام إلى نصوص تفاعلية قابلة للتحرير والاستخدام الشخصي أو المهني.</p>
+<p>2. تمكين الموظفين والمستخدمين من إنجاز أعمالهم بسرعة وكفاءة أكبر.</p>
+<p>3. دعم <strong>ذوي الاحتياجات الخاصة</strong> لتسهيل الوصول للخدمات الرقمية وتحسين تجربة الاستخدام.</p>
+<p>4. تقديم دعم إرشادي للمستخدم في حال تعرضه لإصابة أو وعكة صحية، مع التنويه أن الخدمة لا تغني عن الاستشارة الطبية.</p>
+
+<h3>3. شروط الاستخدام</h3>
+<p>1. يحق للمستخدم استخدام الخدمة للأغراض الشخصية أو المهنية وفقاً لهذه الاتفاقية.</p>
+<p>2. يجب على المستخدم عدم استخدام الخدمة لأي نشاط غير قانوني أو ينتهك حقوق الآخرين.</p>
+<p>3. لا يجوز نسخ أو إعادة بيع الخدمة أو دمجها في منتجات أخرى بدون إذن كتابي من مزود الخدمة.</p>
+<p>4. يجب على المستخدم استخدام الخدمة بطريقة آمنة وعدم تحميل التطبيق على أجهزة غير موثوقة.</p>
+
+<h3>4. حقوق الملكية الفكرية</h3>
+<p>- جميع حقوق الملكية الفكرية المتعلقة بالخدمة، بما في ذلك البرنامج، واجهة المستخدم، التصميم، البيانات، والشعارات، هي ملك لـ <strong>Dragon&Cheat</strong> ومحميّة بموجب قوانين حقوق النشر.</p>
+<p>- النصوص الناتجة عن تحويل الكلام مملوكة للمستخدم، مع مراعاة الشروط وسياسة الخصوصية.</p>
+<p>- لا يجوز للمستخدم استخدام العلامة التجارية أو الشعارات الخاصة بالتطبيق لأي غرض تجاري دون إذن خطي من المطور.</p>
+
+<h3>5. الخصوصية وحماية البيانات</h3>
+<p>- جميع التسجيلات الصوتية والنصوص الناتجة قد تُخزن مؤقتًا لتحسين جودة الخدمة.</p>
+<p>- لن يتم مشاركة بيانات المستخدم مع أطراف ثالثة إلا وفق سياسة الخصوصية أو لأغراض قانونية.</p>
+<p>- يحق للمستخدم طلب حذف بياناته الشخصية من النظام وفق القوانين المعمول بها.</p>
+
+<h3>6. الصحة والسلامة</h3>
+<p>- الخدمة تقدم دعمًا إرشاديًا للمستخدمين في حال تعرضهم لإصابة أو وعكة صحية أثناء استخدام التطبيق، لكنها لا تعتبر بديلاً عن الاستشارة الطبية المتخصصة.</p>
+<p>- ينصح المستخدم بالحرص على بيئة آمنة أثناء استخدام الخدمة لتجنب أي مخاطر صحية أو إصابات.</p>
+
+<h3>7. المسؤولية</h3>
+<p>- الخدمة مقدمة "كما هي" دون أي ضمانات صريحة أو ضمنية.</p>
+<p>- <strong>Dragon&Cheat</strong> غير مسؤول عن أي خسائر أو أضرار تنشأ عن استخدام الخدمة، بما في ذلك أخطاء تحويل الكلام إلى نصوص أو أي مشاكل ناتجة عن استخدام التطبيق بشكل خاطئ.</p>
+<p>- مسؤولية مطور التطبيق لا تشمل المشكلات الصحية أو الطارئة، ويقتصر دوره على تقديم الدعم الإرشادي فقط.</p>
+
+<h3>8. التعديلات</h3>
+<p>- يحق لمزود الخدمة تعديل هذه الاتفاقية في أي وقت، وسيتم إعلام المستخدمين بأي تغييرات جوهرية.</p>
+<p>- استمرار استخدام الخدمة بعد التعديل يعني قبول المستخدم بالشروط الجديدة.</p>
+
+<h3>9. إنهاء الخدمة</h3>
+<p>- يمكن لمزود الخدمة تعليق أو إنهاء حساب أي مستخدم يخالف هذه الاتفاقية أو يسيء استخدام الخدمة.</p>
+
+<h3>10. القانون المطبق والاختصاص القضائي</h3>
+<p>- تخضع هذه الاتفاقية لقوانين [الدولة]، وأي نزاع ينشأ يتم البت فيه أمام محاكم [المدينة/الدولة].</p>
+
+<!-- زر إغلاق -->
+<button onclick="document.getElementById('userAgreementModal').style.display='none'" style="
+    background-color:#f44336;
+    color:#fff;
+    border:none;
+    padding:6px 12px;
+    font-size:12px;
+    border-radius:5px;
+    cursor:pointer;
+    margin-top:10px;
+">إغلاق</button>
+
+</div>
+
+
+
 
 <script>
 // بعد تحميل الصفحة
