@@ -119,7 +119,7 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 /* أزرار القائمة */
 #sideMenu .menuItem {
     flex: 0 0 auto;           /* حجم ثابت حسب المحتوى */
-    padding: 8px 12px;
+    padding: 4px 6px;
     border-radius: 6px;
     background-color: #222;
     color: #fff;
@@ -170,14 +170,14 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 
 /* أزرار القائمة الأخرى */
 #sideMenu .menuItem {
-    padding: 8px 10px; /* تقليل البادينج قليلاً */
+    padding: 4px 6px; /* تقليل البادينج قليلاً */
     border-radius: 6px;
     border: none;
     cursor: pointer;
     background-color: #222;
     color: #fff;
     text-align: center;
-    font-size: 14px;
+    font-size: 12px;
     transition: background 0.2s ease, transform 0.2s ease;
 }
 #sideMenu .menuItem:hover {
@@ -1018,10 +1018,13 @@ function logout() {
   border-radius: 5px;
   cursor: pointer;
   transition: 0.3s;
+  transform 0.2s ease;
+  
 }
 
 .agreement-btn-small:hover {
-  background-color: #45a049; /* تأثير عند التمرير */
+  background-color: #45a049;
+  transform: translateX(-2px);
 }
 </style>
 
@@ -1103,7 +1106,7 @@ function logout() {
     background-color:#f44336;
     color:#fff;
     border:none;
-    padding:6px 12px;
+    padding:4px 6px;
     font-size:12px;
     border-radius:5px;
     cursor:pointer;
