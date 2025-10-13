@@ -1203,6 +1203,30 @@ function applySmartWords(text) {
   return resultWords.join(" ").trim();
 }  
       
+// === إدراج علامات الترقيم من الكلام المنطوق ===
+function applyPunctuation(text) {
+  const punctuationMap = {
+    "اظف نقطه": ".",
+    "اظف فاصله": "،",
+    "اظف فارزه": "،",
+    "استفهام": "؟",
+    "علامه تعجب": "!",
+    "فاصله منقوطه": "؛",
+    "اظف قوسين": "{}",
+    "اقتباس": "\"",
+    "اظف شرطه": "-",
+    "اظف نقطتين": ":"
+  };
+
+  for (const word in punctuationMap) {
+    const symbol = punctuationMap[word];
+    const regex = new RegExp("\\b" + word + "\\b", "g");
+    text = text.replace(regex, symbol);
+  }
+
+  return text;
+}      
+      
 function extractDateFromText(text){
   const regex=/(\d{4})[\/\\](\d{1,2})[\/\\](\d{1,2})/;
   const match=text.match(regex);
@@ -1251,7 +1275,7 @@ function limitNumberRepeats(text) {
     try {
       const transcript = event.results[0][0].transcript || "";
 
-      let preApplied = applySmartWords(transcript);
+      let preApplied = applyPunctuation(applySmartWords(transcript));
       let converted = wordsToNumbersInText(preApplied || "");
       converted = applySmartWords(converted);
 
@@ -1507,7 +1531,7 @@ smartBtn.addEventListener("click", (e) => {
 window.addEventListener("click", (e) => {
   if(menuOpen && !smartMenu.contains(e.target) && e.target !== smartBtn) {
     smartMenu.style.display = "none";
-    smartBtn.innerText = "ادراج تصحيح";
+    smartBtn.innerText = "تصحيح";
     menuOpen = false;
   }
 });
