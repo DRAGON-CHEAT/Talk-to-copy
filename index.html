@@ -231,7 +231,7 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 
   
   <button id="submitSignup">إرسال طلب</button>
-  <button id="cancelSignup">إلغاء</button>
+  <button id="cancelSignup">رجوع</button>
 <p id="signupWarning" style="color:orange; display:none; margin-top:5px; font-size:14px;"></p>
   <!-- رسالة حالة -->
   <p id="signupMsg" style="color:green; display:none;"></p>
@@ -472,7 +472,7 @@ loginBtn.addEventListener("click", () => {
 
     if (!username || !password) {
         loginWarning.style.display = "block";
-        loginWarning.innerText = "⚠ يرجى ملء اسم المستخدم وكلمة المرور";
+        loginWarning.innerText = "⚠ يرجى ملئ اسم المستخدم المسجل به مسبقا" ";
         setTimeout(() => { loginWarning.style.display = "none"; }, 3000);
         return;
     } else {
