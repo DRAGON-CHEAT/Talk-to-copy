@@ -172,7 +172,7 @@
     <div class="slide">
       <h2>قبول الشروط</h2>
       <p>باستمرارك في استخدام التطبيق، فإنك توافق على جميع البنود المذكورة في هذه الاتفاقية.</p>
-      <button class="accept-btn" onclick="window.location.href='https://dragon-cheat.github.io/Talk-to-copy/'">أوافق وأتابع</button>
+      <button class="accept-btn" onclick="window.location.href='https://dragon-cheat.github.io/Talk-to-copy/next/'">أوافق وأتابع</button>
     </div>
 
     <div class="buttons">
@@ -185,7 +185,7 @@
   // تحقق إذا كان المستخدم قد وافق سابقًا
   if (localStorage.getItem('privacyAccepted') === 'true') {
     // تحويله مباشرة إلى رابط تسجيل الدخول
-    window.location.href = 'https://dragon-cheat.github.io/Talk-to-copy/';
+    window.location.href = 'https://dragon-cheat.github.io/Talk-to-copy/next/';
   }
 
   const slides = document.querySelectorAll('.slide');
@@ -231,7 +231,7 @@
   const acceptBtn = document.querySelector('.accept-btn');
   acceptBtn.addEventListener('click', () => {
     localStorage.setItem('privacyAccepted', 'true'); // حفظ الموافقة
-    window.location.href = 'https://dragon-cheat.github.io/Talk-to-copy/'; // تحويل المستخدم
+    window.location.href = 'https://dragon-cheat.github.io/Talk-to-copy/next/'; // تحويل المستخدم
   });
 
   showSlide(index);
