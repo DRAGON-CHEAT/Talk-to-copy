@@ -813,6 +813,24 @@ function logout() {
 <button class="agreement-btn-small" onclick="document.getElementById('userAgreementModal').style.display='block'">
   بنود اتفاقية
 </button>
+
+<div style="margin:10px 0; text-align:center;">
+  <label for="languageSelect" style="font-weight:bold;"></label>
+  <select id="languageSelect" style="
+      width: 55px;      /* عرض مناسب للنص */
+      height: 30px;      /* ارتفاع مناسب للنص */
+      padding: 2px 5px;  /* padding صغير لتظهر النصوص */
+      border-radius:6px;
+      font-size: 12px;   /* خط صغير لكن قابل للقراءة */
+      text-align: left;
+  ">
+    <option value="ar-IQ" selected>(Iq-الغة)</option>
+    <option value="ckb-IQ">(Ckb-الغة)</option>
+    <option value="ar-SA">(Sa-الغة)</option>
+    <option value="en-US">(En-الغة)</option>
+  </select>
+</div>
+  
 </div>
  
 </div>
@@ -1406,7 +1424,7 @@ function startRecognition(){
   }
 
   recognition = new SpeechRecognition();
-  recognition.lang = 'ar-IQ';
+  recognition.lang = document.getElementById("languageSelect").value;
   recognition.interimResults = false;
 
   recognition.onstart = function(){
