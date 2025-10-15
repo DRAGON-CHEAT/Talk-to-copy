@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Convert audio</title>
+<title>Smart voice assistant </title>
 <style>
 /* === التنسيقات الأصلية مع تعديل زر الكلمات الذكية === */
 body{ overflow: hidden; margin:0;padding:0;background-color:#000;color:#fff;/*font-family:Tahoma,sans-serif*/;display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column}
@@ -817,10 +817,10 @@ function logout() {
 </div>
  
 </div>
-<h1> [ Convert Audio To Text In Iraqi ]</h1><br>
+<h1> [ Smart Soice Ssistant Everywhere ]</h1><br>
   <!-- زر البدء -->
 <!-- حاوية الصف -->
-<div style="display:flex; justify-content:space-between; align-items:center; width:90%; max-width:400px; margin:0 auto;">
+<div style="display:flex; justify-content:space-evenly; align-items:center; width:73%; max-width:400px; margin:0 auto;">
 
   <!-- خيار مستمر على اليسار -->
   <label style="font-size:15px; display:flex; flex-direction:column; align-items:center; cursor:pointer; user-select:none;">
@@ -867,17 +867,19 @@ function logout() {
   <select id="languageSelect" style="
       min-width:40px; 
       max-width:57px; 
-      height: 42px;
+      height: 33px;
       padding: 2px 5px;
-      border-radius:6px;
+      border-radius:16px;
       font-size: 12px;
       text-align:left;
       white-space:nowrap;
+      background-color: #181717d4;
+      color: #26bb3fa8;
   ">
-    <option value="ar-IQ" selected>(IQ-العراق/الغة)</option>
-    <option value="ckb-IQ">(Ckb-الكردية/الغة)</option>
-    <option value="ar-SA">(SA-السعودية/الغة)</option>
-    <option value="en-US">(EN-الأنكليزية/الغة)</option>
+    <option value="ar-IQ" selected>(IQ-العراق)</option>
+    <option value="ckb-IQ">(Ckb-الكردية)</option>
+    <option value="ar-SA">(SA-السعودية)</option>
+    <option value="en-US">(EN-الأنكليزية)</option>
   </select>
 
 </div>
@@ -887,8 +889,7 @@ function logout() {
   <span id="recordingDot"></span> ▶︎ جاري التحويل...
 
 </div>
-
-
+<br>
 <div id="output">
   <div id="outputText"></div>
   <button id="smartWordsBtn">تصحيح</button>
