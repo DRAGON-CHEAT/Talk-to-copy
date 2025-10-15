@@ -819,33 +819,12 @@ function logout() {
 </div>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
   <!-- زر البدء -->
-  <button id="startBtn" onclick="startRecognition()">[▶︎] أبدء الكلام</button>
- <div style="margin:10px 0; text-align:center;">
-    <label for="languageSelect" style="font-weight:bold;"></label>
-    <select id="languageSelect" style="
-        width: 55px;
-        height: 30px;
-        padding: 2px 5px;
-        border-radius:6px;
-        font-size: 12px;
-        text-align: left;
-    ">
-      <option value="ar-IQ" selected>(Iq-الغة)</option>
-      <option value="ckb-IQ">(Ckb-الغة)</option>
-      <option value="ar-SA">(Sa-الغة)</option>
-      <option value="en-US">(En-الغة)</option>
-    </select>
-  <!-- زر الإيقاف بنفس المكان -->
-  <button id="stopBtn" onclick="stopRecognition()" 
-          style="display:none; position: absolute; top: 0; left: 0;">[X] إيقاف الكلام</button>
+<!-- حاوية الصف -->
+<div style="display:flex; justify-content:space-between; align-items:center; width:90%; max-width:400px; margin:0 auto;">
 
-  <!-- اختيار اللغة -->
- 
- 
-
-  <!-- خيار مستمر -->
-  <label style="font-size:15px;display:inline-flex; cursor:pointer; user-select:none; flex-direction:column; top:-2%">
-    <input type="checkbox" id="autoRestartCheckbox">  مستمر
+  <!-- خيار مستمر على اليسار -->
+  <label style="font-size:15px; display:flex; flex-direction:column; align-items:center; cursor:pointer; user-select:none;">
+    <input type="checkbox" id="autoRestartCheckbox"> مستمر
     <span id="autoRestartTooltip" style="
           visibility:hidden;
           background-color:#333;
@@ -857,18 +836,39 @@ function logout() {
           z-index:100;
           font-size:12px;
           top:-30px;
-          right:0;
           opacity:0;
           transition: opacity 0.3s;">
       عند تفعيل هذا الخيار سيعمل التسجيل تلقائيًا بدون توقف
     </span>
   </label>
 
+  <!-- زر البدء والإيقاف في المنتصف -->
+  <div style="position:relative; width:120px; text-align:center;">
+    <button id="startBtn" onclick="startRecognition()" style="width:100%;">[▶︎] أبدء الكلام</button>
+    <button id="stopBtn" onclick="stopRecognition()" style="width:100%; display:none;">[X] إيقاف الكلام</button>
+  </div>
+
+  <!-- اختيار اللغة على اليمين -->
+  <select id="languageSelect" style="
+      width: 80px;
+      height: 30px;
+      padding: 2px 5px;
+      border-radius:6px;
+      font-size: 12px;
+      text-align:left;
+  ">
+    <option value="ar-IQ" selected>(Iq-الغة)</option>
+    <option value="ckb-IQ">(Ckb-الغة)</option>
+    <option value="ar-SA">(Sa-الغة)</option>
+    <option value="en-US">(En-الغة)</option>
+  </select>
+
 </div>
 
-<!-- مؤشر التسجيل -->
-<div id="recordingIndicator">
+<!-- مؤشر التسجيل أسفل الصف -->
+<div id="recordingIndicator" style="text-align:center; margin-top:10px;">
   <span id="recordingDot"></span> ▶︎ جاري التحويل...
+
 </div>
 
 
