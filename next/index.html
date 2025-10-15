@@ -843,9 +843,20 @@ function logout() {
   </label>
 
   <!-- زر البدء والإيقاف في المنتصف -->
-  <div style="position:relative; width:120px; text-align:center;">
-    <button id="startBtn" onclick="startRecognition()" style="width:100%;">[▶︎] أبدء الكلام</button>
-    <button id="stopBtn" onclick="stopRecognition()" style="width:100%; display:none;">[X] إيقاف الكلام</button>
+<div style="position:relative; text-align:center; min-width:100px; flex-shrink:0;">
+    <button id="startBtn" onclick="startRecognition()" style="
+        width:120px; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    ">[▶︎] أبدء الكلام</button>
+    <button id="stopBtn" onclick="stopRecognition()" style="
+        width:120px; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display:none;
+    ">[X] إيقاف الكلام</button>
   </div>
 
   <!-- اختيار اللغة على اليمين -->
