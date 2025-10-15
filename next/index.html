@@ -845,33 +845,39 @@ function logout() {
   <!-- زر البدء والإيقاف في المنتصف -->
 <div style="position:relative; text-align:center; min-width:100px; flex-shrink:0;">
     <button id="startBtn" onclick="startRecognition()" style="
-        width:120px; 
+        min-width:80px;
+        max-width:140px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-size:13px;
     ">[▶︎] أبدء الكلام</button>
     <button id="stopBtn" onclick="stopRecognition()" style="
-        width:120px; 
+        min-width:80px;
+        max-width:140px; 
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         display:none;
+        font-size:13px;
     ">[X] إيقاف الكلام</button>
   </div>
 
   <!-- اختيار اللغة على اليمين -->
   <select id="languageSelect" style="
-      width: 80px;
-      height: 30px;
+      min-width:40px; 
+      max-width:57px; 
+      height: 42px;
       padding: 2px 5px;
       border-radius:6px;
       font-size: 12px;
       text-align:left;
+      white-space:nowrap;
   ">
-    <option value="ar-IQ" selected>(Iq-الغة)</option>
-    <option value="ckb-IQ">(Ckb-الغة)</option>
-    <option value="ar-SA">(Sa-الغة)</option>
-    <option value="en-US">(En-الغة)</option>
+    <option value="ar-IQ" selected>(IQ-العراق/الغة)</option>
+    <option value="ckb-IQ">(Ckb-الكردية/الغة)</option>
+    <option value="ar-SA">(SA-السعودية/الغة)</option>
+    <option value="en-US">(EN-الأنكليزية/الغة)</option>
   </select>
 
 </div>
