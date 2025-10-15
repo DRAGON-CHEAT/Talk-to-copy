@@ -818,18 +818,9 @@ function logout() {
  
 </div>
 <h1> [ Convert Audio To Text In Iraqi ]</h1><br>
-<!-- حاوية الزر مع اختيار اللغة والخيارات -->
-<div style="position: relative; width: 200px; margin: 0 auto; text-align: center;">
-
   <!-- زر البدء -->
   <button id="startBtn" onclick="startRecognition()">[▶︎] أبدء الكلام</button>
-
-  <!-- زر الإيقاف بنفس المكان -->
-  <button id="stopBtn" onclick="stopRecognition()" 
-          style="display:none; position: absolute; top: 0; left: 0;">[X] إيقاف الكلام</button>
-
-  <!-- اختيار اللغة -->
-  <div style="margin:10px 0; text-align:center;">
+ <div style="margin:10px 0; text-align:center;">
     <label for="languageSelect" style="font-weight:bold;"></label>
     <select id="languageSelect" style="
         width: 55px;
@@ -844,7 +835,13 @@ function logout() {
       <option value="ar-SA">(Sa-الغة)</option>
       <option value="en-US">(En-الغة)</option>
     </select>
-  </div>
+  <!-- زر الإيقاف بنفس المكان -->
+  <button id="stopBtn" onclick="stopRecognition()" 
+          style="display:none; position: absolute; top: 0; left: 0;">[X] إيقاف الكلام</button>
+
+  <!-- اختيار اللغة -->
+ 
+ 
 
   <!-- خيار مستمر -->
   <label style="font-size:15px;display:inline-flex; cursor:pointer; user-select:none; flex-direction:column; top:-2%">
