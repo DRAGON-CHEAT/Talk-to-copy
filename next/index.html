@@ -13,7 +13,8 @@ body{ overflow: hidden; margin:0;padding:0;background-color:#000;color:#fff;/*fo
 .login-container label{font-size:14px;display:inline-block;align-items:center;justify-content:center;gap:1px;margin-top:10px;cursor:pointer;width:-55℅;text-align:center;position:relative;top:11px}
 .login-container button{/*padding:12px 24px;*/font-size:18px;/*margin-top:15px;*/border:none;border-radius:8px;background-color:#6aab30d9;color:white;cursor:pointer;transition:0.3s}
 .login-container button:hover{opacity:0.85}
-.container{top:-34px;background-color:#111;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:82%;max-width:600px;transition:all 0.3s ease;display:none;position:relative}
+.container{top:-34px;background-color:#111;padding:25px;border-radius:12px;box-shadow:0 0 20px rgba(255,255,255,0.1);text-align:center;width:82%;max-width:600px;transition:all 0.3s ease;display:none;position:relative; overflow-y: auto
+}
 h1{font-family:bodoni,cursive; color:rgba(196, 144, 217, 0.70); margin-bottom:0px;font-size:17px;transition:font-size 0.3s ease}
 button{padding:12px 24px;font-size:18px;margin:0px 0px;border:none;border-radius:8px;cursor:pointer;transition:0.3s,font-size 0.3s ease,padding 0.3s ease}
 #startBtn{background-color:#4CAF50;color:white}
@@ -189,28 +190,38 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 @media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
 @media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
 
- #helpModal::-webkit-scrollbar {
+ #helpModal::-webkit-scrollbar,
+ #userAgreementModal::-webkit-scrollbar,
+ .container::-webkit-scrollbar {
   width: 4px;
   background: transparent;
 }
 
-#helpModal::-webkit-scrollbar-track {
-  background: #222222de; /* خلفية شبه شفافة */
-  border-radius: 10px;
+#helpModal::-webkit-scrollbar-track,
+#userAgreementModal::-webkit-scrollbar-track,
+.container::-webkit-scrollbar-track {
+  background: #2222222de; /* خلفية شبه شفافة */
+  border-radius: 7px;
 }
 
-#helpModal::-webkit-scrollbar-thumb {
-  background: rgba(255, 215, 0, 0.6); /* ذهبي شفاف */
-  border-radius: 10px;
+#helpModal::-webkit-scrollbar-thumb,
+#userAgreementModal::-webkit-scrollbar-thumb, 
+.container::-webkit-scrollbar-thumb {
+  background: rgba(30, 29, 29, 0.7); /* ذهبي شفاف */
+  border-radius: 7px;
   backdrop-filter: blur(4px);
   transition: background 0.3s ease, width 0.2s ease;
 }
- #helpModal::-webkit-scrollbar-thumb:hover {
+ #helpModal::-webkit-scrollbar-thumb:hover,
+ #userAgreementModal::-webkit-scrollbar-thumb:hover,
+ .container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 215, 0, 0.85); /* ذهبي أوضح عند التمرير */
   width: 8px;
 }
 /* تأثير تمرير ناعم داخل المحتوى */
-#helpModal p {
+#helpModal p,
+#userAgreementModal::-p,
+.container::-p {
   scroll-behavior: smooth;
 } 
 </style>
@@ -896,10 +907,10 @@ function logout() {
 <div id="sideMenu">
     <button class="menuItem" onclick="logout()">تسجيل خروج</button>
     <button class="menuItem" id="helpBtn">التعليمات</button>
-<button class="menuItem" onclick="window.open('https://wa.me/9647731200180', '_blank')">تواصل</button>
 <button class="agreement-btn-small" onclick="document.getElementById('userAgreementModal').style.display='block'">
   بنود اتفاقية
 </button>
+<button class="menuItem" onclick="window.open('https://wa.me/9647731200180', '_blank')">تواصل</button>
 </div>
 </div>
 <h1> [ Speak Now Everywhere ]</h1><br>
