@@ -192,7 +192,8 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 
  #helpModal::-webkit-scrollbar,
  #userAgreementModal::-webkit-scrollbar,
- .container::-webkit-scrollbar{
+ .container::-webkit-scrollbar,
+ .history::-webkit-scrollbar {
   width: 4px;
   background: transparent;
  height: 0;
@@ -200,14 +201,16 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 
 #helpModal::-webkit-scrollbar-track,
 #userAgreementModal::-webkit-scrollbar-track,
-.container::-webkit-scrollbar-track {
+.container::-webkit-scrollbar-track,
+.history::-webkit-scrollbar-track {
   background: #2222222de; /* خلفية شبه شفافة */
   border-radius: 7px;
 }
 
 #helpModal::-webkit-scrollbar-thumb,
 #userAgreementModal::-webkit-scrollbar-thumb, 
-.container::-webkit-scrollbar-thumb {
+.container::-webkit-scrollbar-thumb,
+.history::-webkit-scrollbar-thumb {
   background: rgba(30, 29, 29, 0.7); /* ذهبي شفاف */
   border-radius: 7px;
   backdrop-filter: blur(4px);
@@ -215,56 +218,17 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 }
  #helpModal::-webkit-scrollbar-thumb:hover,
  #userAgreementModal::-webkit-scrollbar-thumb:hover,
- .container::-webkit-scrollbar-thumb:hover {
+ .container::-webkit-scrollbar-thumb:hover,
+ .history::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 215, 0, 0.15); /* ذهبي أوضح عند التمرير */
   width: 8px;
 }
 /* تأثير تمرير ناعم داخل المحتوى */
 #helpModal p,
 #userAgreementModal::-p,
-.container::-p {
+.container::-p,
+.history::-p {
   scroll-behavior: smooth;
-  
-  /* العناصر الجديدة في السجل */
-.history-line {
-  opacity: 0;
-  transform: scale(0.9); /* يظهر كأنه أصغر */
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-/* عند إدراج العنصر، نجعل CSS يفعّل التأثير */
-.history-line.show {
-  opacity: 1;
-  transform: scale(1); /* يصل للحجم الطبيعي */
-}
-
-/* شريط التمرير العمودي فقط */
-#history {
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: #FFD700 #222;
-}
-
-#history::-webkit-scrollbar {
-  width: 4px;
-  height: 0; /* يمنع شريط أفقي */
-}
-
-#history::-webkit-scrollbar-track {
-  background: #2222222de;);
-  border-radius: 7px;
-}
-
-#history::-webkit-scrollbar-thumb {
-  background: rgba(30, 29, 29, 0.7);
-  border-radius: 7px;
-}
-
-#history::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 215, 0, 0.25);
-}
-
 } 
 </style>
 
@@ -1746,16 +1710,12 @@ function addToHistory(text){
   lineDiv.appendChild(delBtn);
 
   if (historyEl.firstChild) {
-  historyEl.insertBefore(lineDiv, historyEl.firstChild);
-} else {
-  historyEl.appendChild(lineDiv);
-}
+    historyEl.insertBefore(lineDiv, historyEl.firstChild); 
+  } else {
+    historyEl.appendChild(lineDiv);
+  }
 
-// تفعيل الأنيميشن فقط عبر CSS
-requestAnimationFrame(() => lineDiv.classList.add("show"));
-
-// التمرير للأعلى بعد التأثير
-setTimeout(() => { historyEl.scrollTop = 0; }, 300);
+  historyEl.scrollTop = 0;
 }
 
 function toggleSmartMenu(){smartMenu.style.display="none";}
