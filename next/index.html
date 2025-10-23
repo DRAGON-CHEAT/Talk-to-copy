@@ -189,35 +189,30 @@ footer2{margin-top:-15px;font-size:14px;color:#b17215;text-align:center}
 @media (max-width:500px){.container{padding:20px}.container h1{font-size:20px}button{font-size:16px;padding:10px 18px}#output{font-size:16px;padding:12px}textarea{font-size:14px;padding:10px}}
 @media (max-width:350px){.container{padding:15px}.container h1{font-size:18px}button{font-size:14px;padding:8px 16px}#output{font-size:14px;padding:10px}textarea{font-size:13px;padding:8px}}
 
-
-
-  
-/* أي عنصر يشبه نافذة (popup, modal, dialog) */
-[class*="modal"], [class*="popup"], [id*="Modal"], [id*="Popup"] {
-  transform: scale(0.7);
-  opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
+ #helpModal::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
 }
 
-/* عند إظهاره */
-[class*="modal"].active,
-[class*="popup"].active,
-[id*="Modal"].active,
-[id*="Popup"].active {
-  transform: scale(1);
-  opacity: 1;
+#helpModal::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05); /* خلفية شبه شفافة */
+  border-radius: 10px;
 }
 
-/* تأثير عند الإغلاق */
-[class*="modal"].closing,
-[class*="popup"].closing,
-[id*="Modal"].closing,
-[id*="Popup"].closing {
-  transform: scale(0.8);
-  opacity: 0;
+#helpModal::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.6); /* ذهبي شفاف */
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+  transition: background 0.3s ease, width 0.2s ease;
 }
-
-  
+ #helpModal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 215, 0, 0.85); /* ذهبي أوضح عند التمرير */
+  width: 8px;
+}
+/* تأثير تمرير ناعم داخل المحتوى */
+#helpModal p {
+  scroll-behavior: smooth;
+} 
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -1855,36 +1850,6 @@ function renderSmartWords() {
     list.appendChild(div);
   }
 }
-
-
-document.querySelectorAll('[class*="modal"], [class*="popup"], [id*="Modal"], [id*="Popup"]').forEach(modal => {
-  // عند إظهار العنصر
-  const show = () => {
-    modal.classList.add('active');
-    modal.classList.remove('closing');
-    modal.style.display = 'block';
-  };
-
-  // عند الإخفاء
-  const hide = () => {
-    modal.classList.add('closing');
-    modal.classList.remove('active');
-    setTimeout(() => { modal.style.display = 'none'; }, 400);
-  };
-
-  // إن كان لديك زر إغلاق داخل النافذة
-  modal.querySelectorAll('button, .close').forEach(btn => {
-    btn.addEventListener('click', hide);
-  });
-
-  // اجعلها متاحة عالميًا
-  modal.dataset.show = "true";
-  modal.show = show;
-  modal.hide = hide;
-});
-
-
-  
 </script>
 </body>
 </html>
